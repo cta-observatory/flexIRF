@@ -51,6 +51,7 @@ void checkFitConsistency(string fitFile,
 int main(int argc, char **argv)
 {
 
+
   if(argc != 3) //Do more checking on the number of arguments below                                                                                                
     {
 
