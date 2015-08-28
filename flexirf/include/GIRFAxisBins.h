@@ -20,13 +20,15 @@ class GIRFAxisBins : public GIRFAxis
 
   virtual ~GIRFAxisBins(){};
 
+  virtual bool operator==(const GIRFAxis& otherAxis);													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
+
   virtual inline void SetAxisBins(std::vector<float> axisbins) {fAxisBins=axisbins;}
   virtual inline void SetAxis(std::vector<float> axisbins)     {SetAxisBins(axisbins);}
   virtual void SetAxis(std::vector<float>::size_type size,float* bins);
 
-  virtual inline float GetRangeMin() {return fAxisBins[0];}
-  virtual inline float GetRangeMax() {return fAxisBins[fAxisBins.size()];}
-  virtual inline int   GetSize()     {return int(fAxisBins.size());}
+  virtual inline float GetRangeMin() const {return fAxisBins[0];}
+  virtual inline float GetRangeMax() const {return fAxisBins[fAxisBins.size()];}
+  virtual inline int   GetSize()     const {return int(fAxisBins.size());}
 
   virtual int Write(fitsfile* fptr,int& iaxis,int* status);
   

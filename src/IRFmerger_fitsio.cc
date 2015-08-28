@@ -46,7 +46,7 @@ void checkFitConsistency(string fitFile,
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Main code starts here
-//
+
 
 int main(int argc, char **argv)
 {

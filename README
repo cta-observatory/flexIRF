@@ -18,7 +18,7 @@ command from the build directory to convert the root histograms in the performan
 
 Example -
 
-./bin/IRFconverter_root2FITS ../../dummy/dummyconfig.txt ../prodfiles/Performance_2Q_Aar_50h_20150217.root
+./bin/IRFconverter_root2FITS ../dummy/dummyconfig.txt ../prodfiles/Performance_2Q_Aar_50h_20150505.root
 
 Output will be
 
