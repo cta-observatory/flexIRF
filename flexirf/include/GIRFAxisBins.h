@@ -23,6 +23,8 @@ class GIRFAxisBins : public GIRFAxis
   virtual bool operator==(const GIRFAxis& otherAxis);													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
 
   virtual inline void SetAxisBins(std::vector<float> axisbins) {fAxisBins=axisbins;}
+  const inline std::vector<float>& GetAxisBins() const {return fAxisBins;}
+
   virtual inline void SetAxis(std::vector<float> axisbins)     {SetAxisBins(axisbins);}
   virtual void SetAxis(std::vector<float>::size_type size,float* bins);
 
@@ -31,6 +33,8 @@ class GIRFAxisBins : public GIRFAxis
   virtual inline int   GetSize()     const {return int(fAxisBins.size());}
 
   virtual int Write(fitsfile* fptr,int& iaxis,int* status);
+  virtual int IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* data,int* status);
+
   
  protected:
   virtual int CheckAxisConsistency(); // return 0 if axis is consistent

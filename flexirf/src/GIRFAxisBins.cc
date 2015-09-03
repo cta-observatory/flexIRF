@@ -105,8 +105,13 @@ int GIRFAxisBins::CheckAxisConsistency() {
 //
 bool GIRFAxisBins::operator==(const GIRFAxis& otherAxis) {
 
+//	vector<float> otherAxisBins = otherAxis.Get
+
 	if (otherAxis.GetAxisType() == this->GetAxisType() && otherAxis.GetVarType() == this->GetVarType()){
 		if (otherAxis.GetRangeMax() == this->GetRangeMax() && otherAxis.GetRangeMin() == this->GetRangeMin() && otherAxis.GetSize() == this->GetSize()){
+
+//			for(vector<float>::iterator axisBin = fAxisBins.begin(); axisBin!=fAxisBins.end(); ++fAxisBins)
+
 			return 1;
 		} else return 0;
 	} else return 0;
@@ -146,3 +151,26 @@ int GIRFAxisBins::Write(fitsfile* fptr, int& iaxis, int* status) {
 
 	return *status;
 }
+
+
+////////////////////////////////////////////////////////////////
+//
+// 		Search for identical axis within the fits file
+//
+int GIRFAxisBins::IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* data,int* status){
+
+//	std::vector<float>::size_type axisSize = fAxisBins.size();
+//	float* axisdata = new float[axisSize];
+//	for (std::vector<float>::size_type ibin = 0; ibin < axisSize; ibin++)
+//		axisdata[ibin] = fAxisBins[ibin];
+//
+//	// write the axis header and data
+//	WriteAxis(fptr, iaxis++, int(axisSize), axisdata, status);
+
+	return *status;
+}
+
+
+
+
+
