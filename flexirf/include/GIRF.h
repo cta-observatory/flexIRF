@@ -8,6 +8,7 @@
 #include "GIRFAxisBins.h"
 #include "GIRFAxisParam.h"
 #include "GIRFPdf.h"
+#include "GIRFConfig.h"
 
 class GIRF 
 {
@@ -22,6 +23,8 @@ class GIRF
   inline int AddPdf(GIRFPdf* pdf)     {fPdfList.push_back(pdf);   return int(fPdfList.size())-1;}  // insert pdf in the list and return its id
 
   int Write(std::string filename);
+  GIRFPdf GetPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config);
+
 };
 
 #endif
