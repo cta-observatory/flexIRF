@@ -108,7 +108,6 @@ bool GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
 	int i=0;
 	if (otherAxis.GetAxisType() == this->GetAxisType() && otherAxis.GetVarType() == this->GetVarType()){
 		if (otherAxis.GetRangeMax() == this->GetRangeMax() && otherAxis.GetRangeMin() == this->GetRangeMin() && otherAxis.GetSize() == this->GetSize()){
-			cout << "Hasta aqui sí" << endl;
 			vector<float> otherAxisBins = otherAxis.GetAxisBins();
 			if (otherAxisBins==otherAxisBins) return 1;
 			else return 0;
