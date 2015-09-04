@@ -25,8 +25,7 @@ using namespace std;
 // 
 // Construct empty axis object
 //
-GIRFAxisBins::GIRFAxisBins() :
-		GIRFAxis() {
+GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fIsLog(0), fAxisBinsFilled(0){
 }
 
 ////////////////////////////////////////////////////////////////
@@ -34,7 +33,7 @@ GIRFAxisBins::GIRFAxisBins() :
 // Construct axis object with predefined size
 //
 GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, bool islog) :
-		fIsLog(islog) {
+		fIsLog(islog), fAxisBinsFilled(0) {
 	fAxisBins.reserve(size);
 }
 
@@ -43,7 +42,7 @@ GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, bool islog) :
 // Construct axis object with predefined data
 //
 GIRFAxisBins::GIRFAxisBins(VarType vartype, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog) {
+		GIRFAxis(vartype), fIsLog(islog), fAxisBinsFilled(0) {
 	SetAxisType(kBins);
 }
 
@@ -53,7 +52,7 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, bool islog) :
 //
 GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 		bool islog) :
-		GIRFAxis(vartype), fIsLog(islog) {
+		GIRFAxis(vartype), fIsLog(islog), fAxisBinsFilled(0) {
 	SetAxisType(kBins);
 	fAxisBins.reserve(size);
 }
@@ -103,20 +102,19 @@ int GIRFAxisBins::CheckAxisConsistency() {
 //
 // Check if both axis are identical
 //
-bool GIRFAxisBins::operator==(const GIRFAxis& otherAxis) {
+bool GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
 
 //	vector<float> otherAxisBins = otherAxis.Get
-
+	int i=0;
 	if (otherAxis.GetAxisType() == this->GetAxisType() && otherAxis.GetVarType() == this->GetVarType()){
 		if (otherAxis.GetRangeMax() == this->GetRangeMax() && otherAxis.GetRangeMin() == this->GetRangeMin() && otherAxis.GetSize() == this->GetSize()){
-
-//			for(vector<float>::iterator axisBin = fAxisBins.begin(); axisBin!=fAxisBins.end(); ++fAxisBins)
-
-			return 1;
+			cout << "Hasta aqui sí" << endl;
+			vector<float> otherAxisBins = otherAxis.GetAxisBins();
+			if (otherAxisBins==otherAxisBins) return 1;
+			else return 0;
 		} else return 0;
 	} else return 0;
-
-	return 0;
+	return 1;
 }
 
 ////////////////////////////////////////////////////////////////
