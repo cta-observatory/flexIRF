@@ -7,6 +7,12 @@
 class GIRFAxis
 {
  public: 
+
+//  enum FormatType {kNoFormatType=0,							Posible solución para escribir un axis dentro del header del "Data HDU"
+//		 kHDU,
+//		 kHeader,
+//		 kFormatMax};     // allowed axis types
+
   enum AxisType {kNoAxisType=0,
 		 kBins,
 		 kParam,
@@ -40,15 +46,21 @@ class GIRFAxis
   virtual ~GIRFAxis(){};
   
   virtual inline void SetVarType(VarType vartype) {fVarType=vartype;}
- 
-  virtual inline VarType GetVarType()             {return fVarType;}
 
-  virtual float GetRangeMin(){return 0;}
-  virtual float GetRangeMax(){return 0;}
-  virtual int   GetSize()    {return 0;}
+  virtual inline AxisType GetAxisType() const {return fAxisType;}
+  virtual inline VarType GetVarType() const {return fVarType;}
+
+  virtual float GetRangeMin() const {return 0;}
+  virtual float GetRangeMax() const {return 0;}
+  virtual int   GetSize()     const {return 0;}
+
+  virtual bool operator==(const GIRFAxis& otherAxis){return 0;}													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
   
   virtual int Write(fitsfile* fptr,int& iaxis,int* status){*status=WRITE_ERROR;return *status;}
   virtual int WriteAxis(fitsfile* fptr,int iaxis,long size,float* data,int* status);
+  virtual int IsAlreadyPresent(fitsfile* fptr,const GIRFAxis&,int* status){*status=READ_ERROR;return *status;};
+
+
 
  protected:
   virtual int CheckAxisConsistency();

@@ -44,5 +44,10 @@ set( srcsIRFconv ${PROJECT_SOURCE_DIR}/src/IRFconverter_root2FITS.cc )
 add_executable( IRFconverter_root2FITS ${srcsIRFconv} )
 target_link_libraries( IRFconverter_root2FITS flexirf ${EXTRA_LIBS} ${ROOT_LIBS} )
 
+set( srcsIRFtests ${PROJECT_SOURCE_DIR}/src/IRFsimpleTests.cc )
+add_executable( IRFsimpleTests ${srcsIRFtests} )
+target_link_libraries( IRFsimpleTests flexirf ${EXTRA_LIBS} ${ROOT_LIBS} )
+
+
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 install(TARGETS IRFgenerator_rootio IRFgenerator_rootio DESTINATION bin)

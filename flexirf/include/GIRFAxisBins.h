@@ -9,7 +9,7 @@ class GIRFAxisBins : public GIRFAxis
  private:
   std::vector<float> fAxisBins;
   bool fIsLog;                    // if true, the interpolation will be done on the log of the variable
-
+  bool fAxisBinsFilled;
  public:
   GIRFAxisBins();           // create new empty bin axis
   GIRFAxisBins(std::vector<float>::size_type size,bool islog=false);   // create new bin axis with size
@@ -20,15 +20,21 @@ class GIRFAxisBins : public GIRFAxis
 
   virtual ~GIRFAxisBins(){};
 
-  virtual inline void SetAxisBins(std::vector<float> axisbins) {fAxisBins=axisbins;}
+  virtual bool operator==(const GIRFAxisBins& otherAxis);													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
+
+  virtual inline void SetAxisBins(std::vector<float> axisbins) {fAxisBinsFilled=1; fAxisBins=axisbins;}
+  inline std::vector<float> GetAxisBins() const {return fAxisBins;}
+
   virtual inline void SetAxis(std::vector<float> axisbins)     {SetAxisBins(axisbins);}
   virtual void SetAxis(std::vector<float>::size_type size,float* bins);
 
-  virtual inline float GetRangeMin() {return fAxisBins[0];}
-  virtual inline float GetRangeMax() {return fAxisBins[fAxisBins.size()];}
-  virtual inline int   GetSize()     {return int(fAxisBins.size());}
+  virtual inline float GetRangeMin() const {if (fAxisBinsFilled) return fAxisBins[0]; else return 0;}
+  virtual inline float GetRangeMax() const {if (fAxisBinsFilled) return fAxisBins[fAxisBins.size()-1]; else return 0;}
+  virtual inline int   GetSize()     const {return int(fAxisBins.size());}
 
   virtual int Write(fitsfile* fptr,int& iaxis,int* status);
+  virtual int IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* data,int* status);
+
   
  protected:
   virtual int CheckAxisConsistency(); // return 0 if axis is consistent

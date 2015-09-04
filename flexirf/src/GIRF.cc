@@ -17,6 +17,9 @@
 
 #include "GIRF.h"
 #include "fitsio.h"
+#include "GIRFConfig.h"
+#include "GIRFPdf.h"
+
 
 using namespace std;
 
@@ -70,3 +73,19 @@ int GIRF::Write(string filename)
 
   return status;
 }
+
+GIRFPdf GIRF::GetPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config){
+
+	GIRFPdf extractedPdf;
+
+
+
+
+
+	return extractedPdf;
+
+}
+
+
+
+
