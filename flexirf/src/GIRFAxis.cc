@@ -55,7 +55,7 @@ int GIRFAxis::CheckAxisConsistency()
 //
 // Return the axis name for EXTNAME
 //
-virtual std::string GIRFAxis::GetVarName() const {
+std::string GIRFAxis::GetVarName() const {
 
 	string axisName, axisType, axisVarType;
 
@@ -84,22 +84,20 @@ virtual std::string GIRFAxis::GetVarName() const {
     	  return axisName;
       }
 
-
     switch(fAxisType)
       {
       case kBins: //Energy Resolution for E (kEnergy) v. Offset (kTheta)
-    	  axisVarType="BINS";
+    	  axisType="BINS";
 		  break;
       case kParam: //Energy Bias for E (kEnergy) v. Offset (kTheta)
-    	  axisVarType="PARAM";
+    	  axisType="PARAM";
 		  break;
       default:
         cout << "Incorrect axis type.\n";
         break;
       }
 
-    axisName=axisType+"_"+axisVarType;
-
+    axisName=axisVarType+"_"+axisType;
     return axisName;
 }
 

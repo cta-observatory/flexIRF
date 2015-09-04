@@ -26,6 +26,7 @@ using namespace std;
 // Construct empty axis object
 //
 GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fIsLog(0), fAxisBinsFilled(0){
+	SetAxisType(kBins);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -34,6 +35,7 @@ GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fIsLog(0), fAxisBinsFilled(0){
 //
 GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, bool islog) :
 		fIsLog(islog), fAxisBinsFilled(0) {
+	SetAxisType(kBins);
 	fAxisBins.reserve(size);
 }
 
