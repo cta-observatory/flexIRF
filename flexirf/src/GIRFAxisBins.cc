@@ -104,8 +104,6 @@ int GIRFAxisBins::CheckAxisConsistency() {
 //
 bool GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
 
-//	vector<float> otherAxisBins = otherAxis.Get
-	int i=0;
 	if (otherAxis.GetAxisType() == this->GetAxisType() && otherAxis.GetVarType() == this->GetVarType()){
 		if (otherAxis.GetRangeMax() == this->GetRangeMax() && otherAxis.GetRangeMin() == this->GetRangeMin() && otherAxis.GetSize() == this->GetSize()){
 			vector<float> otherAxisBins = otherAxis.GetAxisBins();
