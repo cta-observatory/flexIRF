@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
 	cout << "(axis1==axis2) = " << (axis1==axis2) << endl;
 
-	cout << "axis1.GetVarName() = " << axis1.GetVarName().data() << endl;
+	cout << "axis1.GetExtName() = " << axis1.GetExtName().data() << endl;
 
 	return 0;
 }//Ends main

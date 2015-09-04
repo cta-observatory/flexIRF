@@ -50,6 +50,30 @@ int GIRFAxis::CheckAxisConsistency()
   return status;
 }
 
+////////////////////////////////////////////////////////////////
+//
+// Return the axis name for EXTNAME
+//
+std::string GIRFAxis::GetTypeName() const {
+
+	string axisType;
+
+    switch(fAxisType)
+      {
+      case kBins: //Energy Resolution for E (kEnergy) v. Offset (kTheta)
+    	  axisType="BINS";
+		  break;
+      case kParam: //Energy Bias for E (kEnergy) v. Offset (kTheta)
+    	  axisType="PARAM";
+		  break;
+      default:
+        cout << "Incorrect axis type.\n";
+        break;
+      }
+
+    return axisType;
+}
+
 
 ////////////////////////////////////////////////////////////////
 //
@@ -57,7 +81,7 @@ int GIRFAxis::CheckAxisConsistency()
 //
 std::string GIRFAxis::GetVarName() const {
 
-	string axisName, axisType, axisVarType;
+	string axisVarType;
 
     switch(fVarType)
       {
@@ -81,29 +105,11 @@ std::string GIRFAxis::GetVarName() const {
 		  break;
       default:
     	  cout << "Incorrect variable type.\n";
-    	  return axisName;
+    	  return axisVarType;
       }
 
-    switch(fAxisType)
-      {
-      case kBins: //Energy Resolution for E (kEnergy) v. Offset (kTheta)
-    	  axisType="BINS";
-		  break;
-      case kParam: //Energy Bias for E (kEnergy) v. Offset (kTheta)
-    	  axisType="PARAM";
-		  break;
-      default:
-        cout << "Incorrect axis type.\n";
-        break;
-      }
-
-    axisName=axisVarType+"_"+axisType;
-    return axisName;
+    return axisVarType;
 }
-
-
-
-
 
 
 ////////////////////////////////////////////////////////////////
@@ -116,9 +122,9 @@ int GIRFAxis::WriteAxis(fitsfile* fptr,int iaxis,long size,float* data,int* stat
   if(fits_create_img(fptr,FLOAT_IMG,1,&size,status))
     cout << "GIRFAxis::Write Error: problem writing axis header (error code: " << *status <<")" << endl;
 
-
-//  TODO: Convert Axis HDUs into binary tables.
-
+  // TODO
+  // Write axis (as a BINTABLE)
+//    char extname[20] = GetExtName().data();
 //	char keyword[9];
 //	char chval[20];
 //	char comment[70];
@@ -141,14 +147,9 @@ int GIRFAxis::WriteAxis(fitsfile* fptr,int iaxis,long size,float* data,int* stat
 //
 //
 //
-//	// Add the axis header as a binary table:
-//    if(fits_create_tbl(fptr,BINARY_TBL,0, 1, &size,status))
-//	  cout << "GIRFAxis::Write Error: problem writing axis header (error code: " << *status <<")" << endl;
-//    fits_create_tbl(fptr, BINARY_TBL, 0, tfields, ttype, tform, tunit,
-//    		  extname, status);
-//
-//  int fits_create_tbl(fitsfile *fptr, int tbltype, LONGLONG naxis2, int tfields, char *ttype[],
-//	   char *tform[], char *tunit[], char *extname, int *status)
+//  if(fits_create_tbl(fptr, BINARY_TBL, 0, 1, char *ttype[],
+//	  	   char *tform[], char *tunit[], extname, status))
+//    cout << "GIRFAxis::Write Error: problem writing axis header (error code: " << *status <<")" << endl;
   
   char keyword[9];
   char chval[20];

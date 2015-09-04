@@ -54,6 +54,8 @@ class GIRFAxis
   virtual float GetRangeMax() const {return 0;}
   virtual int   GetSize()     const {return 0;}
 
+  virtual inline std::string GetExtName() const {return GetVarName() + "_" + GetTypeName();}
+  virtual std::string GetTypeName() const;
   virtual std::string GetVarName() const;
 
 
@@ -68,6 +70,7 @@ class GIRFAxis
  protected:
   virtual int CheckAxisConsistency();
   virtual void SetAxisType(AxisType type) {fAxisType=type;}
+
 }; 
 
 #endif
