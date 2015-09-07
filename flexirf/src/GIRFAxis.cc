@@ -56,10 +56,10 @@ std::string GIRFAxis::GetTypeName() const {
 	string axisType;
 
 	switch (fAxisType) {
-	case kBins: //Energy Resolution for E (kEnergy) v. Offset (kTheta)
+	case kBins:
 		axisType = "BINS";
 		break;
-	case kParam: //Energy Bias for E (kEnergy) v. Offset (kTheta)
+	case kParam:
 		axisType = "PARAM";
 		break;
 	default:
@@ -79,22 +79,22 @@ std::string GIRFAxis::GetVarName() const {
 	string axisVarType;
 
 	switch (fVarType) {
-	case kEnergy: //Energy Resolution for E (kEnergy) v. Offset (kTheta)
+	case kEnergy:
 		axisVarType = "ENERGY";
 		break;
-	case kEnergy_true: //Energy Bias for E (kEnergy) v. Offset (kTheta)
+	case kEnergy_true:
 		axisVarType = "TENERGY";
 		break;
-	case kEnergy_rec: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
+	case kEnergy_rec:
 		axisVarType = "RENERGY";
 		break;
-	case kTheta: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
+	case kTheta:
 		axisVarType = "THETA";
 		break;
-	case kPhi: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
+	case kPhi:
 		axisVarType = "PHI";
 		break;
-	case kID: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
+	case kID:
 		axisVarType = "ID";
 		break;
 	default:
@@ -114,22 +114,22 @@ std::string GIRFAxis::GetVarUnit() const {
 	string axisVarType;
 
 	switch (fVarType) {
-	case kEnergy: //Energy Resolution for E (kEnergy) v. Offset (kTheta)
+	case kEnergy:
 		axisVarType = "log10(TeV)";
 		break;
-	case kEnergy_true: //Energy Bias for E (kEnergy) v. Offset (kTheta)
+	case kEnergy_true:
 		axisVarType = "log10(TeV)";
 		break;
-	case kEnergy_rec: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
+	case kEnergy_rec:
 		axisVarType = "log10(TeV)";
 		break;
-	case kTheta: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
+	case kTheta:
 		axisVarType = "deg";
 		break;
-	case kPhi: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
+	case kPhi:
 		axisVarType = "deg";
 		break;
-	case kID: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
+	case kID:
 		axisVarType = "";
 		break;
 	default:
@@ -249,6 +249,7 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, int iaxis, long size, float* data,
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
+	// TODO		Remove iaxis and check the last axis ID.
 	sprintf(keyword, "HDUCLAS4");
 	usval = ushort(iaxis);
 	sprintf(comment, "Axis ID");
