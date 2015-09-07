@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 	}
 	axis1.SetAxisBins(vect1);
 	axis2.SetAxisBins(vect2);
-
+	axis1.SetVarType(GIRFAxis::kEnergy);
 	cout << "axis1.GetRangeMin() = " << axis1.GetRangeMin() << endl;
 	cout << "axis2.GetRangeMin() = " << axis2.GetRangeMin() << endl;
 
@@ -54,6 +54,8 @@ int main(int argc, char **argv)
 	cout << "axis2.GetRangeMax() = " << axis2.GetRangeMax() << endl;
 
 	cout << "(axis1==axis2) = " << (axis1==axis2) << endl;
+
+	cout << "axis1.GetExtName() = " << axis1.GetExtName().data() << endl;
 
 	return 0;
 }//Ends main
