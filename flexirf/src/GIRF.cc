@@ -79,11 +79,10 @@ int GIRF::Write(string filename) {
 				<< status << ")" << endl;
 
 	// write pdf blocks and associated axes
-	int ipdf = 1;
-	int iaxis = 1;
+
 	for (vector<GIRFPdf*>::iterator pdf = fPdfList.begin();
-			pdf != fPdfList.end(); ++pdf, ipdf++)
-		if ((*pdf)->Write(fptr, ipdf, &status))
+			pdf != fPdfList.end(); ++pdf)
+		if ((*pdf)->Write(fptr, &status))
 			cout << "GIRF::Write Error: cannot write pdf (error code: "
 					<< status << ")" << endl;
 

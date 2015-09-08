@@ -16,6 +16,7 @@
 #include "GIRFPdf.h"
 #include "GIRFAxis.h"
 #include <iostream>
+#include <string.h>
 
 using namespace std;
 
@@ -139,10 +140,68 @@ std::string GIRFPdf::GetVarUnit() const {
 
 ////////////////////////////////////////////////////////////////
 //
+// Check the last Axis ID present within the fits file
+//
+int GIRFPdf::GetLastPdfID(string filename) {
+
+	fitsfile *fptr; /* FITS file pointer, defined in fitsio.h */
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdupos, nkeys, ii;
+	int lastID = 0;
+
+	cout << "Opening file " << filename.data() << endl;
+	if (!fits_open_file(&fptr, filename.data(), READONLY, &status)){
+		lastID = GetLastPdfID(fptr);
+	}
+	if (fits_close_file(fptr, &status))
+			cout << "GIRF::Write Error: cannot close file (error code: " << status
+					<< ")" << endl;
+	return lastID;
+}
+
+int GIRFPdf::GetLastPdfID(fitsfile* fptr) {
+
+	int currenthdu = fptr->HDUposition;
+
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdutype = IMAGE_HDU, hdunum, nkeys, ii;
+	int lastID = 0;
+	fits_get_num_hdus(fptr, &hdunum, &status);
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		if (hdutype == IMAGE_HDU) {						// First check if HDU extension
+			if (!fits_read_key_str(fptr, "EXTNAME", card, NULL, &status)) {
+				if (!strcmp(card, GetExtName().data())) {
+					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL,
+							&status)) {
+						if (atoi(card) > lastID) {
+							lastID = atoi(card);
+						}
+					}
+				}
+			}
+		}
+		status = 0;
+		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
+		if (status)
+			break;
+	}
+	fits_movabs_hdu(fptr, currenthdu + 1, NULL, &status);
+	return lastID;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////
+//
 // Write the pdf and the associated axes to the specified
 // file pointer
 //
-int GIRFPdf::Write(fitsfile* fptr, int ipdf, int* status) {
+int GIRFPdf::Write(fitsfile* fptr, int* status) {
 	// create arrays with size and first entry of every dimension to be saved (1 is first, not 0)
 	int naxis = int(fAxis.size());
 	long* naxes = new long[naxis];
@@ -151,15 +210,20 @@ int GIRFPdf::Write(fitsfile* fptr, int ipdf, int* status) {
 		naxes[jaxis] = int(fAxis[jaxis]->GetSize());
 		fpixel[jaxis] = 1;
 	}
-
+	vector<int> axisIDs;
+	axisIDs.reserve(naxis);
+	int axisID;
 	// TODO ONLY IF NEEDED!!!!!
 	// write associated axis blocks
 	int firstaxis = 1;
 	for (vector<GIRFAxis*>::iterator axis = fAxis.begin(); axis != fAxis.end();
-			++axis)
-		if ((*axis)->Write(fptr, status))
-			cout << "GIRFPdf::Write Error: cannot write axis (error code: "
-					<< *status << ")" << endl;
+			++axis){
+		if ((*axis)->Write(fptr, axisID, status))
+					cout << "GIRFPdf::Write Error: cannot write axis (error code: "
+							<< *status << ")" << endl;
+		else axisIDs.push_back(axisID);
+	}
+
 
 	// write the pdf header
 	if (fits_create_img(fptr, FLOAT_IMG, naxis, naxes, status))
@@ -177,7 +241,7 @@ int GIRFPdf::Write(fitsfile* fptr, int ipdf, int* status) {
 	// write the indeces linking to the relevant axes
 	for (int jaxis = 0; jaxis < naxis; jaxis++) {
 		sprintf(keyword, "AXISID%d", jaxis + 1);
-		usval = ushort(jaxis + firstaxis);
+		usval = ushort(axisIDs[jaxis]);
 		sprintf(comment, "Axis describing dimension #%d", jaxis + 1);
 		if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 			cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
@@ -244,14 +308,16 @@ int GIRFPdf::Write(fitsfile* fptr, int ipdf, int* status) {
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS3");
-	usval = ushort(fPdfVar);
-	sprintf(comment, "Variable Type (see GIRFAxis.h for details)");
-	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+	sprintf(chval, "%s", GetVarName().data());
+	sprintf(comment, "Variable whose pdf is parameterized (see GIRFPdf.h for details)");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
-	// TODO		Remove ipdf and check the last axis ID.
+	//Get the last Pdf ID of the same class
+	int pdfID = GetLastPdfID(fptr)+1;
+
 	sprintf(keyword, "HDUCLAS4");
-	usval = ushort(ipdf);
+	usval = ushort(pdfID);
 	sprintf(comment, "Axis ID");
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "

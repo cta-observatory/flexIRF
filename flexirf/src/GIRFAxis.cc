@@ -201,7 +201,7 @@ std::string GIRFAxis::GetVarUnit() const {
 // 
 // Write the header of the axis HDU
 //
-int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int* status) {
+int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status) {
 // write the axis header
 //  if(fits_create_img(fptr,FLOAT_IMG,1,&size,status))
 //    cout << "GIRFAxis::Write Error: problem writing axis header (error code: " << *status <<")" << endl;
@@ -306,8 +306,10 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int* status) {
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 
+	lastID = GetLastAxisID(fptr)+1;
+
 	sprintf(keyword, "HDUCLAS4");
-	usval = ushort(GetLastAxisID(fptr) + 1);
+	usval = ushort(lastID);
 	sprintf(comment, "Axis ID");
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "

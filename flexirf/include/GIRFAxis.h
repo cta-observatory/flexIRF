@@ -62,8 +62,8 @@ class GIRFAxis
 
   virtual bool operator==(const GIRFAxis& otherAxis){return 0;}													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
   
-  virtual int Write(fitsfile* fptr,int* status){*status=WRITE_ERROR;return *status;}
-  virtual int WriteAxis(fitsfile* fptr,long size,float* data,int* status);
+  virtual int Write(fitsfile* fptr,int& lastID ,int* status){*status=WRITE_ERROR;return *status;}
+  virtual int WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);
   virtual int IsAlreadyPresent(fitsfile* fptr,const GIRFAxis&,int* status){*status=READ_ERROR;return *status;};
   virtual int GetLastAxisID(std::string filename);
 

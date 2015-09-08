@@ -135,7 +135,7 @@ void GIRFAxisBins::SetAxis(std::vector<float>::size_type size, float* bins) {
 // 
 // Write the axis to the specified file pointer
 //
-int GIRFAxisBins::Write(fitsfile* fptr, int* status) {
+int GIRFAxisBins::Write(fitsfile* fptr, int& lastID, int* status) {
 	// fill the data array
 	std::vector<float>::size_type axisSize = fAxisBins.size();
 	float* axisdata = new float[axisSize];
@@ -143,7 +143,7 @@ int GIRFAxisBins::Write(fitsfile* fptr, int* status) {
 		axisdata[ibin] = fAxisBins[ibin];
 
 	// write the axis header and data
-	WriteAxis(fptr, int(axisSize), axisdata, status);
+	WriteAxis(fptr, int(axisSize), axisdata, lastID, status);
 
 	return *status;
 }
