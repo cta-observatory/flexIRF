@@ -64,7 +64,7 @@ class GIRFPdf
       }
   }   
   
-  virtual int Write(fitsfile* fptr,int ipdf,int& iaxis,int* status);
+  virtual int Write(fitsfile* fptr,int ipdf,int* status);
 
 };
   

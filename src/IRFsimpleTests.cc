@@ -56,6 +56,8 @@ int main(int argc, char **argv)
 	cout << "(axis1==axis2) = " << (axis1==axis2) << endl;
 
 	cout << "axis1.GetExtName() = " << axis1.GetExtName().data() << endl;
+	int lastID = axis1.GetLastAxisID("alltest.fits");
+	cout << "lastID = " << lastID << endl;;
 
 	return 0;
 }//Ends main

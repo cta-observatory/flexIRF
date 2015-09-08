@@ -32,7 +32,7 @@ class GIRFAxisBins : public GIRFAxis
   virtual inline float GetRangeMax() const {if (fAxisBinsFilled) return fAxisBins[fAxisBins.size()-1]; else return 0;}
   virtual inline int   GetSize()     const {return int(fAxisBins.size());}
 
-  virtual int Write(fitsfile* fptr,int& iaxis,int* status);
+  virtual int Write(fitsfile* fptr,int* status);
   virtual int IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* data,int* status);
 
   

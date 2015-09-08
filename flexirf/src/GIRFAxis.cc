@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include "GIRFAxis.h"
+#include <stdio.h>
+#include <string.h>
 
 using namespace std;
 
@@ -45,6 +47,61 @@ int GIRFAxis::CheckAxisConsistency() {
 		status++;
 
 	return status;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// Check the last Axis ID present within the fits file
+//
+int GIRFAxis::GetLastAxisID(string filename) {
+
+	fitsfile *fptr; /* FITS file pointer, defined in fitsio.h */
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdupos, nkeys, ii;
+	int lastID = 0;
+
+	cout << "Opening file " << filename.data() << endl;
+	if (!fits_open_file(&fptr, filename.data(), READONLY, &status)){
+		lastID = GetLastAxisID(fptr);
+	}
+	if (fits_close_file(fptr, &status))
+			cout << "GIRF::Write Error: cannot close file (error code: " << status
+					<< ")" << endl;
+	return lastID;
+}
+
+int GIRFAxis::GetLastAxisID(fitsfile* fptr) {
+
+	int currenthdu = fptr->HDUposition;
+
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
+	int lastID = 0;
+	fits_get_num_hdus(fptr, &hdunum, &status);
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		if (hdutype == BINARY_TBL) {
+			if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, &status)) {
+				if (!strcmp(card, GetTypeName().data())) {
+					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL,
+							&status)) {
+						if (atoi(card) > lastID) {
+							lastID = atoi(card);
+						}
+					}
+				}
+			}
+		}
+		status = 0;
+		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
+		if (status)
+			break;
+	}
+	fits_movabs_hdu(fptr, currenthdu + 1, NULL, &status);
+	return lastID;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -144,13 +201,12 @@ std::string GIRFAxis::GetVarUnit() const {
 // 
 // Write the header of the axis HDU
 //
-int GIRFAxis::WriteAxis(fitsfile* fptr, int iaxis, long size, float* data,
-		int* status) {
-	// write the axis header
+int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int* status) {
+// write the axis header
 //  if(fits_create_img(fptr,FLOAT_IMG,1,&size,status))
 //    cout << "GIRFAxis::Write Error: problem writing axis header (error code: " << *status <<")" << endl;
 
-	// Done this way to remove conversion from string constant to ‘char*’
+// Done this way to remove conversion from string constant to ‘char*’
 	char extname[20], varname[20], form[20], unit[20];
 	sprintf(extname, "%s", GetExtName().data());
 	sprintf(varname, "%s", GetVarName().data());
@@ -195,14 +251,14 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, int iaxis, long size, float* data,
 	char comment[70];
 	ushort usval;
 
-	// write axis name. Deprecated due to the IMAGE -> BIN_TABLE conversion
+// write axis name. Deprecated due to the IMAGE -> BIN_TABLE conversion
 //  sprintf(keyword,"EXTNAME");
 //  sprintf(chval,"AXIS%03d",iaxis);
 //  sprintf(comment,"Axis HDU");
 //  if(fits_write_key(fptr,TSTRING,keyword,&chval,comment,status))
-//    cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: " << *status <<")" << endl;
+//  cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: " << *status <<")" << endl;
 
-	// write axis type
+// write axis type
 	sprintf(keyword, "AXISTYPE");
 	usval = ushort(fAxisType);
 	sprintf(comment, "Axis Type (see GIRFAxis.h for details)");
@@ -210,7 +266,7 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, int iaxis, long size, float* data,
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 
-	// write variable type
+// write variable type
 	sprintf(keyword, "VARTYPE");
 	usval = ushort(fVarType);
 	sprintf(comment, "Variable Type (see GIRFAxis.h for details)");
@@ -218,13 +274,13 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, int iaxis, long size, float* data,
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 
-	// Write in the first column, from first row
+// Write in the first column, from first row
 	if (fits_write_col(fptr, TFLOAT, 1, 1, 1, size, data, status))
 		cout
 				<< "GIRFAxis::WriteAxis Error: problem writing axis data (error code: "
 				<< *status << ")" << endl;
 
-	// Add class keywords to the HDU.
+// Add class keywords to the HDU.
 	sprintf(keyword, "HDUCLASS");
 	sprintf(chval, "CTA");
 	sprintf(comment, "FITS file following the CTA data format.");
@@ -244,14 +300,14 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, int iaxis, long size, float* data,
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS3");
-	usval = ushort(fVarType);
+	sprintf(chval, "%s", GetTypeName().data());
 	sprintf(comment, "Variable Type (see GIRFAxis.h for details)");
-	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
-	// TODO		Remove iaxis and check the last axis ID.
+
 	sprintf(keyword, "HDUCLAS4");
-	usval = ushort(iaxis);
+	usval = ushort(GetLastAxisID(fptr) + 1);
 	sprintf(comment, "Axis ID");
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "

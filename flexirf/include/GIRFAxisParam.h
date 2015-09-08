@@ -26,7 +26,7 @@ class GIRFAxisParam : public GIRFAxis
 
   virtual inline int   GetSize()                                {return int(fAxisParam.size());}
   
-  virtual int Write(fitsfile* fptr,int& iaxis,int* status);
+  virtual int Write(fitsfile* fptr,int* status);
 
  protected:
   virtual int CheckAxisConsistency(); // return 0 if axis is consistent

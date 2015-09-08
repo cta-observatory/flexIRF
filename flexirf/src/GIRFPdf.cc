@@ -14,6 +14,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "GIRFPdf.h"
+#include "GIRFAxis.h"
 #include <iostream>
 
 using namespace std;
@@ -141,7 +142,7 @@ std::string GIRFPdf::GetVarUnit() const {
 // Write the pdf and the associated axes to the specified
 // file pointer
 //
-int GIRFPdf::Write(fitsfile* fptr, int ipdf, int& iaxis, int* status) {
+int GIRFPdf::Write(fitsfile* fptr, int ipdf, int* status) {
 	// create arrays with size and first entry of every dimension to be saved (1 is first, not 0)
 	int naxis = int(fAxis.size());
 	long* naxes = new long[naxis];
@@ -153,10 +154,10 @@ int GIRFPdf::Write(fitsfile* fptr, int ipdf, int& iaxis, int* status) {
 
 	// TODO ONLY IF NEEDED!!!!!
 	// write associated axis blocks
-	int firstaxis = iaxis;
+	int firstaxis = 1;
 	for (vector<GIRFAxis*>::iterator axis = fAxis.begin(); axis != fAxis.end();
 			++axis)
-		if ((*axis)->Write(fptr, iaxis, status))
+		if ((*axis)->Write(fptr, status))
 			cout << "GIRFPdf::Write Error: cannot write axis (error code: "
 					<< *status << ")" << endl;
 
