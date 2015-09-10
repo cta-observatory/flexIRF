@@ -46,9 +46,12 @@ class GIRFAxis
   virtual ~GIRFAxis(){};
   
   virtual inline void SetVarType(VarType vartype) {fVarType=vartype;}
+  virtual void SetVarType(std::string axisVarName);
 
   virtual inline AxisType GetAxisType() const {return fAxisType;}
   virtual inline VarType GetVarType() const {return fVarType;}
+
+//  virtual GIRFAxis* GetAxis(fitsfile* fptr, int axisID, int* status);
 
   virtual float GetRangeMin() const {return 0;}
   virtual float GetRangeMax() const {return 0;}
@@ -66,14 +69,16 @@ class GIRFAxis
   virtual int WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);
   virtual int IsAlreadyPresent(fitsfile* fptr,const GIRFAxis&,int* status){*status=READ_ERROR;return *status;};
   virtual int GetLastAxisID(std::string filename);
-
+//  virtual bool CheckAxisExists(std::string filename, int& axisID);
 
 
  protected:
   virtual int CheckAxisConsistency();
+//  virtual bool CheckAxisExists(fitsfile* fptr, int& axisID);
   virtual int GetLastAxisID(fitsfile* fptr);
   virtual void SetAxisType(AxisType type) {fAxisType=type;}
-
+  virtual void SetAxisType(std::string axisTypeName);
+  AxisType CheckAxisType(fitsfile* fptr, int axisID, int* status);
 }; 
 
 #endif

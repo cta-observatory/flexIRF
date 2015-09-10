@@ -173,8 +173,8 @@ int GIRFPdf::GetLastPdfID(fitsfile* fptr) {
 	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
 	{
 		if (hdutype == IMAGE_HDU) {						// First check if HDU extension
-			if (!fits_read_key_str(fptr, "EXTNAME", card, NULL, &status)) {
-				if (!strcmp(card, GetExtName().data())) {
+			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, &status)) {
+				if (!strcmp(card, "DATA")) {
 					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL,
 							&status)) {
 						if (atoi(card) > lastID) {
