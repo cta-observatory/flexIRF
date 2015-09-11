@@ -9,7 +9,7 @@
 class GIRFPdf
 {
  public:
-  enum PdfVar   {kNoPdfVar=0,
+  enum PdfVar {kNoPdfVar=0,
 		 kEfficiency,
 		 kEDispersion,
 		 kPsf,

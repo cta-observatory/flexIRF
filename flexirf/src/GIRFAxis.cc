@@ -87,7 +87,6 @@ GIRFAxis::GIRFAxis(VarType vartype) :
 //
 GIRFAxis::AxisType GIRFAxis::CheckAxisType(fitsfile* fptr, int axisID, int* status) {
 
-//	cout << "Aqui llega!" << endl;
 	int currenthdu = fptr->HDUposition;
 
 	GIRFAxis::AxisType axisType = GIRFAxis::kNoAxisType;
@@ -96,26 +95,17 @@ GIRFAxis::AxisType GIRFAxis::CheckAxisType(fitsfile* fptr, int axisID, int* stat
 	int exists = 0;
 	char axisIDkeyword[20];
 	sprintf(axisIDkeyword, "%d", axisID);
-//	cout << "Aqui llega! 1" << endl;
 
 	fits_get_num_hdus(fptr, &hdunum, status);
-	cout << "currenthdu = " << currenthdu << " and hdunum = " << hdunum << endl;
-	cout << "From 1 to " << hdunum << endl;
 
 	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
 	{
 		fits_movabs_hdu(fptr, hdupos, &hdutype, status);
-		cout << "Did it work? hdutype = " << hdutype << " and status = " << *status << endl;
 		if (hdutype == BINARY_TBL) {
-			cout << "I try to read HDU #" << fptr->HDUposition << endl;
 			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, status)) {
-				cout << "At fptr->HDUposition = " << fptr->HDUposition << endl;
 				if (!strcmp(card, "AXIS")) {
-					cout << "Current HDU is " << fptr->HDUposition << endl;
 					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, status)) { 	// Now we know this is the axis we want.
-						cout << "Aqui llega! 6" << endl;
 						if (!strcmp(card, axisIDkeyword)) {
-							cout << "Aqui llega! 7" << endl;
 							if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, status)) {
 								if (!strcmp(card, "BINS")) axisType = GIRFAxis::kBins;
 								else if (!strcmp(card, "PARAM")) axisType = GIRFAxis::kParam;
@@ -126,17 +116,12 @@ GIRFAxis::AxisType GIRFAxis::CheckAxisType(fitsfile* fptr, int axisID, int* stat
 				}
 			}
 		}
-		if (KEY_NO_EXIST) *status = 0;
-//		cout << "Aqui llega! 8. Status = " << *status << endl;
-//		fits_movabs_hdu(fptr, hdupos, &hdutype, status);
-		if (status)
-			break;
+		if (*status == KEY_NO_EXIST) *status = 0;
+		if (*status) break;
+
 	}
-//	cout << "Aqui llega! !!!!!!!!!!!!!" << endl;
 //TODO: Handle status and errors: No axis with that ID... Unknown axis type... etc...
 	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
-	fits_get_num_hdus(fptr, &hdunum, status);
-	cout << "Exitting at currenthdu = " << currenthdu << endl;
 	return axisType;
 }
 
@@ -241,6 +226,7 @@ int GIRFAxis::GetLastAxisID(fitsfile* fptr) {
 
 	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
 	{
+		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
 		if (hdutype == BINARY_TBL) {
 			if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, &status)) {
 				if (!strcmp(card, GetTypeName().data())) {
@@ -253,10 +239,9 @@ int GIRFAxis::GetLastAxisID(fitsfile* fptr) {
 				}
 			}
 		}
-		status = 0;
-		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
-		if (status)
-			break;
+		if (status == KEY_NO_EXIST) status = 0;
+		if (status) break;
+
 	}
 	fits_movabs_hdu(fptr, currenthdu + 1, NULL, &status);
 	return lastID;
@@ -490,14 +475,6 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
-
-	cout << "The axis type of ID number 1 is " << CheckAxisType(fptr, 1, status) << endl;
-
-
-
-//  Deprecated due to the IMAGE -> BIN_TABLE conversion
-//  if(fits_write_pix(fptr,TFLOAT,fpixel,size,data,status))
-//    cout << "GIRFAxis::WriteAxis Error: problem writing axis data (error code: " << *status <<")" << endl;
 
 	return *status;
 }
