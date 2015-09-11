@@ -17,6 +17,7 @@ class GIRFAxisParam : public GIRFAxis
   GIRFAxisParam(VarType vartype,std::vector<float>::size_type size,bool islog=false); // create new axis 
   GIRFAxisParam(VarType vartype,std::vector<float> bins,bool islog=false); // create new axis 
   GIRFAxisParam(VarType vartype,std::vector<float>::size_type size,float* bins,bool islog=false); // create new axis 
+  GIRFAxisParam(fitsfile* fptr,int* status);
 
   virtual ~GIRFAxisParam(){};
 

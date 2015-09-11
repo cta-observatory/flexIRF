@@ -17,7 +17,7 @@ class GIRFAxisBins : public GIRFAxis
   GIRFAxisBins(VarType vartype,std::vector<float>::size_type size,bool islog=false); // create new axis 
   GIRFAxisBins(VarType vartype,std::vector<float> bins,bool islog=false); // create new axis 
   GIRFAxisBins(VarType vartype,std::vector<float>::size_type size,float* bins,bool islog=false); // create new axis 
-
+  GIRFAxisBins(fitsfile* fptr,int* status);
   virtual ~GIRFAxisBins(){};
 
   virtual bool operator==(const GIRFAxisBins& otherAxis);													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
@@ -34,7 +34,7 @@ class GIRFAxisBins : public GIRFAxis
 
   virtual int Write(fitsfile* fptr, int& lastID, int* status);
   virtual int IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* data,int* status);
-
+  virtual void Print();
   
  protected:
   virtual int CheckAxisConsistency(); // return 0 if axis is consistent

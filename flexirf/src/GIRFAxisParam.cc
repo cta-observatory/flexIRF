@@ -89,6 +89,19 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype,std::vector<float>::size_type size,
 
 ////////////////////////////////////////////////////////////////
 // 
+// Construct axis object directly reading from HDU
+//
+GIRFAxisParam::GIRFAxisParam(fitsfile* fptr,int* status)
+{
+
+	//TODO: Read everything from fits file.
+
+
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // Check that the vector describe consistently the axis
 //
 int GIRFAxisParam::CheckAxisConsistency()

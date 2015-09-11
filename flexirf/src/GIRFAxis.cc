@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include "GIRFAxis.h"
+#include "GIRFAxisBins.h"
+#include "GIRFAxisParam.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -42,44 +44,40 @@ GIRFAxis::GIRFAxis(VarType vartype) :
 //
 // Get axis object from fitsfile
 //
-//GIRFAxis* GetAxis(fitsfile* fptr, int axisID, int* status) {
-//
-//	int currenthdu = fptr->HDUposition;
-//
-//	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-//	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
-//	int exists = 0;
-//	fits_get_num_hdus(fptr, &hdunum, status);
-//	char axisIDkeyword[20];
-//	sprintf(axisIDkeyword, "%d", axisID);
-//	GIRFAxis* IRFAxis;
-//	//TODO: CAMBIAR TODO ESTO!!!!
-//	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
-//	{
-//		if (hdutype == BINARY_TBL) {
-//			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, status)) {
-//				if (!strcmp(card, "AXIS")) {
-//					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL,
-//							status)) { 	// Now we know this is the axis we want.
-//						if (!strcmp(card, axisIDkeyword)) {
-//							if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL,
-//									status)) {
-//								//TODO constructor que genere cada tipo de Axis
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-//		status = 0;
-//		fits_movabs_hdu(fptr, hdupos, &hdutype, status);
-//		if (status)
-//			break;
-//	}
-//
-//	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
-//	return IRFAxis;
-//}
+GIRFAxis* GIRFAxis::GetAxis(fitsfile* fptr, int axisID, GIRFAxis::AxisType axisType, int* status) {
+
+	int currenthdu = fptr->HDUposition;
+
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
+	int exists = 0;
+	char axisIDkeyword[20];
+	sprintf(axisIDkeyword, "%d", axisID);
+	GIRFAxis* IRFAxis;
+
+	fits_get_num_hdus(fptr, &hdunum, status);
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fptr, hdupos, &hdutype, status);
+		if (hdutype == BINARY_TBL) {
+			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, status)) {
+				if (!strcmp(card, "AXIS")) {
+					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, status)) {
+						if (!strcmp(card, axisIDkeyword)) {
+							if (axisType == GIRFAxis::kBins) IRFAxis = new GIRFAxisBins(fptr, status);
+							if (axisType == GIRFAxis::kParam) IRFAxis = new GIRFAxisParam(fptr, status);
+						}
+					}
+				}
+			}
+		}
+		if (*status == KEY_NO_EXIST) *status = 0;
+		if (*status) break;
+	}
+
+	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
+	return IRFAxis;
+}
 
 ////////////////////////////////////////////////////////////////
 //
@@ -387,8 +385,6 @@ std::string GIRFAxis::GetVarUnit() const {
 //
 int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 		int* status) {
-	cout << "Writting axis!!!" << endl;
-// write the axis header
 
 	// First check if the axis already exists
 	// TODO
@@ -465,9 +461,16 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 
-	lastID = GetLastAxisID(fptr) + 1;
 
-//	int a = CheckAxisType(fptr, lastID-1, status);
+	// Only for testing purposes.
+//	lastID = GetLastAxisID(fptr) + 1;
+//	GIRFAxisBins* IRFAxisbins;
+//	int a = CheckAxisType(fptr, 1, status);
+//	if (a == 1) {
+//		IRFAxisbins = (GIRFAxisBins*) GetAxis(fptr, 1, (GIRFAxis::AxisType) a, status);
+//		IRFAxisbins->Print();
+//	}
+
 	//Good spot for axis tests
 	sprintf(keyword, "HDUCLAS4");
 	usval = ushort(lastID);

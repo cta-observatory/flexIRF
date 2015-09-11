@@ -84,6 +84,34 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 	SetAxis(size, bins);
 }
 
+
+////////////////////////////////////////////////////////////////
+//
+// Construct axis object directly reading from HDU
+//
+GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
+{
+	SetAxisType(kBins);
+
+	long int nRows;
+	int nCol, anynull;
+	float nullfloat = 0.0F;
+
+	fits_get_num_rows(fptr, &nRows, status);
+	fits_get_num_cols(fptr, &nCol, status);
+	float farray[nRows];
+	//TODO: For now, just get one column. In the future Axis should have several columns (low/high bin edges)
+	fits_read_col (fptr, TFLOAT, 1, 1, 1, nRows, &nullfloat, &farray, &anynull, status);
+	fAxisBins.assign(farray,farray+nRows);
+	fAxisBinsFilled=1;
+	fIsLog=0;
+}
+
+
+
+
+
+
 ////////////////////////////////////////////////////////////////
 // 
 // Check that the vector describe consistently the axis
@@ -167,6 +195,15 @@ int GIRFAxisBins::IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* dat
 }
 
 
-
+////////////////////////////////////////////////////////////////
+//
+// Print Axis content
+//
+void GIRFAxisBins::Print()
+{
+	//TODO: Improve print output.
+	std::vector<float>::size_type axisSize = fAxisBins.size();
+	for (std::vector<float>::size_type ibin = 0; ibin < axisSize; ibin++) cout << "fAxisBins[" << ibin << "] = " << fAxisBins[ibin] << endl;
+}
 
 
