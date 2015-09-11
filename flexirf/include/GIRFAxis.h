@@ -75,7 +75,7 @@ class GIRFAxis
 
  protected:
   virtual int CheckAxisConsistency();
-//  virtual bool CheckAxisExists(fitsfile* fptr, int& axisID);
+  virtual bool CheckAxisExists(fitsfile* fptr, int* status);
   virtual int GetLastAxisID(fitsfile* fptr);
   virtual void SetAxisType(AxisType type) {fAxisType=type;}
   virtual void SetAxisType(std::string axisTypeName);
