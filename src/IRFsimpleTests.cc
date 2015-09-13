@@ -56,6 +56,16 @@ int main(int argc, char **argv)
 	cout << "(axis1==axis2) = " << (axis1==axis2) << endl;
 
 	cout << "axis1.GetExtName() = " << axis1.GetExtName().data() << endl;
+	int lastID = axis1.GetLastAxisID("alltest.fits");
+	cout << "lastID = " << lastID << endl;;
+
+	GIRFAxisBins* axis3;
+	GIRFAxisBins* axis4;
+	axis3 = new GIRFAxisBins();
+	axis4 = new GIRFAxisBins();
+	axis3->SetAxisBins(vect1);
+	axis4->SetAxisBins(vect2);
+	cout << "axis3==axis4 = " << ((*axis3)==(*axis4)) << endl;
 
 	return 0;
 }//Ends main

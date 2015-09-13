@@ -17,6 +17,7 @@ class GIRFAxisParam : public GIRFAxis
   GIRFAxisParam(VarType vartype,std::vector<float>::size_type size,bool islog=false); // create new axis 
   GIRFAxisParam(VarType vartype,std::vector<float> bins,bool islog=false); // create new axis 
   GIRFAxisParam(VarType vartype,std::vector<float>::size_type size,float* bins,bool islog=false); // create new axis 
+  GIRFAxisParam(fitsfile* fptr,int* status);
 
   virtual ~GIRFAxisParam(){};
 
@@ -26,7 +27,8 @@ class GIRFAxisParam : public GIRFAxis
 
   virtual inline int   GetSize()                                {return int(fAxisParam.size());}
   
-  virtual int Write(fitsfile* fptr,int& iaxis,int* status);
+  virtual int Write(fitsfile* fptr, int& axisID, int* status);
+  virtual bool CheckAxisExists(fitsfile* fptr, int& axisID, int* status);
 
  protected:
   virtual int CheckAxisConsistency(); // return 0 if axis is consistent

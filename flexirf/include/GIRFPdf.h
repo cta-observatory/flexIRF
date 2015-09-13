@@ -8,8 +8,8 @@
 
 class GIRFPdf
 {
- public: 
-  enum PdfVar   {kNoPdfVar=0,
+ public:
+  enum PdfVar {kNoPdfVar=0,
 		 kEfficiency,
 		 kEDispersion,
 		 kPsf,
@@ -18,7 +18,7 @@ class GIRFPdf
 		 kDiffSens,
 		 kAeff,
 		 kAeffNoTheta2Cut,
-		 kPdfVarMax}; // allowed Pdfs   
+		 kPdfVarMax}; // allowed Pdfs
 
   enum PdfFunc  {kNoPdfFunc=0,
 		 kNumber,
@@ -38,9 +38,13 @@ class GIRFPdf
 
   inline int    AddAxis(GIRFAxis* axis)  {fAxis.push_back(axis); return int(fAxis.size())-1;} // insert axis in the list and return its id
   inline void   SetData(float* data)     {fData = data;}
-  inline float* GetData()                const {return fData;} 
+  inline float* GetData()                const {return fData;}
   inline float* GetDataEntry(int ientry) const {return fData+ientry*GetNEntriesPerBin(fPdfFunc);}
   inline long   GetSize()                const {long tot=1;for(uint i=0;i<fAxis.size();i++) tot*=int(fAxis[i]->GetSize()); return tot;}
+  virtual inline std::string GetExtName() const {return GetVarName() + "_" + GetFuncName();}
+  virtual std::string GetFuncName() const;
+  virtual std::string GetVarName() const;
+  virtual std::string GetVarUnit() const;
 
   inline int GetNEntriesPerBin(PdfFunc func) const
   {
@@ -55,11 +59,18 @@ class GIRFPdf
       default:
 	return 0;
       }
-  }   
-  
-  virtual int Write(fitsfile* fptr,int ipdf,int& iaxis,int* status);
+  }
+
+  virtual int Write(fitsfile* fptr,int* status);
+  virtual int GetLastPdfID(std::string filename);
+
+ private:
+
+  virtual int GetLastPdfID(fitsfile* fptr);
+
+
 
 };
-  
+
 #endif
 

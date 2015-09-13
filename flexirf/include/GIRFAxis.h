@@ -4,6 +4,8 @@
 #include <string>
 #include "fitsio.h"
 
+using namespace std;
+
 class GIRFAxis
 {
  public: 
@@ -46,9 +48,12 @@ class GIRFAxis
   virtual ~GIRFAxis(){};
   
   virtual inline void SetVarType(VarType vartype) {fVarType=vartype;}
+  virtual void SetVarType(std::string axisVarName);
 
   virtual inline AxisType GetAxisType() const {return fAxisType;}
   virtual inline VarType GetVarType() const {return fVarType;}
+
+//  virtual GIRFAxis* GetAxis(fitsfile* fptr, int axisID, int* status);
 
   virtual float GetRangeMin() const {return 0;}
   virtual float GetRangeMax() const {return 0;}
@@ -58,20 +63,25 @@ class GIRFAxis
   virtual std::string GetTypeName() const;
   virtual std::string GetVarName() const;
   virtual std::string GetVarUnit() const;
+  GIRFAxis* GetAxis(fitsfile* fptr, int axisID, GIRFAxis::AxisType axisType, int* status);
 
-
-  virtual bool operator==(const GIRFAxis& otherAxis){return 0;}													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
+  virtual bool operator==(const GIRFAxis& otherAxis){return 1;}													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
   
-  virtual int Write(fitsfile* fptr,int& iaxis,int* status){*status=WRITE_ERROR;return *status;}
-  virtual int WriteAxis(fitsfile* fptr,int iaxis,long size,float* data,int* status);
+  virtual int Write(fitsfile* fptr,int& axisID ,int* status){*status=WRITE_ERROR;return *status;}
+  virtual int WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);
   virtual int IsAlreadyPresent(fitsfile* fptr,const GIRFAxis&,int* status){*status=READ_ERROR;return *status;};
+  virtual int GetLastAxisID(std::string filename);
+  virtual void Print(){;}
 
-
+  //  virtual bool CheckAxisExists(std::string filename, int& axisID);
 
  protected:
   virtual int CheckAxisConsistency();
+  virtual bool CheckAxisExists(fitsfile* fptr, int& axisID, int* status){return 0;}
+  virtual int GetLastAxisID(fitsfile* fptr);
   virtual void SetAxisType(AxisType type) {fAxisType=type;}
-
+  virtual void SetAxisType(std::string axisTypeName);
+  AxisType CheckAxisType(fitsfile* fptr, int axisID, int* status);
 }; 
 
 #endif

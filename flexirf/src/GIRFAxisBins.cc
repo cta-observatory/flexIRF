@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "GIRFAxisBins.h"
+#include "string.h"
 
 using namespace std;
 
@@ -84,6 +85,40 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 	SetAxis(size, bins);
 }
 
+
+////////////////////////////////////////////////////////////////
+//
+// Construct axis object directly reading from HDU
+//
+GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
+{
+	SetAxisType(kBins);
+
+	long int nRows;
+	int nCol, anynull;
+	float nullfloat = 0.0F;
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+
+	fits_get_num_rows(fptr, &nRows, status);
+	fits_get_num_cols(fptr, &nCol, status);
+	float farray[nRows];
+	//TODO: For now, just get one column. In the future Axis should have several columns (low/high bin edges)
+	fits_read_col (fptr, TFLOAT, 1, 1, 1, nRows, &nullfloat, &farray, &anynull, status);
+	fAxisBins.assign(farray,farray+nRows);
+	fAxisBinsFilled=1;
+	fIsLog=0;
+
+	fits_read_key_str(fptr, "VARTYPE", card, NULL, status);
+	SetVarType((VarType)atoi(card));
+
+
+}
+
+
+
+
+
+
 ////////////////////////////////////////////////////////////////
 // 
 // Check that the vector describe consistently the axis
@@ -129,22 +164,25 @@ void GIRFAxisBins::SetAxis(std::vector<float>::size_type size, float* bins) {
 	// Fill vector with arrays
 	for (std::vector<float>::size_type i = 0; i < size; i++)
 		fAxisBins.push_back(bins[i]);
+	fAxisBinsFilled=1;
 }
 
 ////////////////////////////////////////////////////////////////
 // 
 // Write the axis to the specified file pointer
 //
-int GIRFAxisBins::Write(fitsfile* fptr, int& iaxis, int* status) {
+int GIRFAxisBins::Write(fitsfile* fptr, int& axisID, int* status) {
 	// fill the data array
 	std::vector<float>::size_type axisSize = fAxisBins.size();
 	float* axisdata = new float[axisSize];
 	for (std::vector<float>::size_type ibin = 0; ibin < axisSize; ibin++)
 		axisdata[ibin] = fAxisBins[ibin];
 
-	// write the axis header and data
-	WriteAxis(fptr, iaxis++, int(axisSize), axisdata, status);
 
+	if (!CheckAxisExists(fptr, axisID, status)){
+		// write the axis header and data
+		WriteAxis(fptr, int(axisSize), axisdata, axisID, status);
+	}
 	return *status;
 }
 
@@ -166,6 +204,65 @@ int GIRFAxisBins::IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* dat
 	return *status;
 }
 
+
+////////////////////////////////////////////////////////////////
+//
+// Print Axis content
+//
+void GIRFAxisBins::Print()
+{
+	//TODO: Improve print output.
+	std::vector<float>::size_type axisSize = fAxisBins.size();
+	for (std::vector<float>::size_type ibin = 0; ibin < axisSize; ibin++) cout << "fAxisBins[" << ibin << "] = " << fAxisBins[ibin] << endl;
+}
+
+
+
+////////////////////////////////////////////////////////////////
+//
+// Check if the Axis already exists within the fits file
+//
+bool GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
+
+	bool exists = 0;
+
+	int currenthdu = fptr->HDUposition;
+
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
+
+	fits_get_num_hdus(fptr, &hdunum, status);
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fptr, hdupos, &hdutype, status);
+		if (hdutype == BINARY_TBL) {
+			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, status)) {
+				if (!strcmp(card, "AXIS")) {
+					if (!fits_read_key_str(fptr, "VARTYPE", card, NULL, status)) {
+						if ((ushort)atoi(card) == (ushort)this->GetVarType()) {
+							if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, status)) {
+								if (!strcmp(card, "BINS") && this->GetAxisType() == kBins) {
+									GIRFAxisBins* IRFAxis = new GIRFAxisBins(fptr, status);
+									if ((*IRFAxis)==(*this)) {
+										if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, status)) {
+											axisID=(ushort)atoi(card);
+											return TRUE;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (*status == KEY_NO_EXIST) *status = 0;
+		if (*status) break;
+	}
+
+	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
+	return exists;
+}
 
 
 
