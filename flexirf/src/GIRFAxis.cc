@@ -133,42 +133,7 @@ int GIRFAxis::CheckAxisConsistency() {
 	return status;
 }
 
-////////////////////////////////////////////////////////////////
-//
-// Check if the Axis already exists within the fits file
-//
-bool GIRFAxis::CheckAxisExists(fitsfile* fptr, int* status) {
 
-	bool exists = 0;
-
-	int currenthdu = fptr->HDUposition;
-
-	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
-	GIRFAxis* IRFAxis;
-
-	fits_get_num_hdus(fptr, &hdunum, status);
-	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
-	{
-		fits_movabs_hdu(fptr, hdupos, &hdutype, status);
-		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, status)) {
-				if (!strcmp(card, "AXIS")) {
-					if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, status)) {
-						if (!strcmp(card, "PARAM") && fAxisType == kParam) IRFAxis = new GIRFAxisBins(fptr, status);
-						if (!strcmp(card, "BINS") && fAxisType == kBins) IRFAxis = new GIRFAxisParam(fptr, status);
-					}
-					if (IRFAxis == this) return 1;
-				}
-			}
-		}
-		if (*status == KEY_NO_EXIST) *status = 0;
-		if (*status) break;
-	}
-
-	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
-	return exists;
-}
 
 ////////////////////////////////////////////////////////////////
 //
@@ -366,13 +331,6 @@ std::string GIRFAxis::GetVarUnit() const {
 int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 		int* status) {
 
-	// First check if the axis already exists
-	// TODO
-
-	if (CheckAxisExists(fptr, status)){
-		cout << "Existe ya el axis!!!!!!!!!!" << endl;
-	}
-
 
 	char extname[20], varname[20], form[20], unit[20];
 	sprintf(extname, "%s", GetExtName().data());
@@ -444,7 +402,6 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 
 
 	// Only for testing purposes.
-//	lastID = GetLastAxisID(fptr) + 1;
 //	GIRFAxisBins* IRFAxisbins;
 //	int a = CheckAxisType(fptr, 1, status);
 //	if (a == 1) {
@@ -455,6 +412,7 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 
 	//Good spot for axis tests
 	sprintf(keyword, "HDUCLAS4");
+	lastID = GetLastAxisID(fptr) + 1;
 	usval = ushort(lastID);
 	sprintf(comment, "Axis ID");
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))

@@ -35,7 +35,8 @@ class GIRFAxisBins : public GIRFAxis
   virtual int Write(fitsfile* fptr, int& lastID, int* status);
   virtual int IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* data,int* status);
   virtual void Print();
-  
+  virtual bool CheckAxisExists(fitsfile* fptr, int* status);
+
  protected:
   virtual int CheckAxisConsistency(); // return 0 if axis is consistent
 }; 

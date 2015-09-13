@@ -4,6 +4,8 @@
 #include <string>
 #include "fitsio.h"
 
+using namespace std;
+
 class GIRFAxis
 {
  public: 
@@ -63,7 +65,7 @@ class GIRFAxis
   virtual std::string GetVarUnit() const;
   GIRFAxis* GetAxis(fitsfile* fptr, int axisID, GIRFAxis::AxisType axisType, int* status);
 
-  virtual bool operator==(const GIRFAxis& otherAxis){return 0;}													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
+  virtual bool operator==(const GIRFAxis& otherAxis){return 1;}													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
   
   virtual int Write(fitsfile* fptr,int& lastID ,int* status){*status=WRITE_ERROR;return *status;}
   virtual int WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);
@@ -75,7 +77,7 @@ class GIRFAxis
 
  protected:
   virtual int CheckAxisConsistency();
-  virtual bool CheckAxisExists(fitsfile* fptr, int* status);
+  virtual bool CheckAxisExists(fitsfile* fptr, int* status){return 0;}
   virtual int GetLastAxisID(fitsfile* fptr);
   virtual void SetAxisType(AxisType type) {fAxisType=type;}
   virtual void SetAxisType(std::string axisTypeName);

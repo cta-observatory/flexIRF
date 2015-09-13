@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "GIRFAxisBins.h"
+#include "string.h"
 
 using namespace std;
 
@@ -96,6 +97,7 @@ GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 	long int nRows;
 	int nCol, anynull;
 	float nullfloat = 0.0F;
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
 
 	fits_get_num_rows(fptr, &nRows, status);
 	fits_get_num_cols(fptr, &nCol, status);
@@ -105,6 +107,11 @@ GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 	fAxisBins.assign(farray,farray+nRows);
 	fAxisBinsFilled=1;
 	fIsLog=0;
+
+	fits_read_key_str(fptr, "VARTYPE", card, NULL, status);
+	SetVarType((VarType)atoi(card));
+
+
 }
 
 
@@ -157,6 +164,7 @@ void GIRFAxisBins::SetAxis(std::vector<float>::size_type size, float* bins) {
 	// Fill vector with arrays
 	for (std::vector<float>::size_type i = 0; i < size; i++)
 		fAxisBins.push_back(bins[i]);
+	fAxisBinsFilled=1;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -169,6 +177,11 @@ int GIRFAxisBins::Write(fitsfile* fptr, int& lastID, int* status) {
 	float* axisdata = new float[axisSize];
 	for (std::vector<float>::size_type ibin = 0; ibin < axisSize; ibin++)
 		axisdata[ibin] = fAxisBins[ibin];
+
+
+	if (CheckAxisExists(fptr, status)){
+		cout << "Existe ya el axis!!!!!!!!!!" << endl;
+	}
 
 	// write the axis header and data
 	WriteAxis(fptr, int(axisSize), axisdata, lastID, status);
@@ -205,5 +218,50 @@ void GIRFAxisBins::Print()
 	std::vector<float>::size_type axisSize = fAxisBins.size();
 	for (std::vector<float>::size_type ibin = 0; ibin < axisSize; ibin++) cout << "fAxisBins[" << ibin << "] = " << fAxisBins[ibin] << endl;
 }
+
+
+
+////////////////////////////////////////////////////////////////
+//
+// Check if the Axis already exists within the fits file
+//
+bool GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int* status) {
+
+	bool exists = 0;
+
+	int currenthdu = fptr->HDUposition;
+
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
+
+	fits_get_num_hdus(fptr, &hdunum, status);
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fptr, hdupos, &hdutype, status);
+		if (hdutype == BINARY_TBL) {
+			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, status)) {
+				if (!strcmp(card, "AXIS")) {
+					if (!fits_read_key_str(fptr, "VARTYPE", card, NULL, status)) {
+						if ((ushort)atoi(card) == (ushort)this->GetVarType()) {
+							if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, status)) {
+								if (!strcmp(card, "BINS") && this->GetAxisType() == kBins) {
+									GIRFAxisBins* IRFAxis = new GIRFAxisBins(fptr, status);
+									if ((*IRFAxis)==(*this)) return TRUE;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (*status == KEY_NO_EXIST) *status = 0;
+		if (*status) break;
+	}
+
+	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
+	return exists;
+}
+
+
 
 
