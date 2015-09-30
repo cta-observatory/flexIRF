@@ -341,8 +341,11 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 	char *tform[] = { form }; // One column with float single precision (4 bytes)
 	char *tunit[] = { unit };
 
-	if (fits_create_tbl(fptr, BINARY_TBL, 0, 1, ttype, tform, tunit, extname,
-			status))
+	GoToLastAxisHDU(fptr);
+
+//	if (fits_create_tbl(fptr, BINARY_TBL, 0, 1, ttype, tform, tunit, extname,
+//			status))
+	if (fits_insert_btbl(fptr, 0, 1, ttype, tform, tunit, extname, 0, status))
 		cout
 				<< "GIRFAxis::Write Error: problem writing axis header (error code: "
 				<< *status << ")" << endl;
@@ -421,3 +424,41 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 
 	return *status;
 }
+
+////////////////////////////////////////////////////////////////
+//
+// Set CHDU to last Axis HDU present within the fits file
+//
+void GIRFAxis::GoToLastAxisHDU(fitsfile* fptr) {
+
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
+	int lastID = 0, lasthdu, initialHDU;
+
+	initialHDU = fptr->HDUposition;
+
+	fits_get_num_hdus(fptr, &hdunum, &status);
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		if (hdutype == BINARY_TBL) {
+			if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, &status)) {
+				if (!strcmp(card, GetTypeName().data())) {
+					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, &status)) {
+						if (atoi(card) > lastID) {
+							lastID = atoi(card);
+							lasthdu=fptr->HDUposition;
+						}
+					}
+				}
+			}
+		}
+		status = 0;
+		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
+		if (status)
+			break;
+	}
+	fits_movabs_hdu(fptr, lasthdu + 1, NULL, &status);
+}
+

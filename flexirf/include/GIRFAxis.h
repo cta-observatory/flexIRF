@@ -82,6 +82,7 @@ class GIRFAxis
   virtual void SetAxisType(AxisType type) {fAxisType=type;}
   virtual void SetAxisType(std::string axisTypeName);
   AxisType CheckAxisType(fitsfile* fptr, int axisID, int* status);
+  void GoToLastAxisHDU(fitsfile* fptr);
 }; 
 
 #endif
