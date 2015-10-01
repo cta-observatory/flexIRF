@@ -28,10 +28,8 @@ using namespace std;
 //
 GIRFConfig::GIRFConfig() :
 		fNSBLevel(kNoNSBLevel), fObsMode(kNoObsMode), fSubArray(kNoSubArray) {
-	fWeather.Transmitance = 0;
-	fWeather.molProfile = kNoMolProfile;
-	fHWStatus.reflectivity = 0;
-	fHWStatus.trigger = kNoTrigger;
+
+	SetDefault();
 
 	//Check if there is a config file in the path:
 	ifstream configfile("IRFConfig.txt");
@@ -43,10 +41,8 @@ GIRFConfig::GIRFConfig() :
 
 GIRFConfig::GIRFConfig(string filename) :
 		fNSBLevel(kNoNSBLevel), fObsMode(kNoObsMode), fSubArray(kNoSubArray) {
-	fWeather.Transmitance = 0;
-	fWeather.molProfile = kNoMolProfile;
-	fHWStatus.reflectivity = 0;
-	fHWStatus.trigger = kNoTrigger;
+
+	SetDefault();
 
 	ifstream configfile(filename.c_str());
 
@@ -62,7 +58,6 @@ int GIRFConfig::LoadConfigFile(string filename) {
 
 	// TODO
 	// Read input card and set values
-
 
 	return 0;
 }

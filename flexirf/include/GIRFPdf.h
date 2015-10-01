@@ -36,7 +36,7 @@ class GIRFPdf
   GIRFPdf(PdfVar pdftype=kNoPdfVar,PdfFunc pdffunc=kNoPdfFunc,std::vector<GIRFAxis*>::size_type naxes=0); // create new pdf table for a given PdfVar
   virtual ~GIRFPdf(){};
 
-  inline int    AddAxis(GIRFAxis* axis)  {fAxis.push_back(axis); return int(fAxis.size())-1;} // insert axis in the list and return its id
+  inline int    AddAxis(GIRFAxis* axis)  {fAxis.push_back(axis); return int(fAxis.size())-1;} // insert axis in the list and return its id TODO: deprecated!!! not anymore this ID!!!
   inline void   SetData(float* data)     {fData = data;}
   inline float* GetData()                const {return fData;}
   inline float* GetDataEntry(int ientry) const {return fData+ientry*GetNEntriesPerBin(fPdfFunc);}
