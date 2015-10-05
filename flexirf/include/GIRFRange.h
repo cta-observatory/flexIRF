@@ -1,7 +1,8 @@
-#ifndef G_IRFConfig
-#define G_IRFConfig
+#ifndef G_IRFRange
+#define G_IRFRange
 
 #include <string>
+#include <vector>
 #include <GIRFAxis.h>
 
 class GIRFRange {
@@ -26,6 +27,7 @@ public:
 
 	GIRFRange();
 	virtual ~GIRFRange() {};
+	inline std::vector<AxisRange*> GetAxisRanges(){return fAxisRanges;}
 };
 
 #endif

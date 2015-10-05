@@ -67,5 +67,15 @@ int main(int argc, char **argv)
 	axis4->SetAxisBins(vect2);
 	cout << "axis3==axis4 = " << ((*axis3)==(*axis4)) << endl;
 
+
+	GIRFConfig config;
+//	config.SetDefault();
+
+
+
+
+
+
+
 	return 0;
 }//Ends main

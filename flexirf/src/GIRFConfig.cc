@@ -20,6 +20,8 @@
 using namespace std;
 
 #include "GIRFConfig.h"
+#include "GIRFAxis.h"
+#include "GIRFRange.h"
 
 ////////////////////////////////////////////////////////////////
 // 
@@ -63,6 +65,7 @@ int GIRFConfig::LoadConfigFile(string filename) {
 }
 
 void GIRFConfig::SetDefault() {
+
 	fNSBLevel = kExtragalactic;
 	fObsMode = kPoint;
 	fSubArray = kFull;
@@ -70,5 +73,8 @@ void GIRFConfig::SetDefault() {
 	fWeather.molProfile = kAverage;
 	fHWStatus.reflectivity = 1;
 	fHWStatus.trigger = kStandard;
+
+//	fGIRFRange.AddAxisRange(GIRFAxis::kEnergy, -1,1);
+
 }
 

@@ -94,7 +94,18 @@ int GIRF::Write(string filename) {
 	return status;
 }
 
-GIRFPdf GIRF::GetPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
+GIRFPdf GIRF::GetPdf(string filename, GIRFPdf::PdfVar pdfVar, GIRFConfig* config) {
+
+	// Find all axis containing the valid range. Get IDs
+	std::vector<GIRFRange::AxisRange*> axisRanges = config->GetAxisRanges();
+	// List all Pdfs of pdfVar type, and check if they point to selected Axis (from the IDs)
+
+	// If found, extract Pdf values within the correct range:
+	// 		- Define each axis the Pdf points to, in the correct ranges
+	// 		- With the axis defined, set Pdf values for the correct ranges
+	// 		- return Pdf
+
+
 
 	GIRFPdf extractedPdf;
 
