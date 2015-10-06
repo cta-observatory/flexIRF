@@ -125,10 +125,10 @@ std::string GIRFPdf::GetVarUnit() const {
 		axisVarType = "erg*cm^-2*s^-1";
 		break;
 	case kAeff:
-		axisVarType = "m";
+		axisVarType = "m^2";
 		break;
 	case kAeffNoTheta2Cut:
-		axisVarType = "m";
+		axisVarType = "m^2";
 		break;
 	default:
 		cout << "Incorrect variable type.\n";

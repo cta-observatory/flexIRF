@@ -65,9 +65,11 @@ public:
 	GIRFConfig(std::string filename);
 	virtual ~GIRFConfig() {};
 
-	std::vector<GIRFRange::AxisRange*> GetAxisRanges(){return fGIRFRange.GetAxisRanges();}
+	inline std::vector<GIRFRange::AxisRange> GetAxisRanges(){return fGIRFRange.GetAxisRanges();}
+	inline void AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax){fGIRFRange.AddAxisRange(varType, valueMin, valueMax);}
 
 	void SetDefault();
+	void Print();
 };
 
 #endif

@@ -94,10 +94,14 @@ int GIRF::Write(string filename) {
 	return status;
 }
 
-GIRFPdf GIRF::GetPdf(string filename, GIRFPdf::PdfVar pdfVar, GIRFConfig* config) {
+GIRFPdf GIRF::GetPdf(string filename, GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 
 	// Find all axis containing the valid range. Get IDs
-	std::vector<GIRFRange::AxisRange*> axisRanges = config->GetAxisRanges();
+	std::vector<GIRFRange::AxisRange> axisRanges = config.GetAxisRanges();
+
+	for(std::vector<GIRFRange::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;;
+	}
 	// List all Pdfs of pdfVar type, and check if they point to selected Axis (from the IDs)
 
 	// If found, extract Pdf values within the correct range:

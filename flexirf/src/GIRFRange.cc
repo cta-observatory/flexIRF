@@ -38,11 +38,11 @@ GIRFRange::GIRFRange() {
 //
 void GIRFRange::AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax){
 
-	AxisRange* axisRange;
+	AxisRange axisRange;
 
-	axisRange->varType = varType;
-	axisRange->lowRange = valueMin;
-	axisRange->highRange = valueMax;
+	axisRange.varType = varType;
+	axisRange.lowRange = valueMin;
+	axisRange.highRange = valueMax;
 
 	fAxisRanges.push_back(axisRange);
 }

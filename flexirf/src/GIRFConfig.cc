@@ -74,7 +74,34 @@ void GIRFConfig::SetDefault() {
 	fHWStatus.reflectivity = 1;
 	fHWStatus.trigger = kStandard;
 
-//	fGIRFRange.AddAxisRange(GIRFAxis::kEnergy, -1,1);
+}
+
+void GIRFConfig::Print() {
+
+	cout << "*******************************************" << endl;
+	cout << "***       Printing CTAconfig          ***" << endl;
+	cout << "*******************************************" << endl;
+
+	cout << "fNSBLevel = " << fNSBLevel << endl;
+	cout << "fObsMode = " << fObsMode << endl;
+	cout << "fSubArray = " << fSubArray << endl;
+	cout << "Transmitance = " << fWeather.Transmitance << endl;
+	cout << "molProfile = " << fWeather.molProfile << endl;
+	cout << "reflectivity = " << fHWStatus.reflectivity << endl;
+	cout << "trigger = " << fHWStatus.trigger << endl;
+
+	std::vector<GIRFRange::AxisRange> axisRanges = GetAxisRanges();
+	for(std::vector<GIRFRange::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;;
+	}
+
+	cout << "" << endl;
+	cout << "*******************************************" << endl;
 
 }
+
+
+
+
+
 
