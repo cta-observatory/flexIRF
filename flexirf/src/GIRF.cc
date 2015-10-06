@@ -19,29 +19,45 @@
 #include "GIRFConfig.h"
 #include "GIRFPdf.h"
 
+#include <string>
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////
 // 
-// Construct fits object: open new file and overwrite
-// its content if already exists
-// Use only for empty Primary Image fits file
+// Create GIRF object: either for read/write FITS files
 //
 GIRF::GIRF() {
+
 }
 
 ////////////////////////////////////////////////////////////////
-// 
+//
+// Create GIRF object: either for read/write FITS files
+//
+GIRF::GIRF(string filename) {
+	fFilename=filename;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // Write IRF into file, return status (0 if ok)
 // (use filename="-" for stdout, or
 // start it with "!" to force overwriting)
-// 
-int GIRF::Write(string filename) {
+//
+int GIRF::Write() {
+
+	if (fFilename.empty()){
+		cout << "ERROR: No filename specified." << endl;
+		return 1;
+	}
+
 	fitsfile* fptr; // pointer to output file
 	int status = 0;   // must be initialized (0 means ok)
 
 	// create output file
-	if (fits_create_file(&fptr, filename.data(), &status))
+	if (fits_create_file(&fptr, fFilename.data(), &status))
 		cout << "GIRF::Write Error: cannot create file (error code: " << status
 				<< ")" << endl;
 
@@ -94,7 +110,8 @@ int GIRF::Write(string filename) {
 	return status;
 }
 
-GIRFPdf GIRF::GetPdf(string filename, GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
+
+GIRFPdf GIRF::GetPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 
 	// Find all axis containing the valid range. Get IDs
 	std::vector<GIRFRange::AxisRange> axisRanges = config.GetAxisRanges();
@@ -102,6 +119,10 @@ GIRFPdf GIRF::GetPdf(string filename, GIRFPdf::PdfVar pdfVar, GIRFConfig config)
 	for(std::vector<GIRFRange::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;;
 	}
+
+
+
+
 	// List all Pdfs of pdfVar type, and check if they point to selected Axis (from the IDs)
 
 	// If found, extract Pdf values within the correct range:
@@ -116,4 +137,12 @@ GIRFPdf GIRF::GetPdf(string filename, GIRFPdf::PdfVar pdfVar, GIRFConfig config)
 	return extractedPdf;
 
 }
+
+
+
+
+
+
+
+
 

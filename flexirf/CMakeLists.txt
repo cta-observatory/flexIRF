@@ -5,4 +5,5 @@ add_library(flexirf ${EXTRA_LIBS}
   ${srcForfIRF}/GIRF.cc
   ${srcForfIRF}/GIRFPdf.cc
   ${srcForfIRF}/GIRFConfig.cc 
-  ${srcForfIRF}/GIRFRange.cc )
+  ${srcForfIRF}/GIRFRange.cc 
+  ${srcForfIRF}/GIRFUtils.cc )

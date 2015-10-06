@@ -33,7 +33,6 @@ class GIRFAxisBins : public GIRFAxis
   virtual inline int   GetSize()     const {return int(fAxisBins.size());}
 
   virtual int Write(fitsfile* fptr, int& axisID, int* status);
-  virtual int IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* data,int* status);
   virtual void Print();
   virtual bool CheckAxisExists(fitsfile* fptr, int& axisID, int* status);
 

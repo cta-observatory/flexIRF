@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <GIRFUtils.h>
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////
@@ -133,62 +135,6 @@ int GIRFAxis::CheckAxisConsistency() {
 	return status;
 }
 
-
-
-////////////////////////////////////////////////////////////////
-//
-// Check the last Axis ID present within the fits file
-//
-int GIRFAxis::GetLastAxisID(string filename) {
-
-	fitsfile *fptr; /* FITS file pointer, defined in fitsio.h */
-	int status = 0;   		// must be initialized (0 means ok)
-	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-	int single = 0, hdupos, nkeys, ii;
-	int lastID = 0;
-
-	cout << "Opening file " << filename.data() << endl;
-	if (!fits_open_file(&fptr, filename.data(), READONLY, &status)) {
-		lastID = GetLastAxisID(fptr);
-	}
-	if (fits_close_file(fptr, &status))
-		cout << "GIRF::Write Error: cannot close file (error code: " << status
-				<< ")" << endl;
-	return lastID;
-}
-
-int GIRFAxis::GetLastAxisID(fitsfile* fptr) {
-
-	int currenthdu = fptr->HDUposition;
-
-	int status = 0;   		// must be initialized (0 means ok)
-	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
-	int lastID = 0;
-	fits_get_num_hdus(fptr, &hdunum, &status);
-
-	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
-	{
-		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
-		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, &status)) {
-				if (!strcmp(card, GetTypeName().data())) {
-					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL,
-							&status)) {
-						if (atoi(card) > lastID) {
-							lastID = atoi(card);
-						}
-					}
-				}
-			}
-		}
-		if (status == KEY_NO_EXIST) status = 0;
-		if (status) break;
-
-	}
-	fits_movabs_hdu(fptr, currenthdu + 1, NULL, &status);
-	return lastID;
-}
 
 ////////////////////////////////////////////////////////////////
 //
@@ -341,7 +287,7 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 	char *tform[] = { form }; // One column with float single precision (4 bytes)
 	char *tunit[] = { unit };
 
-	GoToLastAxisHDU(fptr);
+	GIRFUtils::GoToLastAxisHDU(fptr);
 
 //	if (fits_create_tbl(fptr, BINARY_TBL, 0, 1, ttype, tform, tunit, extname,
 //			status))
@@ -415,7 +361,7 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 
 	//Good spot for axis tests
 	sprintf(keyword, "HDUCLAS4");
-	lastID = GetLastAxisID(fptr) + 1;
+	lastID = GIRFUtils::GetLastAxisID(fptr) + 1;
 	usval = ushort(lastID);
 	sprintf(comment, "Axis ID");
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
@@ -425,40 +371,4 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 	return *status;
 }
 
-////////////////////////////////////////////////////////////////
-//
-// Set CHDU to last Axis HDU present within the fits file
-//
-void GIRFAxis::GoToLastAxisHDU(fitsfile* fptr) {
-
-	int status = 0;   		// must be initialized (0 means ok)
-	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
-	int lastID = 0, lasthdu, initialHDU;
-
-	initialHDU = fptr->HDUposition;
-
-	fits_get_num_hdus(fptr, &hdunum, &status);
-
-	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
-	{
-		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, &status)) {
-				if (!strcmp(card, GetTypeName().data())) {
-					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, &status)) {
-						if (atoi(card) > lastID) {
-							lastID = atoi(card);
-							lasthdu=fptr->HDUposition;
-						}
-					}
-				}
-			}
-		}
-		status = 0;
-		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
-		if (status)
-			break;
-	}
-	fits_movabs_hdu(fptr, lasthdu + 1, NULL, &status);
-}
 

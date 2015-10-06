@@ -69,20 +69,14 @@ class GIRFAxis
   
   virtual int Write(fitsfile* fptr,int& axisID ,int* status){*status=WRITE_ERROR;return *status;}
   virtual int WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);
-  virtual int IsAlreadyPresent(fitsfile* fptr,const GIRFAxis&,int* status){*status=READ_ERROR;return *status;};
-  virtual int GetLastAxisID(std::string filename);
   virtual void Print(){;}
-
-  //  virtual bool CheckAxisExists(std::string filename, int& axisID);
 
  protected:
   virtual int CheckAxisConsistency();
   virtual bool CheckAxisExists(fitsfile* fptr, int& axisID, int* status){return 0;}
-  virtual int GetLastAxisID(fitsfile* fptr);
   virtual void SetAxisType(AxisType type) {fAxisType=type;}
   virtual void SetAxisType(std::string axisTypeName);
   AxisType CheckAxisType(fitsfile* fptr, int axisID, int* status);
-  void GoToLastAxisHDU(fitsfile* fptr);
 }; 
 
 #endif

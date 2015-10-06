@@ -189,24 +189,6 @@ int GIRFAxisBins::Write(fitsfile* fptr, int& axisID, int* status) {
 
 ////////////////////////////////////////////////////////////////
 //
-// 		Search for identical axis within the fits file
-//
-int GIRFAxisBins::IsAlreadyPresent(fitsfile* fptr,int iaxis,long size,float* data,int* status){
-
-//	std::vector<float>::size_type axisSize = fAxisBins.size();
-//	float* axisdata = new float[axisSize];
-//	for (std::vector<float>::size_type ibin = 0; ibin < axisSize; ibin++)
-//		axisdata[ibin] = fAxisBins[ibin];
-//
-//	// write the axis header and data
-//	WriteAxis(fptr, iaxis++, int(axisSize), axisdata, status);
-
-	return *status;
-}
-
-
-////////////////////////////////////////////////////////////////
-//
 // Print Axis content
 //
 void GIRFAxisBins::Print()
