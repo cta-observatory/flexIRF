@@ -119,7 +119,7 @@ GIRFPdf GIRF::GetPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	for(std::vector<GIRFRange::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;;
 	}
-
+	vector<int> ids = GIRFUtils::FindAxisRanges(fFilename, axisRanges);
 
 
 

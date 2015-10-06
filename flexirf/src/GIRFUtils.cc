@@ -19,7 +19,9 @@
 using namespace std;
 
 #include "GIRFUtils.h"
+#include "GIRFRange.h"
 #include <string.h>
+#include <vector>
 
 
 
@@ -174,6 +176,11 @@ int GIRFUtils::GetLastPdfID(fitsfile* fptr) {
 	return lastID;
 }
 
+vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<GIRFRange::AxisRange> axisRanges){
 
+	vector<int> axisIDs;
+
+	return axisIDs;
+}
 
 
