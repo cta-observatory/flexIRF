@@ -42,86 +42,8 @@ GIRFAxis::GIRFAxis(VarType vartype) :
 		fAxisType(kNoAxisType), fVarType(vartype) {
 }
 
-////////////////////////////////////////////////////////////////
-//
-// Get axis object from fitsfile
-//
-GIRFAxis* GIRFAxis::GetAxis(fitsfile* fptr, int axisID, GIRFAxis::AxisType axisType, int* status) {
 
-	int currenthdu = fptr->HDUposition;
 
-	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-	int hdutype = BINARY_TBL, hdunum;
-	char axisIDkeyword[20];
-	sprintf(axisIDkeyword, "%d", axisID);
-	GIRFAxis* IRFAxis;
-
-	fits_get_num_hdus(fptr, &hdunum, status);
-	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
-	{
-		fits_movabs_hdu(fptr, hdupos, &hdutype, status);
-		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, status)) {
-				if (!strcmp(card, "AXIS")) {
-					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, status)) {
-						if (!strcmp(card, axisIDkeyword)) {
-							if (axisType == GIRFAxis::kBins) IRFAxis = new GIRFAxisBins(fptr, status);
-							if (axisType == GIRFAxis::kParam) IRFAxis = new GIRFAxisParam(fptr, status);
-						}
-					}
-				}
-			}
-		}
-		if (*status == KEY_NO_EXIST) *status = 0;
-		if (*status) break;
-	}
-
-	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
-	return IRFAxis;
-}
-
-////////////////////////////////////////////////////////////////
-//
-// Get axis object from fitsfile
-//
-GIRFAxis::AxisType GIRFAxis::CheckAxisType(fitsfile* fptr, int axisID, int* status) {
-
-	int currenthdu = fptr->HDUposition;
-
-	GIRFAxis::AxisType axisType = GIRFAxis::kNoAxisType;
-	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-	int hdutype = BINARY_TBL, hdunum;
-	char axisIDkeyword[20];
-	sprintf(axisIDkeyword, "%d", axisID);
-
-	fits_get_num_hdus(fptr, &hdunum, status);
-
-	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
-	{
-		fits_movabs_hdu(fptr, hdupos, &hdutype, status);
-		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, status)) {
-				if (!strcmp(card, "AXIS")) {
-					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, status)) { 	// Now we know this is the axis we want.
-						if (!strcmp(card, axisIDkeyword)) {
-							if (!fits_read_key_str(fptr, "HDUCLAS3", card, NULL, status)) {
-								if (!strcmp(card, "BINS")) axisType = GIRFAxis::kBins;
-								else if (!strcmp(card, "PARAM")) axisType = GIRFAxis::kParam;
-								else axisType = GIRFAxis::kNoAxisType;
-							}
-						}
-					}
-				}
-			}
-		}
-		if (*status == KEY_NO_EXIST) *status = 0;
-		if (*status) break;
-
-	}
-//TODO: Handle status and errors: No axis with that ID... Unknown axis type... etc...
-	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
-	return axisType;
-}
 
 ////////////////////////////////////////////////////////////////
 // 
@@ -352,7 +274,7 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 
 	// Only for testing purposes.
 //	GIRFAxisBins* IRFAxisbins;
-//	int a = CheckAxisType(fptr, 1, status);
+//	int a = GIRFUtils::CheckAxisType(fptr, 1, status);
 //	if (a == 1) {
 //		IRFAxisbins = (GIRFAxisBins*) GetAxis(fptr, 1, (GIRFAxis::AxisType) a, status);
 //		IRFAxisbins->Print();

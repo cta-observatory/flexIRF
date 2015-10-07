@@ -178,9 +178,79 @@ int GIRFUtils::GetLastPdfID(fitsfile* fptr) {
 
 vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<GIRFRange::AxisRange> axisRanges){
 
-	vector<int> axisIDs;
+	vector<int> axisIDs, foundIDs;
+
+
+	fitsfile *fptr; /* FITS file pointer, defined in fitsio.h */
+	int status = 0;   		// must be initialized (0 means ok)
+
+	if (fits_open_file(&fptr, filename.data(), READONLY, &status)) {
+		cout << "ERROR " << status << " while trying to open the FITS file." << endl;
+	}
+	for(std::vector<GIRFRange::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+		foundIDs = FindAxisRange(fptr, *axisRange);
+//		axisIDs.push_back(ID);
+		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;
+		for(vector<int>::iterator foundID = foundIDs.begin(); foundID != foundIDs.end(); ++foundID){
+			cout << "Found axis ID = " << *foundID << endl;
+		}
+	}
 
 	return axisIDs;
 }
+
+
+////////////////////////////////////////////////////////////////
+//
+// 		Return all axis IDs matching AxisRange.
+//
+//
+vector<int> GIRFUtils::FindAxisRange(fitsfile *fptr, GIRFRange::AxisRange axisRange){
+	vector<int> foundAxisID;
+
+	int currenthdu = fptr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...
+
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdutype, hdunum;
+	fits_get_num_hdus(fptr, &hdunum, &status);
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
+		if (hdutype == BINARY_TBL) {
+			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, &status)) {
+				if (!strcmp(card, "AXIS")) {
+					if (!fits_read_key_str(fptr, "VARTYPE", card, NULL, &status)) {
+						if (atoi(card) == axisRange.varType) {
+							if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, &status)) {
+								foundAxisID.push_back(atoi(card));
+							}
+						}
+					}
+				}
+			}
+		}
+		if (status == KEY_NO_EXIST) status = 0;
+		if (status) break;
+
+	}
+	fits_movabs_hdu(fptr, currenthdu + 1, NULL, &status);
+
+	return foundAxisID;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

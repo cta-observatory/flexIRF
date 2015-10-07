@@ -14,6 +14,9 @@ namespace GIRFUtils{
 	int GetLastPdfID(string filename);
 	int GetLastPdfID(fitsfile* fptr);
 	vector<int> FindAxisRanges(string filename, std::vector<GIRFRange::AxisRange> axisRanges);
+	vector<int> FindAxisRange(fitsfile *fptr, GIRFRange::AxisRange axisRange);
+	GIRFAxis GetAxis(fitsfile *fptr, int axisID);
+
 };
 
 #endif

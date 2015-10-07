@@ -63,7 +63,6 @@ class GIRFAxis
   virtual std::string GetTypeName() const;
   virtual std::string GetVarName() const;
   virtual std::string GetVarUnit() const;
-  GIRFAxis* GetAxis(fitsfile* fptr, int axisID, GIRFAxis::AxisType axisType, int* status);
 
   virtual bool operator==(const GIRFAxis& otherAxis){return 1;}													//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
   
@@ -76,7 +75,7 @@ class GIRFAxis
   virtual bool CheckAxisExists(fitsfile* fptr, int& axisID, int* status){return 0;}
   virtual void SetAxisType(AxisType type) {fAxisType=type;}
   virtual void SetAxisType(std::string axisTypeName);
-  AxisType CheckAxisType(fitsfile* fptr, int axisID, int* status);
+
 }; 
 
 #endif

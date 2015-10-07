@@ -16,6 +16,8 @@ class GIRF {
 private:
 	std::vector<GIRFPdf*> fPdfList;
 	std::string fFilename;
+	fitsfile* fFitsPtr;
+	int fStatus;
 
 public:
 	GIRF();
@@ -24,11 +26,20 @@ public:
 
 	inline int AddPdf(GIRFPdf* pdf) { fPdfList.push_back(pdf); return int(fPdfList.size()) - 1;}  // insert pdf in the list and return its id
 
+	int CheckStatus();
+
+	GIRFAxis GetAxis(int axisID);
+	GIRFPdf GetPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config);
+	inline GIRFPdf GetPdf(std::string filename, GIRFPdf::PdfVar pdfVar, GIRFConfig config){fFilename=filename; return GetPdf(pdfVar, config);};
+
 	int Write();
 	inline int Write(std::string filename){fFilename=filename; return Write();};
 
-	GIRFPdf GetPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config);
-	inline GIRFPdf GetPdf(std::string filename, GIRFPdf::PdfVar pdfVar, GIRFConfig config){fFilename=filename; return GetPdf(pdfVar, config);};
+
+protected:
+
+	int CheckAxisHDUpos(int axisID);
+	GIRFAxis::AxisType CheckAxisType(int axisID);
 
 	void GoToLastAxisHDU(fitsfile* fptr);
 };

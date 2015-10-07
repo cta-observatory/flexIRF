@@ -88,7 +88,7 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 
 ////////////////////////////////////////////////////////////////
 //
-// Construct axis object directly reading from HDU
+// Construct axis object directly reading from current HDU
 //
 GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 {
@@ -110,8 +110,6 @@ GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 
 	fits_read_key_str(fptr, "VARTYPE", card, NULL, status);
 	SetVarType((VarType)atoi(card));
-
-
 }
 
 
