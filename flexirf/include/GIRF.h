@@ -42,9 +42,12 @@ protected:
 
 	int CheckAxisHDUpos(int axisID);
 	GIRFAxis::AxisType CheckAxisType(int axisID);
-	vector<int> FindAxisRange(GIRFAxis::AxisRange axisRange);
-	vector< vector<int> > FindAxisRanges(std::vector<GIRFAxis::AxisRange> axisRanges);
-	vector<int> FindPdfs(vector< vector<int> > axisIDs);
+	vector<int> 			FindAxisRange(GIRFAxis::AxisRange axisRange);
+	vector< vector<int> > 	FindAxisRanges(std::vector<GIRFAxis::AxisRange> axisRanges);
+	vector<int> 			FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar);
+	vector<int> 			FindPdfsOfType(GIRFPdf::PdfVar pdfVar);
+	vector<int> 			GetPdfAxes(int pdfID);
+
 };
 
 #endif

@@ -261,7 +261,7 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 
 	sprintf(keyword, "HDUCLAS4");
 	usval = ushort(pdfID);
-	sprintf(comment, "Axis ID");
+	sprintf(comment, "Pdf ID");
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;

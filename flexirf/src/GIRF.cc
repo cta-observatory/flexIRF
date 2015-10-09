@@ -300,8 +300,9 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	//**************************************************************//
 	// 		Find all pdfs containing the valid axis IDs.
 	//**************************************************************//
-
 	cout << "ids.size() = " << ids[0].size() << endl;
+
+	vector<int> foundPdfs = FindPdfs(ids, pdfVar);
 
 //	for(std::vector<int>::iterator foundAxisID = ids.begin(); foundAxisID != ids.end(); ++foundAxisID) {
 //		cout << "foundAxisID = " << *foundAxisID << endl;
@@ -407,16 +408,119 @@ vector< vector<int> > GIRF::FindAxisRanges(std::vector<GIRFAxis::AxisRange> axis
 
 ////////////////////////////////////////////////////////////////
 //
-// 		Return all axis IDs matching AxisRange.
+// 		Return Pdfs IDs pointing at all axisIDs.
 //
-vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs){
+vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar){
+
+	vector<int> foundPdfIDs, pdfAxes;
+
+
+	vector<int> pdfsOfCorrectType = FindPdfsOfType(pdfVar);
+
+	vector< vector<int> > foundPdfsAxisIDs;
+
+	for(std::vector<int>::iterator pdfID = pdfsOfCorrectType.begin(); pdfID != pdfsOfCorrectType.end(); ++pdfID) {
+		cout << "Pdf #" << *pdfID << " is of correct type!!" << endl;
+		foundPdfsAxisIDs.push_back(GetPdfAxes(*pdfID));
+	}
 
 
 
+
+
+
+	return foundPdfIDs;
 }
 
+////////////////////////////////////////////////////////////////
+//
+// 		Return all axis IDs matching AxisRange.
+//
+vector<int> GIRF::FindPdfsOfType(GIRFPdf::PdfVar pdfVar){
 
+	vector<int> foundPdfIDs;
 
+	int currenthdu = fFitsPtr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...
+
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int numaxes = 0, hdutype, hdunum;
+	fits_get_num_hdus(fFitsPtr, &hdunum, &status);
+	char axisIDkeyword[20];
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
+		if (hdutype == IMAGE_HDU) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+				if (!strcmp(card, "DATA")) {
+					if (!fits_read_key_str(fFitsPtr, "PDFVAR", card, NULL, &status)) {
+						if (atoi(card) == (int)pdfVar) {
+							if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
+								foundPdfIDs.push_back(atoi(card));
+							}
+						}
+					}
+				}
+			}
+		}
+		if (status == KEY_NO_EXIST) status = 0;
+		if (status) break;
+
+	}
+	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &status);
+
+	return foundPdfIDs;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// 		Return the axis IDs which the Pdf points at.
+//
+vector<int> GIRF::GetPdfAxes(int pdfID){
+
+	vector<int> foundAxisIDs;
+
+	int currenthdu = fFitsPtr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...
+
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int numaxes = 0, hdutype, hdunum;
+	fits_get_num_hdus(fFitsPtr, &hdunum, &status);
+	char axisIDkeyword[20];
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
+		if (hdutype == IMAGE_HDU) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+				if (!strcmp(card, "DATA")) {
+					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
+						if (atoi(card) == pdfID){
+							// Current HDU is the pdf we want.
+							if (!fits_read_key_str(fFitsPtr, "NAXIS", card, NULL, &status)) {
+								numaxes=atoi(card);
+								for (int i=1;i<=numaxes;i++){
+									sprintf(axisIDkeyword, "AXISID%d", i);
+									if (!fits_read_key_str(fFitsPtr, axisIDkeyword, card, NULL, &status)) {
+										foundAxisIDs.push_back(atoi(card));
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (status == KEY_NO_EXIST) status = 0;
+		if (status) break;
+
+	}
+	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &status);
+
+	return foundAxisIDs;
+
+}
 
 
 
