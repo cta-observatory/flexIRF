@@ -19,6 +19,8 @@ class GIRFAxisParam : public GIRFAxis
   GIRFAxisParam(VarType vartype,std::vector<float>::size_type size,float* bins,bool islog=false); // create new axis 
   GIRFAxisParam(fitsfile* fptr,int* status);
 
+  bool ContainsRange(AxisRange axisRange);
+
   virtual ~GIRFAxisParam(){};
 
   virtual inline void SetAxisParam(std::vector<float> axisbins) {fAxisParam=axisbins;}

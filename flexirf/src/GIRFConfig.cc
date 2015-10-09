@@ -90,8 +90,8 @@ void GIRFConfig::Print() {
 	cout << "reflectivity = " << fHWStatus.reflectivity << endl;
 	cout << "trigger = " << fHWStatus.trigger << endl;
 
-	std::vector<GIRFRange::AxisRange> axisRanges = GetAxisRanges();
-	for(std::vector<GIRFRange::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+	std::vector<GIRFAxis::AxisRange> axisRanges = GetAxisRanges();
+	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;;
 	}
 

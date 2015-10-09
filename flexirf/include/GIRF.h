@@ -18,6 +18,7 @@ private:
 	std::string fFilename;
 	fitsfile* fFitsPtr;
 	int fStatus;
+	bool fFITSopened;
 
 public:
 	GIRF();
@@ -28,20 +29,22 @@ public:
 
 	int CheckStatus();
 
-	GIRFAxis GetAxis(int axisID);
-	GIRFPdf GetPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config);
-	inline GIRFPdf GetPdf(std::string filename, GIRFPdf::PdfVar pdfVar, GIRFConfig config){fFilename=filename; return GetPdf(pdfVar, config);};
+	GIRFAxis* ReadAxis(int axisID);
+	inline GIRFPdf GetPdf(int pdfPos){GIRFPdf pdf = *fPdfList[pdfPos]; return pdf;};
+	GIRFPdf ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config);
 
 	int Write();
 	inline int Write(std::string filename){fFilename=filename; return Write();};
-
+	int OpenFITS();
+	int CreateFITS();
 
 protected:
 
 	int CheckAxisHDUpos(int axisID);
 	GIRFAxis::AxisType CheckAxisType(int axisID);
-
-	void GoToLastAxisHDU(fitsfile* fptr);
+	vector<int> FindAxisRange(GIRFAxis::AxisRange axisRange);
+	vector< vector<int> > FindAxisRanges(std::vector<GIRFAxis::AxisRange> axisRanges);
+	vector<int> FindPdfs(vector< vector<int> > axisIDs);
 };
 
 #endif

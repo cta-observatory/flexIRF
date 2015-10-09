@@ -20,6 +20,7 @@
 using namespace std;
 
 #include "GIRFRange.h"
+#include "GIRFAxis.h"
 
 ////////////////////////////////////////////////////////////////
 //
@@ -38,7 +39,7 @@ GIRFRange::GIRFRange() {
 //
 void GIRFRange::AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax){
 
-	AxisRange axisRange;
+	GIRFAxis::AxisRange axisRange;
 
 	axisRange.varType = varType;
 	axisRange.lowRange = valueMin;

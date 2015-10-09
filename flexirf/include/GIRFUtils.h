@@ -8,13 +8,15 @@
 
 namespace GIRFUtils{
 
-	void GoToLastAxisHDU(fitsfile* fptr);
 	int GetLastAxisID(fitsfile* fptr);
 	int GetLastAxisID(string filename);
 	int GetLastPdfID(string filename);
 	int GetLastPdfID(fitsfile* fptr);
-	vector<int> FindAxisRanges(string filename, std::vector<GIRFRange::AxisRange> axisRanges);
-	vector<int> FindAxisRange(fitsfile *fptr, GIRFRange::AxisRange axisRange);
+
+	void GoToLastAxisHDU(fitsfile* fptr);
+
+	vector<int> FindAxisRanges(string filename, std::vector<GIRFAxis::AxisRange> axisRanges);
+	vector<int> FindAxisRange(fitsfile *fptr, GIRFAxis::AxisRange axisRange);
 	GIRFAxis GetAxis(fitsfile *fptr, int axisID);
 
 };

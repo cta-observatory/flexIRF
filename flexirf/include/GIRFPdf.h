@@ -62,13 +62,6 @@ class GIRFPdf
   }
 
   virtual int Write(fitsfile* fptr,int* status);
-  virtual int GetLastPdfID(std::string filename);
-
- private:
-
-  virtual int GetLastPdfID(fitsfile* fptr);
-
-
 
 };
 

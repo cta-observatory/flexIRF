@@ -135,10 +135,9 @@ int GIRFAxisBins::CheckAxisConsistency() {
 
 ////////////////////////////////////////////////////////////////
 //
-// Check if both axis are identical
-//
+// Check if both axis are identical. For now, only ranges and bins
+//	TODO: check values inside
 bool GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
-
 	if (otherAxis.GetAxisType() == this->GetAxisType() && otherAxis.GetVarType() == this->GetVarType()){
 		if (otherAxis.GetRangeMax() == this->GetRangeMax() && otherAxis.GetRangeMin() == this->GetRangeMin() && otherAxis.GetSize() == this->GetSize()){
 			vector<float> otherAxisBins = otherAxis.GetAxisBins();
@@ -146,6 +145,19 @@ bool GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
 			else return 0;
 		} else return 0;
 	} else return 0;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// Check if axis contains AxisRange
+//
+bool GIRFAxisBins::ContainsRange(GIRFAxis::AxisRange axisRange){
+	if (axisRange.varType != this->GetVarType()) return 0;							//Sanity check
+	else{
+		if (axisRange.lowRange > this->GetRangeMin() && axisRange.highRange < this->GetRangeMax()) return 1;
+		else return 0;
+	}
 }
 
 ////////////////////////////////////////////////////////////////

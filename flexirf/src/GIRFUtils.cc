@@ -155,6 +155,7 @@ int GIRFUtils::GetLastPdfID(fitsfile* fptr) {
 
 	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
 	{
+		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
 		if (hdutype == IMAGE_HDU) {						// First check if HDU extension
 			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, &status)) {
 				if (!strcmp(card, "DATA")) {
@@ -176,7 +177,7 @@ int GIRFUtils::GetLastPdfID(fitsfile* fptr) {
 	return lastID;
 }
 
-vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<GIRFRange::AxisRange> axisRanges){
+vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<GIRFAxis::AxisRange> axisRanges){
 
 	vector<int> axisIDs, foundIDs;
 
@@ -187,7 +188,7 @@ vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<GIRFRange::Ax
 	if (fits_open_file(&fptr, filename.data(), READONLY, &status)) {
 		cout << "ERROR " << status << " while trying to open the FITS file." << endl;
 	}
-	for(std::vector<GIRFRange::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 		foundIDs = FindAxisRange(fptr, *axisRange);
 //		axisIDs.push_back(ID);
 		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;
@@ -205,7 +206,7 @@ vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<GIRFRange::Ax
 // 		Return all axis IDs matching AxisRange.
 //
 //
-vector<int> GIRFUtils::FindAxisRange(fitsfile *fptr, GIRFRange::AxisRange axisRange){
+vector<int> GIRFUtils::FindAxisRange(fitsfile *fptr, GIRFAxis::AxisRange axisRange){
 	vector<int> foundAxisID;
 
 	int currenthdu = fptr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...
