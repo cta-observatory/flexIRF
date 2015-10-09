@@ -421,8 +421,11 @@ vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar
 
 	for(std::vector<int>::iterator pdfID = pdfsOfCorrectType.begin(); pdfID != pdfsOfCorrectType.end(); ++pdfID) {
 		cout << "Pdf #" << *pdfID << " is of correct type!!" << endl;
+		pdfAxes = GetPdfAxes(*pdfID);
+
 		foundPdfsAxisIDs.push_back(GetPdfAxes(*pdfID));
 	}
+
 
 
 
