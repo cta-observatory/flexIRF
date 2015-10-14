@@ -277,6 +277,7 @@ GIRFAxis* GIRF::ReadAxis(int axisID) {
 		cout << "Invalid axis type\n";
 		CheckStatus();
 		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
+		return NULL;
 		break;
 	}
 
@@ -284,7 +285,11 @@ GIRFAxis* GIRF::ReadAxis(int axisID) {
 
 
 
-
+////////////////////////////////////////////////////////////////
+//
+// 		Search and extract GIRFPdf object from fitsfile
+//		with specific  PdfVar and GIRFConfig.
+//
 GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 
 	//**************************************************************//
@@ -300,9 +305,24 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	//**************************************************************//
 	// 		Find all pdfs containing the valid axis IDs.
 	//**************************************************************//
-	cout << "ids.size() = " << ids[0].size() << endl;
+	cout << "Number of axis dependencies: ids.size() = " << ids.size() << endl;
+	cout << "Found axis IDs for the first dependency: ids[0].size() = " << ids[0].size() << endl;
 
 	vector<int> foundPdfs = FindPdfs(ids, pdfVar);
+
+	// Several IRFs may contain the valid axis IDs!!
+	//**************************************************************//
+	// 		Several IRFs may contain the valid axis IDs
+	// 		Choose the preferable one. TODO!!
+	//**************************************************************//
+	int chosenPdfID = PickPreferredPdf(foundPdfs, config);
+
+	//**************************************************************//
+	// 		Extract Pdf ID.
+	//**************************************************************//
+
+	GIRFPdf extractedPdf = ReadPdf(chosenPdfID);
+
 
 //	for(std::vector<int>::iterator foundAxisID = ids.begin(); foundAxisID != ids.end(); ++foundAxisID) {
 //		cout << "foundAxisID = " << *foundAxisID << endl;
@@ -315,12 +335,30 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	// 		- return Pdf
 
 
-
-	GIRFPdf extractedPdf;
-
 	return extractedPdf;
 
 }
+
+////////////////////////////////////////////////////////////////
+//
+// 		Read GIRFPdf object from fitsfile with a specific
+//		pdfID
+//
+GIRFPdf GIRF::ReadPdf(int pdfID) {
+
+	vector<int> pdfAxes = GetPdfAxisIDs(pdfID);
+
+	GIRFPdf pdfOut;
+
+	for(std::vector<int>::iterator axisID = pdfAxes.begin(); axisID != pdfAxes.end(); ++axisID) {
+		pdfOut.AddAxis(ReadAxis(*axisID));
+	}
+
+
+
+	return pdfOut;
+}
+
 
 ////////////////////////////////////////////////////////////////
 //
@@ -415,29 +453,45 @@ vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar
 	vector<int> foundPdfIDs, pdfAxes;
 
 
-	vector<int> pdfsOfCorrectType = FindPdfsOfType(pdfVar);
+	vector<int> pdfsIDOfCorrectType = FindPdfsOfType(pdfVar);
 
-	vector< vector<int> > foundPdfsAxisIDs;
+	vector< vector<int> > foundPdfsAxisIDs = GetPdfAxisIDs(pdfsIDOfCorrectType);
 
-	for(std::vector<int>::iterator pdfID = pdfsOfCorrectType.begin(); pdfID != pdfsOfCorrectType.end(); ++pdfID) {
-		cout << "Pdf #" << *pdfID << " is of correct type!!" << endl;
-		pdfAxes = GetPdfAxes(*pdfID);
 
-		foundPdfsAxisIDs.push_back(GetPdfAxes(*pdfID));
+	cout << "foundPdfsAxisIDs:" << endl;
+	for(std::vector< vector<int> >::iterator pdf = foundPdfsAxisIDs.begin(); pdf != foundPdfsAxisIDs.end(); ++pdf) {
+		cout << "This pdf points axes: ";
+		for(std::vector<int>::iterator pdfID = pdf->begin(); pdfID != pdf->end(); ++pdfID) {
+			cout << *pdfID << ", ";
+		}
+		cout << endl;
 	}
 
+	cout << "axisIDs:" << endl;
+	for(std::vector< vector<int> >::iterator axis = axisIDs.begin(); axis != axisIDs.end(); ++axis) {
+		cout << "This axis range points axes: ";
+		for(std::vector<int>::iterator axisID = axis->begin(); axisID != axis->end(); ++axisID) {
+			cout << *axisID << ", ";
+		}
+		cout << endl;
+	}
+	// Now we have the axis IDs of each Pdf of correct type.
+	// We need to check if any of these Pdfs point to the correct axis IDs.
 
+	vector<int> correctPdfIDs = FindPdfsPointingToAxisIDs(axisIDs, pdfsIDOfCorrectType, foundPdfsAxisIDs);
 
-
-
-
+	cout << "correctPdfIDs: ";
+	for(std::vector<int>::iterator pdfID = correctPdfIDs.begin(); pdfID != correctPdfIDs.end(); ++pdfID) {
+		cout << *pdfID << " ";
+	}
+	cout << endl;
 
 	return foundPdfIDs;
 }
 
 ////////////////////////////////////////////////////////////////
 //
-// 		Return all axis IDs matching AxisRange.
+// 		Return all pdf IDs matching the Pdf type pdfVar.
 //
 vector<int> GIRF::FindPdfsOfType(GIRFPdf::PdfVar pdfVar){
 
@@ -480,7 +534,7 @@ vector<int> GIRF::FindPdfsOfType(GIRFPdf::PdfVar pdfVar){
 //
 // 		Return the axis IDs which the Pdf points at.
 //
-vector<int> GIRF::GetPdfAxes(int pdfID){
+vector<int> GIRF::GetPdfAxisIDs(int pdfID){
 
 	vector<int> foundAxisIDs;
 
@@ -526,10 +580,67 @@ vector<int> GIRF::GetPdfAxes(int pdfID){
 }
 
 
+////////////////////////////////////////////////////////////////
+//
+// 		Return the axis IDs which the Pdfs points at.
+//
+vector< vector<int> > GIRF::GetPdfAxisIDs(vector<int> pdfIDs){
+
+	vector< vector<int> > foundPdfsAxisIDs;
+
+	for(std::vector<int>::iterator pdfID = pdfIDs.begin(); pdfID != pdfIDs.end(); ++pdfID) {
+		cout << "Pdf #" << *pdfID << " is of correct type!!" << endl;
+		foundPdfsAxisIDs.push_back(GetPdfAxisIDs(*pdfID));
+	}
+
+	return foundPdfsAxisIDs;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// 		Return the pdf IDs pointing at the correct axis.
+//
+vector<int> GIRF::FindPdfsPointingToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfsIDs, vector< vector<int> > allPdfsAxisIDs){
+
+	vector<int> foundPdfIDs;
+
+	int ipdf=0;
+	for(std::vector< vector<int> >::iterator pdf = allPdfsAxisIDs.begin(); pdf != allPdfsAxisIDs.end(); ++pdf, ipdf++) {
+		if (CheckPdfPointsToAxisIDs(axisIDs, *pdf)) foundPdfIDs.push_back(pdfsIDs[ipdf]);
+	}
+	return foundPdfIDs;
+}
 
 
+////////////////////////////////////////////////////////////////
+//
+// 		Check if one pdf points to the required axes
+//
+bool GIRF::CheckPdfPointsToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfAxisIDs){
 
 
+	bool axisRangePresent=0;
+	for(std::vector< vector<int> >::iterator axisRange = axisIDs.begin(); axisRange != axisIDs.end(); ++axisRange) {
+		for(std::vector<int>::iterator axisRangeID = axisRange->begin(); axisRangeID != axisRange->end(); ++axisRangeID) {
+			for(std::vector<int>::iterator pdfaxisID = pdfAxisIDs.begin(); pdfaxisID != pdfAxisIDs.end(); ++pdfaxisID) {
+				if (*pdfaxisID == *axisRangeID) axisRangePresent=1;
+			}
+		}
+		if (!axisRangePresent) return 0;
+	}
+	return 1;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// 		Check if one pdf points to the required axes
+//
+int GIRF::PickPreferredPdf(vector<int> foundPdfs, GIRFConfig config){
+
+	//TODO!!!!!!!!!!!!!
+	return foundPdfs[0];
+
+}
 
 
 

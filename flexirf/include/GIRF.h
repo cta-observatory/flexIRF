@@ -32,6 +32,7 @@ public:
 	GIRFAxis* ReadAxis(int axisID);
 	inline GIRFPdf GetPdf(int pdfPos){GIRFPdf pdf = *fPdfList[pdfPos]; return pdf;};
 	GIRFPdf ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config);
+	GIRFPdf ReadPdf(int pdfID);
 
 	int Write();
 	inline int Write(std::string filename){fFilename=filename; return Write();};
@@ -46,8 +47,11 @@ protected:
 	vector< vector<int> > 	FindAxisRanges(std::vector<GIRFAxis::AxisRange> axisRanges);
 	vector<int> 			FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar);
 	vector<int> 			FindPdfsOfType(GIRFPdf::PdfVar pdfVar);
-	vector<int> 			GetPdfAxes(int pdfID);
-
+	vector<int> 			GetPdfAxisIDs(int pdfID);
+	vector< vector<int> > 	GetPdfAxisIDs(vector<int> pdfIDs);
+	vector<int> 			FindPdfsPointingToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfsIDs, vector< vector<int> > allPdfsAxisIDs);
+	bool 					CheckPdfPointsToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfAxisIDs);
+	int 					PickPreferredPdf(vector<int> foundPdfs, GIRFConfig config);
 };
 
 #endif
