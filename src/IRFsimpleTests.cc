@@ -76,7 +76,28 @@ int main(int argc, char **argv)
 	string filename = "/home/thassan/Workspace/IRM_devel/build/alltest.fits";
 	GIRF irf(filename);
 	GIRFPdf effArea = irf.ReadPdf(GIRFPdf::kAeff, config);
+//	effArea.Print();
 
+
+
+//	vector<int> test;
+//	test.push_back(1);
+//	test.push_back(2);
+//	test.push_back(3);
+//
+//	int *test2 = test.data();
+//
+//	test.erase(test.begin(),test.begin()+0);
+//	test.erase(test.begin()+3,test.end());
+//
+//	cout << "test.size() = " << test.size() << endl;
+//	cout << "test[0] = " << test[0] << endl;
+//	cout << "test[1] = " << test[1] << endl;
+//	cout << "test[3] = " << test[3] << endl;
+//
+//	cout << "test2[0] = " << test2[0] << endl;
+//	cout << "test2[1] = " << test2[1] << endl;
+//	cout << "test2[3] = " << test2[3] << endl;
 
 
 	return 0;

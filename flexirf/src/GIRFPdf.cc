@@ -274,3 +274,31 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 
 	return *status;
 }
+
+
+
+////////////////////////////////////////////////////////////////
+//
+// Write the pdf and the associated axes to the specified
+// file pointer
+//
+void GIRFPdf::Print() const {
+
+	int iAxis=0;
+	cout << "Printing Axes:" << endl;
+	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iAxis++) {
+		cout << "Printing Axis #" << iAxis+1 << endl;
+		(*axis)->Print();
+	}
+	cout << "Printing Pdf content:" << endl;
+	int iData=0;
+	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {
+		cout << "Printing Axis #1" << iAxis+1 << endl;
+		for (int i=0;i<(*axis)->GetSize();i++){
+			cout << fData[i] << endl;
+		}
+	}
+
+}
+
+

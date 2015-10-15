@@ -129,6 +129,51 @@ GIRFAxis::AxisType GIRF::CheckAxisType(int axisID) {
 	return axisType;
 }
 
+
+////////////////////////////////////////////////////////////////
+//
+// Get axis variable with specific ID
+//
+GIRFAxis::VarType GIRF::CheckAxisVarType(int axisID) {
+
+	int currenthdu = fFitsPtr->HDUposition;
+
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int hdutype = BINARY_TBL, hdunum;
+	char axisIDkeyword[20];
+	sprintf(axisIDkeyword, "%d", axisID);
+
+	fits_get_num_hdus(fFitsPtr, &hdunum, &fStatus);
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &fStatus);
+		if (hdutype == BINARY_TBL) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &fStatus)) {
+				if (!strcmp(card, "AXIS")) {
+					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &fStatus)) {
+						if (!strcmp(card, axisIDkeyword)) {
+							// Now we know this is the axis we want.
+							if (!fits_read_key_str(fFitsPtr, "VARTYPE", card, NULL, &fStatus)) {
+								return static_cast<GIRFAxis::VarType>(atoi(card));
+							}
+						}
+					}
+				}
+			}
+		}
+		if (fStatus == KEY_NO_EXIST) fStatus = 0;
+		if (fStatus) break;
+
+	}
+//TODO: Handle status and errors: No axis with that ID... Unknown axis type... etc...
+	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
+	return GIRFAxis::kNoVarType;
+}
+
+
+
+
 ////////////////////////////////////////////////////////////////
 //
 // Write IRF into file, return status (0 if ok)
@@ -248,6 +293,7 @@ GIRFAxis* GIRF::ReadAxis(int axisID) {
 	int currenthdu = fFitsPtr->HDUposition;
 
 	GIRFAxis::AxisType axisType = CheckAxisType(axisID);
+
 	int hduPos = CheckAxisHDUpos(axisID);
 	//TODO: Handle status!!
 
@@ -262,6 +308,56 @@ GIRFAxis* GIRF::ReadAxis(int axisID) {
 
 	case GIRFAxis::kBins:{
 		GIRFAxisBins *axisBins = new GIRFAxisBins(fFitsPtr, &fStatus);
+		CheckStatus();
+		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
+		return axisBins;
+	}
+	case GIRFAxis::kParam:{
+		GIRFAxisParam *axisParam = new GIRFAxisParam(fFitsPtr, &fStatus);
+		CheckStatus();
+		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
+		return axisParam;
+	}
+	default:
+
+		cout << "Invalid axis type\n";
+		CheckStatus();
+		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
+		return NULL;
+		break;
+	}
+
+}
+
+////////////////////////////////////////////////////////////////
+//
+// Get axis object from fitsfile with the range defined
+// within AxisRanges
+//
+GIRFAxis* GIRF::ReadAxis(int axisID, vector<GIRFAxis::AxisRange> axisRanges) {
+
+	int currenthdu = fFitsPtr->HDUposition;
+
+	GIRFAxis::AxisType axisType = CheckAxisType(axisID);
+	GIRFAxis::VarType varType = CheckAxisVarType(axisID);
+
+	int hduPos = CheckAxisHDUpos(axisID);
+	//TODO: Handle status!!
+
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int hdutype = BINARY_TBL, hdunum;
+	char axisIDkeyword[20];
+	sprintf(axisIDkeyword, "%d", axisID);
+
+	fits_movabs_hdu(fFitsPtr, hduPos, NULL, &fStatus);
+
+	switch (axisType){
+
+	case GIRFAxis::kBins:{
+		GIRFAxisBins *axisBins = new GIRFAxisBins(fFitsPtr, &fStatus);
+		for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+			if (axisRange->varType == varType) axisBins->Resize(axisRange->lowRange, axisRange->highRange);
+		}
 		CheckStatus();
 		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
 		return axisBins;
@@ -302,11 +398,18 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	}
 	vector< vector<int> > ids = FindAxisRanges(axisRanges);
 
+	cout << "ids:" << endl;
+	for(std::vector< vector<int> >::iterator idrow = ids.begin(); idrow != ids.end(); ++idrow) {
+		for(std::vector<int>::iterator id = idrow->begin(); id != idrow->end(); ++id) {
+			cout << " " << *id << " ";
+		}
+		cout << endl;
+	}
+
+
 	//**************************************************************//
 	// 		Find all pdfs containing the valid axis IDs.
 	//**************************************************************//
-	cout << "Number of axis dependencies: ids.size() = " << ids.size() << endl;
-	cout << "Found axis IDs for the first dependency: ids[0].size() = " << ids[0].size() << endl;
 
 	vector<int> foundPdfs = FindPdfs(ids, pdfVar);
 
@@ -321,8 +424,7 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	// 		Extract Pdf ID.
 	//**************************************************************//
 
-	GIRFPdf extractedPdf = ReadPdf(chosenPdfID);
-
+	GIRFPdf extractedPdf = ReadPdf(chosenPdfID, config);
 
 //	for(std::vector<int>::iterator foundAxisID = ids.begin(); foundAxisID != ids.end(); ++foundAxisID) {
 //		cout << "foundAxisID = " << *foundAxisID << endl;
@@ -344,20 +446,195 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 // 		Read GIRFPdf object from fitsfile with a specific
 //		pdfID
 //
-GIRFPdf GIRF::ReadPdf(int pdfID) {
+GIRFPdf GIRF::ReadPdf(int pdfID, GIRFConfig config) {
+
+	std::vector<GIRFAxis::AxisRange> axisRanges = config.GetAxisRanges();
 
 	vector<int> pdfAxes = GetPdfAxisIDs(pdfID);
+	GIRFPdf::PdfVar pdfVar = ReadPdfVar(pdfID);
+	GIRFPdf::PdfFunc pdfFunc = ReadPdfFunc(pdfID);
 
-	GIRFPdf pdfOut;
+
+	GIRFPdf pdfOut(pdfVar, pdfFunc);
 
 	for(std::vector<int>::iterator axisID = pdfAxes.begin(); axisID != pdfAxes.end(); ++axisID) {
-		pdfOut.AddAxis(ReadAxis(*axisID));
+		pdfOut.AddAxis(ReadAxis(*axisID, axisRanges));
 	}
-
+	pdfOut.SetData(ReadPdfData(pdfID, pdfAxes, config.GetAxisRanges()));
 
 
 	return pdfOut;
 }
+
+
+
+////////////////////////////////////////////////////////////////
+//
+// 		Read GIRFPdf::PdfVar object from fitsfile with a
+//		specific pdfID
+//
+GIRFPdf::PdfVar GIRF::ReadPdfVar(int pdfID) {
+
+	int currenthdu = fFitsPtr->HDUposition;
+
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int numaxes = 0, hdutype, hdunum;
+	fits_get_num_hdus(fFitsPtr, &hdunum, &status);
+	char axisIDkeyword[20];
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
+		if (hdutype == IMAGE_HDU) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+				if (!strcmp(card, "DATA")) {
+					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
+						if (atoi(card) == pdfID){
+							// Current HDU is the pdf we want.
+							if (!fits_read_key_str(fFitsPtr, "PDFVAR", card, NULL, &status)) {
+								GIRFPdf::PdfVar pdfVar = static_cast<GIRFPdf::PdfVar>(atoi(card));
+								return pdfVar;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (status == KEY_NO_EXIST) status = 0;
+		if (status) break;
+
+	}
+	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &status);
+
+	cout << "ERROR: Pdf with no PdfVar!" << endl;
+	return static_cast<GIRFPdf::PdfVar>(0);
+
+}
+
+////////////////////////////////////////////////////////////////
+//
+// 		Read GIRFPdf::PdfFunc object from fitsfile with a
+//		specific pdfID
+//
+GIRFPdf::PdfFunc GIRF::ReadPdfFunc(int pdfID) {
+
+	int currenthdu = fFitsPtr->HDUposition;
+
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int numaxes = 0, hdutype, hdunum;
+	fits_get_num_hdus(fFitsPtr, &hdunum, &status);
+	char axisIDkeyword[20];
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
+		if (hdutype == IMAGE_HDU) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+				if (!strcmp(card, "DATA")) {
+					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
+						if (atoi(card) == pdfID){
+							// Current HDU is the pdf we want.
+							if (!fits_read_key_str(fFitsPtr, "PDFFUNC", card, NULL, &status)) {
+								GIRFPdf::PdfFunc pdfVar = static_cast<GIRFPdf::PdfFunc>(atoi(card));
+								return pdfVar;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (status == KEY_NO_EXIST) status = 0;
+		if (status) break;
+
+	}
+	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &status);
+
+	cout << "ERROR: Pdf with no PdfFunc!" << endl;
+	return static_cast<GIRFPdf::PdfFunc>(0);
+
+}
+
+////////////////////////////////////////////////////////////////
+//
+// 		Read data from fitsfile from a Data HDU with a
+//		specific pdfID
+//
+float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisRange> axisRanges){
+
+	vector<long> lBins, hBins, incVector;
+	int lBin, hBin, anynull;
+	long nBins=0;
+
+	int iAxis=0;
+	float * array, nulval = 0.;
+	long *fpixel, *lpixel, *inc;
+	for(std::vector<int>::iterator axisID = pdfAxes.begin(); axisID != pdfAxes.end(); ++axisID, iAxis++) {
+		GIRFAxis *axis;
+		lBin=0; hBin = 0;
+		switch (CheckAxisType(*axisID)){
+			case GIRFAxis::kBins:{
+				axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(*axisID));
+				break;
+			}
+			case GIRFAxis::kParam:{
+				axis = dynamic_cast<GIRFAxisParam*>(ReadAxis(*axisID));
+				break;
+			}
+		}
+		for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+			if (CheckAxisVarType(*axisID) == axisRange->varType){
+				axis->Resize(axisRange->lowRange, axisRange->highRange, &lBin, &hBin);
+				break;
+			}
+		}
+		if (lBin==0 && hBin == 0){
+			lBins.push_back(1);
+			hBins.push_back(axis->GetSize());
+		} else {
+			lBins.push_back(lBin);
+			hBins.push_back(hBin);
+		}
+		nBins+=axis->GetSize();
+		incVector.push_back(1);
+	}
+
+	cout << "lBins.size() = " << lBins.size() << endl;
+	cout << "hBin.size() = " << hBins.size() << endl;
+	cout << "incVector.size() = " << incVector.size() << endl;
+
+	cout << "lBins[0] = " << lBins[0] << endl;
+	cout << "hBin.[0] = " << hBins[0] << endl;
+	cout << "incVector[0] = " << incVector[0] << endl;
+
+	cout << "nBins = " << nBins << endl;
+
+	array = (float *) malloc(nBins * sizeof(float));
+
+	cout << "(long*)lBins.data() = " << (long*)lBins.data() << endl;
+	cout << "(long*)hBins.data() = " << (long*)hBins.data() << endl;
+	cout << "(long*)incVector.data() = " << (long*)incVector.data() << endl;
+	fpixel = lBins.data();
+	lpixel = hBins.data();
+	inc = incVector.data();
+
+	cout << "fpixel[0] = " << fpixel[0] << endl;
+
+	GIRFUtils::GoToPdfHDU(fFitsPtr, pdfID);
+
+	if (fits_read_subset(fFitsPtr, TFLOAT, fpixel, lpixel, inc, &nulval, array, &anynull, &fStatus)){
+		CheckStatus();
+		return NULL;
+	}
+	return array;
+
+}
+
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////
@@ -450,7 +727,7 @@ vector< vector<int> > GIRF::FindAxisRanges(std::vector<GIRFAxis::AxisRange> axis
 //
 vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar){
 
-	vector<int> foundPdfIDs, pdfAxes;
+	vector<int> pdfAxes;
 
 
 	vector<int> pdfsIDOfCorrectType = FindPdfsOfType(pdfVar);
@@ -486,7 +763,7 @@ vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar
 	}
 	cout << endl;
 
-	return foundPdfIDs;
+	return correctPdfIDs;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -538,7 +815,7 @@ vector<int> GIRF::GetPdfAxisIDs(int pdfID){
 
 	vector<int> foundAxisIDs;
 
-	int currenthdu = fFitsPtr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...
+	int currenthdu = fFitsPtr->HDUposition;
 
 	int status = 0;   		// must be initialized (0 means ok)
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
@@ -636,6 +913,9 @@ bool GIRF::CheckPdfPointsToAxisIDs(vector< vector<int> > axisIDs, vector<int> pd
 // 		Check if one pdf points to the required axes
 //
 int GIRF::PickPreferredPdf(vector<int> foundPdfs, GIRFConfig config){
+
+	cout << "foundPdfs.size() = " << foundPdfs.size() << endl;
+	if (foundPdfs.size() == 0) return 0;
 
 	//TODO!!!!!!!!!!!!!
 	return foundPdfs[0];

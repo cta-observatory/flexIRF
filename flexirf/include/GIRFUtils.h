@@ -14,10 +14,12 @@ namespace GIRFUtils{
 	int GetLastPdfID(fitsfile* fptr);
 
 	void GoToLastAxisHDU(fitsfile* fptr);
+	void GoToPdfHDU(fitsfile* fptr, int pdfID);
 
 	vector<int> FindAxisRanges(string filename, std::vector<GIRFAxis::AxisRange> axisRanges);
 	vector<int> FindAxisRange(fitsfile *fptr, GIRFAxis::AxisRange axisRange);
 	GIRFAxis GetAxis(fitsfile *fptr, int axisID);
+
 
 };
 

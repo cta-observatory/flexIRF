@@ -3,6 +3,7 @@
 
 #include <string>
 #include "fitsio.h"
+#include <iostream>
 
 using namespace std;
 
@@ -60,9 +61,9 @@ public:
 
 //  virtual GIRFAxis* GetAxis(fitsfile* fptr, int axisID, int* status);
 
-	virtual float GetRangeMin() const {return 0;}
-	virtual float GetRangeMax() const {return 0;}
-	virtual int GetSize() const {return 0;}
+	virtual float 	GetRangeMin() const {return 0;}
+	virtual float 	GetRangeMax() const {return 0;}
+	virtual int 	GetSize() const {return 0;}
 
 	virtual inline std::string GetExtName() const {return GetVarName() + "_" + GetTypeName();}
 	virtual std::string GetTypeName() const;
@@ -71,18 +72,21 @@ public:
 
 	virtual bool operator==(const GIRFAxis& otherAxis) {return 1;}//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
 
-	virtual int Write(fitsfile* fptr, int& axisID, int* status) {*status = WRITE_ERROR;	return *status;}
-	virtual int WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);
-	virtual void Print() {};
+	virtual int 	Write(fitsfile* fptr, int& axisID, int* status) {*status = WRITE_ERROR;	return *status;}
+	virtual int 	WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);
+	virtual void 	Print() {};
 
-	virtual bool ContainsRange(AxisRange axisRange) {return 0;}
+	virtual bool 	ContainsRange(AxisRange axisRange) {return 0;}
 
+	virtual inline void Resize(int lbin, int hbin){ cout << "ERROR: Resizing Axis of uncertain type." << endl;}
+	virtual inline void Resize(float lValue, float hValue){ cout << "ERROR: Resizing Axis of uncertain type." << endl;}
+	virtual inline void Resize(float lValue, float hValue, int *lbin, int *hbin){ cout << "ERROR: Resizing Axis of uncertain type." << endl;}
 
 protected:
-	virtual int CheckAxisConsistency();
-	virtual bool CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {return 0;}
-	virtual void SetAxisType(AxisType type) {fAxisType = type;}
-	virtual void SetAxisType(std::string axisTypeName);
+	virtual int		CheckAxisConsistency();
+	virtual bool 	CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {return 0;}
+	virtual void 	SetAxisType(AxisType type) {fAxisType = type;}
+	virtual void 	SetAxisType(std::string axisTypeName);
 
 };
 

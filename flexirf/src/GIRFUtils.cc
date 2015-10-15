@@ -62,6 +62,43 @@ void GIRFUtils::GoToLastAxisHDU(fitsfile* fptr) {
 	fits_movabs_hdu(fptr, lasthdu + 1, NULL, &status);
 }
 
+////////////////////////////////////////////////////////////////
+//
+// Set CHDU to the Data HDU with ID equal to pdfID
+//
+void GIRFUtils::GoToPdfHDU(fitsfile* fptr, int pdfID) {
+
+	int status = 0;   		// must be initialized (0 means ok)
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int single = 0, hdutype = BINARY_TBL, hdunum, nkeys, ii;
+	int lastID = 0, lasthdu, initialHDU;
+
+	initialHDU = fptr->HDUposition;
+
+	fits_get_num_hdus(fptr, &hdunum, &status);
+	char axisIDkeyword[20];
+
+	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+	{
+		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
+		if (hdutype == IMAGE_HDU) {
+			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, &status)) {
+				if (!strcmp(card, "DATA")) {
+					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, &status)) {
+						if (atoi(card) == pdfID){
+							// Current HDU is the pdf we want.
+							break;
+						}
+					}
+				}
+			}
+		}
+		if (status == KEY_NO_EXIST) status = 0;
+		if (status) break;
+	}
+}
+
+
 
 ////////////////////////////////////////////////////////////////
 //

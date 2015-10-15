@@ -62,7 +62,7 @@ class GIRFPdf
   }
 
   virtual int Write(fitsfile* fptr,int* status);
-
+  virtual void Print() const;
 };
 
 #endif

@@ -212,7 +212,7 @@ void GIRFAxisBins::Print()
 
 ////////////////////////////////////////////////////////////////
 //
-// Check if the Axis already exists within the fits file
+// 		Check if the Axis already exists within the fits file
 //
 bool GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 
@@ -256,6 +256,33 @@ bool GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 	return exists;
 }
 
+////////////////////////////////////////////////////////////////
+//
+// 		Resize Axis, checking internal axis limit values
+//
+void GIRFAxisBins::Resize(float lValue, float hValue){
+	int lbin, hbin;
+	bool lBinFilled=0,hBinFilled=0;
+	for (std::vector<float>::size_type ibin = 0; ibin < fAxisBins.size(); ibin++) {
+		if (fAxisBins[ibin] > lValue && !lBinFilled){ lbin = ibin; lBinFilled=1;}
+		if (fAxisBins[ibin] > hValue && !hBinFilled){ hbin = ibin; hBinFilled=1;}
+	}
+	Resize(lbin, hbin);
+}
 
+////////////////////////////////////////////////////////////////
+//
+// 		Resize Axis, checking internal axis limit values,
+// 		returning lbin and hbin.
+//
+void GIRFAxisBins::Resize(float lValue, float hValue, int *lbin, int *hbin){
+
+	bool lBinFilled=0,hBinFilled=0;
+	for (std::vector<float>::size_type ibin = 0; ibin < fAxisBins.size(); ibin++) {
+		if (fAxisBins[ibin] >= lValue && !lBinFilled){ *lbin = ibin; lBinFilled=1;}
+		if (fAxisBins[ibin] > hValue && !hBinFilled){ *hbin = ibin; hBinFilled=1;}
+	}
+	Resize((*lbin), (*hbin));
+}
 
 

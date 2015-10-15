@@ -34,12 +34,16 @@ class GIRFAxisBins : public GIRFAxis
   virtual inline float GetRangeMax() const {if (fAxisBinsFilled) return fAxisBins[fAxisBins.size()-1]; else return 0;}		//TODO: Improve!! they must be in order!!
   virtual inline int   GetSize()     const {return int(fAxisBins.size());}
 
-  virtual int Write(fitsfile* fptr, int& axisID, int* status);
-  virtual void Print();
-  virtual bool CheckAxisExists(fitsfile* fptr, int& axisID, int* status);
+  virtual int 	Write(fitsfile* fptr, int& axisID, int* status);
+  virtual void 	Print();
+  virtual bool 	CheckAxisExists(fitsfile* fptr, int& axisID, int* status);
+
+  inline void 	Resize(int lbin, int hbin){ fAxisBins.erase(fAxisBins.begin(),fAxisBins.begin()+lbin);fAxisBins.erase(fAxisBins.begin()+(hbin-lbin),fAxisBins.end());}
+  void 			Resize(float lValue, float hValue);
+  void 			Resize(float lValue, float hValue, int *lbin, int *hbin);
 
  protected:
-  virtual int CheckAxisConsistency(); // return 0 if axis is consistent
+  virtual int 	CheckAxisConsistency(); // return 0 if axis is consistent
 }; 
 
 #endif
