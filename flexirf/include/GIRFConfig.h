@@ -67,6 +67,7 @@ public:
 
 	inline std::vector<GIRFAxis::AxisRange> GetAxisRanges() const {return fGIRFRange.GetAxisRanges();}
 	inline void AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax){fGIRFRange.AddAxisRange(varType, valueMin, valueMax);}
+	inline void AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax, bool required){fGIRFRange.AddAxisRange(varType, valueMin, valueMax, required);}
 
 	void SetDefault();
 	void Print();

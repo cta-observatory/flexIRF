@@ -31,6 +31,36 @@ GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc,
 	fAxis.reserve(naxes);
 }
 
+
+
+////////////////////////////////////////////////////////////////
+//
+// 		Draw Pdf content
+//
+void GIRFPdf::Draw() const {
+
+	int iAxis=0;
+	cout << "Printing Axes:" << endl;
+	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iAxis++) {
+		cout << "Printing Axis #" << iAxis+1 << endl;
+		(*axis)->Print();
+	}
+	cout << "Printing Pdf content:" << endl;
+	int iData=0;
+	// TODO: This is obviously wrong... but at least printing some numbers...
+	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {
+		cout << "Printing Axis #" << iData+1 << endl;
+		for (int i=0;i<(*axis)->GetSize();i++){
+			cout << fData[i] << endl;
+		}
+	}
+
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////
 //
 // Return the axis name for EXTNAME
@@ -292,8 +322,9 @@ void GIRFPdf::Print() const {
 	}
 	cout << "Printing Pdf content:" << endl;
 	int iData=0;
+	// TODO: This is obviously wrong... but at least printing some numbers...
 	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {
-		cout << "Printing Axis #1" << iAxis+1 << endl;
+		cout << "Printing Axis #" << iData+1 << endl;
 		for (int i=0;i<(*axis)->GetSize();i++){
 			cout << fData[i] << endl;
 		}

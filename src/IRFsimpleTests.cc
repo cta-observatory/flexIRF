@@ -47,17 +47,17 @@ int main(int argc, char **argv)
 	axis1.SetAxisBins(vect1);
 	axis2.SetAxisBins(vect2);
 	axis1.SetVarType(GIRFAxis::kEnergy);
-	cout << "axis1.GetRangeMin() = " << axis1.GetRangeMin() << endl;
-	cout << "axis2.GetRangeMin() = " << axis2.GetRangeMin() << endl;
-
-	cout << "axis1.GetRangeMax() = " << axis1.GetRangeMax() << endl;
-	cout << "axis2.GetRangeMax() = " << axis2.GetRangeMax() << endl;
-
-	cout << "(axis1==axis2) = " << (axis1==axis2) << endl;
-
-	cout << "axis1.GetExtName() = " << axis1.GetExtName().data() << endl;
+//	cout << "axis1.GetRangeMin() = " << axis1.GetRangeMin() << endl;
+//	cout << "axis2.GetRangeMin() = " << axis2.GetRangeMin() << endl;
+//
+//	cout << "axis1.GetRangeMax() = " << axis1.GetRangeMax() << endl;
+//	cout << "axis2.GetRangeMax() = " << axis2.GetRangeMax() << endl;
+//
+//	cout << "(axis1==axis2) = " << (axis1==axis2) << endl;
+//
+//	cout << "axis1.GetExtName() = " << axis1.GetExtName().data() << endl;
 	int lastID = GIRFUtils::GetLastAxisID("alltest.fits");
-	cout << "lastID = " << lastID << endl;;
+//	cout << "lastID = " << lastID << endl;
 
 	GIRFAxisBins* axis3;
 	GIRFAxisBins* axis4;
@@ -65,20 +65,28 @@ int main(int argc, char **argv)
 	axis4 = new GIRFAxisBins();
 	axis3->SetAxisBins(vect1);
 	axis4->SetAxisBins(vect2);
-	cout << "axis3==axis4 = " << ((*axis3)==(*axis4)) << endl;
+//	cout << "axis3==axis4 = " << ((*axis3)==(*axis4)) << endl;
 
+
+//	GIRFConfig config;
+////	config.SetDefault();
+//	config.AddAxisRange(GIRFAxis::kEnergy, -1,1, 1);
+//	config.AddAxisRange(GIRFAxis::kPhi, -1,1, 0);
+////	config.Print();
+//	string filename = "/home/thassan/Workspace/IRM_devel/build/alltest.fits";
+//	GIRF irf(filename);
+//	GIRFPdf effArea = irf.ReadPdf(GIRFPdf::kAeff, config);
+////	effArea.Print();
 
 	GIRFConfig config;
 //	config.SetDefault();
-	config.AddAxisRange(GIRFAxis::kEnergy, -1,1);
-//	config.AddAxisRange(GIRFAxis::kPhi, -1,1);
+	config.AddAxisRange(GIRFAxis::kEnergy_true, -1,1, 1);
+	config.AddAxisRange(GIRFAxis::kEnergy_rec, -1,1, 1);
 //	config.Print();
 	string filename = "/home/thassan/Workspace/IRM_devel/build/alltest.fits";
 	GIRF irf(filename);
-	GIRFPdf effArea = irf.ReadPdf(GIRFPdf::kAeff, config);
+	GIRFPdf effArea = irf.ReadPdf(GIRFPdf::kEDispersion, config);
 //	effArea.Print();
-
-
 
 //	vector<int> test;
 //	test.push_back(1);

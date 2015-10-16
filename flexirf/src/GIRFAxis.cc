@@ -116,6 +116,45 @@ std::string GIRFAxis::GetVarName() const {
 	return axisVarType;
 }
 
+
+////////////////////////////////////////////////////////////////
+//
+// Return the axis name for EXTNAME
+//
+std::string GIRFAxis::GetVarName(VarType varType) {
+
+	string axisVarType;
+
+	switch (varType) {
+	case kEnergy:
+		axisVarType = "ENERGY";
+		break;
+	case kEnergy_true:
+		axisVarType = "TENERGY";
+		break;
+	case kEnergy_rec:
+		axisVarType = "RENERGY";
+		break;
+	case kTheta:
+		axisVarType = "THETA";
+		break;
+	case kPhi:
+		axisVarType = "PHI";
+		break;
+	case kID:
+		axisVarType = "ID";
+		break;
+	default:
+		cout << "Incorrect variable type.\n";
+		return axisVarType;
+	}
+
+	return axisVarType;
+}
+
+
+
+
 ////////////////////////////////////////////////////////////////
 //
 // Set the axis type using FITS format keywords

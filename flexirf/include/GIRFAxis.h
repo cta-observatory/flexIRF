@@ -16,7 +16,10 @@ public:
 //		 kFormatMax};     // allowed axis types
 
 	enum AxisType {
-		kNoAxisType = 0, kBins, kParam, kAxisMax
+		kNoAxisType = 0,
+		kBins,
+		kParam,
+		kAxisMax
 	};     // allowed axis types
 
 	enum VarType {
@@ -69,6 +72,7 @@ public:
 	virtual inline std::string GetExtName() const {return GetVarName() + "_" + GetTypeName();}
 	virtual std::string GetTypeName() const;
 	virtual std::string GetVarName() const;
+	static std::string GetVarName(VarType varType);
 	virtual std::string GetVarUnit() const;
 
 	virtual bool operator==(const GIRFAxis& otherAxis) {return 1;}//TH: We will constantly check if Axis are equal... (when adding new Pdfs)

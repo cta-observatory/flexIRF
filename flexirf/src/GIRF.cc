@@ -41,7 +41,6 @@ GIRF::GIRF(string filename) : fStatus(0) {
 
 	//First try to open existing fits file.
 	if (OpenFITS()){
-		cout << "File opened!!!!" << endl;
 		fFITSopened=1;
 		CheckStatus();
 	}
@@ -395,9 +394,9 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	//**************************************************************//
 
 	std::vector<GIRFAxis::AxisRange> axisRanges = config.GetAxisRanges();
-	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
-		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;
-	}
+//	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+//		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;
+//	}
 	vector< vector<int> > ids = FindAxisRanges(axisRanges);
 
 	if (ids.empty()) {
@@ -431,6 +430,7 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	// 		Extract Pdf ID.
 	//**************************************************************//
 
+	cout << "Pdf #" << chosenPdfID << " was chosen." << endl;
 	extractedPdf = ReadPdf(chosenPdfID, config);
 
 //	for(std::vector<int>::iterator foundAxisID = ids.begin(); foundAxisID != ids.end(); ++foundAxisID) {
@@ -467,6 +467,7 @@ GIRFPdf GIRF::ReadPdf(int pdfID, GIRFConfig config) {
 	for(std::vector<int>::iterator axisID = pdfAxes.begin(); axisID != pdfAxes.end(); ++axisID) {
 		pdfOut.AddAxis(ReadAxis(*axisID, axisRanges));
 	}
+
 	pdfOut.SetData(ReadPdfData(pdfID, pdfAxes, config.GetAxisRanges()));
 
 
@@ -575,12 +576,17 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 	long nBins=0;
 
 	int iAxis=0;
-	float * array, nulval = 0.;
+	float *array, nulval = 0.;
 	long *fpixel, *lpixel, *inc;
+	GIRFAxis::AxisType axisType;
+	GIRFAxis::VarType varType;
+
 	for(std::vector<int>::iterator axisID = pdfAxes.begin(); axisID != pdfAxes.end(); ++axisID, iAxis++) {
 		GIRFAxis *axis;
 		lBin=0; hBin = 0;
-		switch (CheckAxisType(*axisID)){
+		axisType = CheckAxisType(*axisID);
+		varType = CheckAxisVarType(*axisID);
+		switch (axisType){
 			case GIRFAxis::kBins:{
 				axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(*axisID));
 				break;
@@ -591,8 +597,10 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 			}
 		}
 		for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
-			if (CheckAxisVarType(*axisID) == axisRange->varType){
+			if (varType == axisRange->varType){
+//				cout << "Axis #" << *axisID << " is resized using lowRange = " << axisRange->lowRange << " & highRange = " << axisRange->highRange << endl;
 				axis->Resize(axisRange->lowRange, axisRange->highRange, &lBin, &hBin);
+//				cout << "lBin = " << lBin << " and hBin = " << hBin << endl;
 				break;
 			}
 		}
@@ -603,9 +611,25 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 			lBins.push_back(lBin);
 			hBins.push_back(hBin);
 		}
-		nBins+=axis->GetSize();
+//		cout << "Axis #" << *axisID << " with axis size = " << axis->GetSize() << endl;
+		if (nBins == 0) nBins=axis->GetSize();
+		else nBins*=axis->GetSize();
 		incVector.push_back(1);
 	}
+
+	cout << "lBins = [ ";
+	for(std::vector<long>::iterator lbin = lBins.begin(); lbin != lBins.end(); ++lbin) {
+		cout << *lbin << " ";
+	}
+	cout << "]" << endl;
+
+	cout << "hBins = [ ";
+	for(std::vector<long>::iterator hbin = hBins.begin(); hbin != hBins.end(); ++hbin) {
+		cout << *hbin << " ";
+	}
+	cout << "]" << endl;
+
+//	cout << "nBins = " << nBins << endl;
 
 	array = (float *) malloc(nBins * sizeof(float));
 
@@ -615,6 +639,7 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 		CheckStatus();
 		return NULL;
 	}
+
 	return array;
 
 }
@@ -639,7 +664,7 @@ vector<int> GIRF::FindAxisRange(GIRFAxis::AxisRange axisRange){
 	int single = 0, hdutype, hdunum;
 	fits_get_num_hdus(fFitsPtr, &hdunum, &status);
 
-	GIRFAxis::VarType varType;
+	GIRFAxis::AxisType axisType;
 	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
@@ -648,25 +673,29 @@ vector<int> GIRF::FindAxisRange(GIRFAxis::AxisRange axisRange){
 				if (!strcmp(card, "AXIS")) {
 					if (!fits_read_key_str(fFitsPtr, "VARTYPE", card, NULL, &status)) {
 						if (atoi(card) == axisRange.varType) {
-							if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
-								switch(axisRange.varType){
-									case GIRFAxis::kBins:{
-										GIRFAxisBins *axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(atoi(card)));
-										if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
-										break;
-									}
-									case GIRFAxis::kParam:{
-										GIRFAxisParam *axis = dynamic_cast<GIRFAxisParam*>(ReadAxis(atoi(card)));
-										if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
-										break;
-									}
-									default:
-										cout << "Invalid axis type\n";
-										CheckStatus();
-										fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
-										break;
+							if (!fits_read_key_str(fFitsPtr, "AXISTYPE", card, NULL, &status)) {
+								axisType=static_cast<GIRFAxis::AxisType>(atoi(card));
+								if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
+									switch(axisType){
+										case GIRFAxis::kBins:{
+											GIRFAxisBins *axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(atoi(card)));
+											if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
+											break;
+										}
+										case GIRFAxis::kParam:{
+											GIRFAxisParam *axis = dynamic_cast<GIRFAxisParam*>(ReadAxis(atoi(card)));
+											if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
+											break;
+										}
+										default:{
+											cout << "Invalid axis type\n";
+											CheckStatus();
+											fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
+											break;
+										}
 									}
 
+								}
 							}
 						}
 					}
@@ -678,7 +707,7 @@ vector<int> GIRF::FindAxisRange(GIRFAxis::AxisRange axisRange){
 
 	}
 
-	if (foundAxisID.empty()) cout << "Axis of type " <<  axisRange.varType << " between " << axisRange.lowRange << " and " << axisRange.highRange << " is not present in the FITS file!!!" << endl;
+	if (foundAxisID.empty()) cout << "Axis of type " <<  GIRFAxis::GetVarName(axisRange.varType).data() << " between " << axisRange.lowRange << " and " << axisRange.highRange << " is not present in the FITS file!!!" << endl;
 
 	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &status);
 
@@ -698,12 +727,12 @@ vector< vector<int> > GIRF::FindAxisRanges(std::vector<GIRFAxis::AxisRange> axis
 	int loop=0;
 	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange, loop++) {
 		foundIDs = FindAxisRange(*axisRange);
-		for(vector<int>::iterator foundID = foundIDs.begin(); foundID != foundIDs.end(); ++foundID){
-			cout << "In loop " << loop << " found axis ID = " << *foundID << endl;
-		}
+//		for(vector<int>::iterator foundID = foundIDs.begin(); foundID != foundIDs.end(); ++foundID){
+//			cout << "In loop " << loop << " found axis ID = " << *foundID << endl;
+//		}
 		if (!foundIDs.empty()) axisIDs.push_back(foundIDs);
 		else if (axisRange->required){
-			cout << "ERROR: Required axis of type " << axisRange->varType << " between " << axisRange->lowRange << " and " << axisRange->highRange << " is not present in the FITS file!!! Exiting..." << endl;
+			cout << "ERROR: Required axis of type " << GIRFAxis::GetVarName(axisRange->varType).data() << " between " << axisRange->lowRange << " and " << axisRange->highRange << " is not present in the FITS file!!! Exiting..." << endl;
 			return emptyVector;
 		}
 	}
@@ -729,21 +758,21 @@ vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar
 
 	cout << "foundPdfsAxisIDs:" << endl;
 	for(std::vector< vector<int> >::iterator pdf = foundPdfsAxisIDs.begin(); pdf != foundPdfsAxisIDs.end(); ++pdf) {
-		cout << "This pdf points axes: ";
+		cout << "This pdf points to the axes: ";
 		for(std::vector<int>::iterator pdfID = pdf->begin(); pdfID != pdf->end(); ++pdfID) {
 			cout << *pdfID << ", ";
 		}
 		cout << endl;
 	}
 
-	cout << "axisIDs:" << endl;
-	for(std::vector< vector<int> >::iterator axis = axisIDs.begin(); axis != axisIDs.end(); ++axis) {
-		cout << "This axis range points axes: ";
-		for(std::vector<int>::iterator axisID = axis->begin(); axisID != axis->end(); ++axisID) {
-			cout << *axisID << ", ";
-		}
-		cout << endl;
-	}
+//	cout << "axisIDs:" << endl;
+//	for(std::vector< vector<int> >::iterator axis = axisIDs.begin(); axis != axisIDs.end(); ++axis) {
+//		cout << "This axis range points axes: ";
+//		for(std::vector<int>::iterator axisID = axis->begin(); axisID != axis->end(); ++axisID) {
+//			cout << *axisID << ", ";
+//		}
+//		cout << endl;
+//	}
 	// Now we have the axis IDs of each Pdf of correct type.
 	// We need to check if any of these Pdfs point to the correct axis IDs.
 
