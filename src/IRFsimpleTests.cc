@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 	GIRFConfig config;
 //	config.SetDefault();
 	config.AddAxisRange(GIRFAxis::kEnergy, -1,1);
-	config.AddAxisRange(GIRFAxis::kPhi, -1,1);
+//	config.AddAxisRange(GIRFAxis::kPhi, -1,1);
 //	config.Print();
 	string filename = "/home/thassan/Workspace/IRM_devel/build/alltest.fits";
 	GIRF irf(filename);

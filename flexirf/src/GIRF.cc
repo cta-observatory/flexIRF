@@ -388,6 +388,8 @@ GIRFAxis* GIRF::ReadAxis(int axisID, vector<GIRFAxis::AxisRange> axisRanges) {
 //
 GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 
+	GIRFPdf extractedPdf;
+
 	//**************************************************************//
 	// 		Find all axis containing the valid range.
 	//**************************************************************//
@@ -397,6 +399,11 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;
 	}
 	vector< vector<int> > ids = FindAxisRanges(axisRanges);
+
+	if (ids.empty()) {
+		cout << "Required Pdf dependencies are not present within the FITS file" << endl;
+		return extractedPdf;
+	}
 
 	cout << "ids:" << endl;
 	for(std::vector< vector<int> >::iterator idrow = ids.begin(); idrow != ids.end(); ++idrow) {
@@ -424,7 +431,7 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	// 		Extract Pdf ID.
 	//**************************************************************//
 
-	GIRFPdf extractedPdf = ReadPdf(chosenPdfID, config);
+	extractedPdf = ReadPdf(chosenPdfID, config);
 
 //	for(std::vector<int>::iterator foundAxisID = ids.begin(); foundAxisID != ids.end(); ++foundAxisID) {
 //		cout << "foundAxisID = " << *foundAxisID << endl;
@@ -600,30 +607,11 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 		incVector.push_back(1);
 	}
 
-	cout << "lBins.size() = " << lBins.size() << endl;
-	cout << "hBin.size() = " << hBins.size() << endl;
-	cout << "incVector.size() = " << incVector.size() << endl;
-
-	cout << "lBins[0] = " << lBins[0] << endl;
-	cout << "hBin.[0] = " << hBins[0] << endl;
-	cout << "incVector[0] = " << incVector[0] << endl;
-
-	cout << "nBins = " << nBins << endl;
-
 	array = (float *) malloc(nBins * sizeof(float));
-
-	cout << "(long*)lBins.data() = " << (long*)lBins.data() << endl;
-	cout << "(long*)hBins.data() = " << (long*)hBins.data() << endl;
-	cout << "(long*)incVector.data() = " << (long*)incVector.data() << endl;
-	fpixel = lBins.data();
-	lpixel = hBins.data();
-	inc = incVector.data();
-
-	cout << "fpixel[0] = " << fpixel[0] << endl;
 
 	GIRFUtils::GoToPdfHDU(fFitsPtr, pdfID);
 
-	if (fits_read_subset(fFitsPtr, TFLOAT, fpixel, lpixel, inc, &nulval, array, &anynull, &fStatus)){
+	if (fits_read_subset(fFitsPtr, TFLOAT, lBins.data(), hBins.data(), incVector.data(), &nulval, array, &anynull, &fStatus)){
 		CheckStatus();
 		return NULL;
 	}
@@ -705,7 +693,7 @@ vector<int> GIRF::FindAxisRange(GIRFAxis::AxisRange axisRange){
 //		FITS file, and ignores the rest.
 vector< vector<int> > GIRF::FindAxisRanges(std::vector<GIRFAxis::AxisRange> axisRanges){
 
-	vector< vector<int> > axisIDs;
+	vector< vector<int> > axisIDs, emptyVector;
 	vector<int> foundIDs;
 	int loop=0;
 	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange, loop++) {
@@ -714,6 +702,10 @@ vector< vector<int> > GIRF::FindAxisRanges(std::vector<GIRFAxis::AxisRange> axis
 			cout << "In loop " << loop << " found axis ID = " << *foundID << endl;
 		}
 		if (!foundIDs.empty()) axisIDs.push_back(foundIDs);
+		else if (axisRange->required){
+			cout << "ERROR: Required axis of type " << axisRange->varType << " between " << axisRange->lowRange << " and " << axisRange->highRange << " is not present in the FITS file!!! Exiting..." << endl;
+			return emptyVector;
+		}
 	}
 
 	return axisIDs;

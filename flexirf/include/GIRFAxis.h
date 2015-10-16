@@ -34,6 +34,7 @@ public:
 		VarType varType;
 		float lowRange;
 		float highRange;
+		bool required;
 	};
 	// for the time being units are:
 	// Energy: GeV

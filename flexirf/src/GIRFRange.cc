@@ -44,6 +44,19 @@ void GIRFRange::AddAxisRange(GIRFAxis::VarType varType, float valueMin, float va
 	axisRange.varType = varType;
 	axisRange.lowRange = valueMin;
 	axisRange.highRange = valueMax;
+	axisRange.required = 0;
+
+	fAxisRanges.push_back(axisRange);
+}
+
+void GIRFRange::AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax, bool required){
+
+	GIRFAxis::AxisRange axisRange;
+
+	axisRange.varType = varType;
+	axisRange.lowRange = valueMin;
+	axisRange.highRange = valueMax;
+	axisRange.required = required;
 
 	fAxisRanges.push_back(axisRange);
 }
