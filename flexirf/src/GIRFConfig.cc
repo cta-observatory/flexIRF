@@ -20,6 +20,8 @@
 using namespace std;
 
 #include "GIRFConfig.h"
+#include "GIRFAxis.h"
+#include "GIRFRange.h"
 
 ////////////////////////////////////////////////////////////////
 // 
@@ -28,10 +30,8 @@ using namespace std;
 //
 GIRFConfig::GIRFConfig() :
 		fNSBLevel(kNoNSBLevel), fObsMode(kNoObsMode), fSubArray(kNoSubArray) {
-	fWeather.Transmitance = 0;
-	fWeather.molProfile = kNoMolProfile;
-	fHWStatus.reflectivity = 0;
-	fHWStatus.trigger = kNoTrigger;
+
+	SetDefault();
 
 	//Check if there is a config file in the path:
 	ifstream configfile("IRFConfig.txt");
@@ -43,10 +43,8 @@ GIRFConfig::GIRFConfig() :
 
 GIRFConfig::GIRFConfig(string filename) :
 		fNSBLevel(kNoNSBLevel), fObsMode(kNoObsMode), fSubArray(kNoSubArray) {
-	fWeather.Transmitance = 0;
-	fWeather.molProfile = kNoMolProfile;
-	fHWStatus.reflectivity = 0;
-	fHWStatus.trigger = kNoTrigger;
+
+	SetDefault();
 
 	ifstream configfile(filename.c_str());
 
@@ -63,11 +61,11 @@ int GIRFConfig::LoadConfigFile(string filename) {
 	// TODO
 	// Read input card and set values
 
-
 	return 0;
 }
 
 void GIRFConfig::SetDefault() {
+
 	fNSBLevel = kExtragalactic;
 	fObsMode = kPoint;
 	fSubArray = kFull;
@@ -75,5 +73,35 @@ void GIRFConfig::SetDefault() {
 	fWeather.molProfile = kAverage;
 	fHWStatus.reflectivity = 1;
 	fHWStatus.trigger = kStandard;
+
 }
+
+void GIRFConfig::Print() {
+
+	cout << "*******************************************" << endl;
+	cout << "***       Printing CTAconfig          ***" << endl;
+	cout << "*******************************************" << endl;
+
+	cout << "fNSBLevel = " << fNSBLevel << endl;
+	cout << "fObsMode = " << fObsMode << endl;
+	cout << "fSubArray = " << fSubArray << endl;
+	cout << "Transmitance = " << fWeather.Transmitance << endl;
+	cout << "molProfile = " << fWeather.molProfile << endl;
+	cout << "reflectivity = " << fHWStatus.reflectivity << endl;
+	cout << "trigger = " << fHWStatus.trigger << endl;
+
+	std::vector<GIRFAxis::AxisRange> axisRanges = GetAxisRanges();
+	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;;
+	}
+
+	cout << "" << endl;
+	cout << "*******************************************" << endl;
+
+}
+
+
+
+
+
 

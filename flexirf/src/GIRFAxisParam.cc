@@ -98,6 +98,20 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 
 ////////////////////////////////////////////////////////////////
 //
+// Check if axis contains AxisRange
+//
+bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange){
+
+	//TODO: Modify as soon as I add the range of validity!!!
+	if (axisRange.varType != this->GetVarType()) return 0;							//Sanity check
+	else{
+		if (axisRange.lowRange > this->GetRangeMin() && axisRange.highRange < this->GetRangeMax()) return 1;
+		else return 0;
+	}
+}
+
+////////////////////////////////////////////////////////////////
+//
 // Check that the vector describe consistently the axis
 //
 int GIRFAxisParam::CheckAxisConsistency() {

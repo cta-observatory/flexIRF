@@ -30,21 +30,24 @@ class GIRFPdf
   PdfVar  fPdfVar;
   PdfFunc fPdfFunc;
   std::vector<GIRFAxis*> fAxis;
+  bool fIsEmpty;
   float*  fData;
 
  public:
   GIRFPdf(PdfVar pdftype=kNoPdfVar,PdfFunc pdffunc=kNoPdfFunc,std::vector<GIRFAxis*>::size_type naxes=0); // create new pdf table for a given PdfVar
   virtual ~GIRFPdf(){};
 
-  inline int    AddAxis(GIRFAxis* axis)  {fAxis.push_back(axis); return int(fAxis.size())-1;} // insert axis in the list and return its id
-  inline void   SetData(float* data)     {fData = data;}
+  inline int    AddAxis(GIRFAxis* axis)  {fAxis.push_back(axis); return int(fAxis.size())-1;} // insert axis in the list and return its id TODO: deprecated!!! not anymore this ID!!!
+  virtual void 	Draw() const;
   inline float* GetData()                const {return fData;}
   inline float* GetDataEntry(int ientry) const {return fData+ientry*GetNEntriesPerBin(fPdfFunc);}
-  inline long   GetSize()                const {long tot=1;for(uint i=0;i<fAxis.size();i++) tot*=int(fAxis[i]->GetSize()); return tot;}
+  inline long   GetSize()                const {long tot=1;for(uint i=0;i<fAxis.size();i++) tot*=int(fAxis[i]->GetSize()-1); return tot;}
   virtual inline std::string GetExtName() const {return GetVarName() + "_" + GetFuncName();}
   virtual std::string GetFuncName() const;
   virtual std::string GetVarName() const;
   virtual std::string GetVarUnit() const;
+  virtual inline bool IsEmpty () const {return fIsEmpty;}
+  void   		SetData(float* data);
 
   inline int GetNEntriesPerBin(PdfFunc func) const
   {
@@ -62,14 +65,7 @@ class GIRFPdf
   }
 
   virtual int Write(fitsfile* fptr,int* status);
-  virtual int GetLastPdfID(std::string filename);
-
- private:
-
-  virtual int GetLastPdfID(fitsfile* fptr);
-
-
-
+  virtual void Print() const;
 };
 
 #endif

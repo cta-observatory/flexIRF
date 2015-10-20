@@ -15,8 +15,13 @@
 
 #include "GIRFPdf.h"
 #include "GIRFAxis.h"
+#include "GIRFAxisBins.h"
+#include "GIRFAxisParam.h"
+#include "GIRFUtils.h"
 #include <iostream>
 #include <string.h>
+
+#include "rootincludes.h"
 
 using namespace std;
 
@@ -26,9 +31,86 @@ using namespace std;
 //
 GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc,
 		std::vector<GIRFAxis*>::size_type naxes) :
-		fPdfVar(pdftype), fPdfFunc(pdffunc), fData(0) {
+		fPdfVar(pdftype), fPdfFunc(pdffunc), fData(0), fIsEmpty(1) {
 	fAxis.reserve(naxes);
 }
+
+
+
+////////////////////////////////////////////////////////////////
+//
+// 		Draw Pdf content
+//
+void GIRFPdf::Draw() const {
+
+	if (fIsEmpty) {
+		cout << "Pdf is empty" << endl;
+		return;
+	}
+	// Check how many dimensions does the Pdf have:
+	int dimensions = fAxis.size();
+
+	if (dimensions == 0) {
+		cout << "ERROR: Cannot draw empty Pdf." << endl;
+		return;
+	} else if (dimensions > 2){
+		cout << "ERROR: Only Pdfs with dimension lower than 3 are currently supported." << endl;
+		return;
+	} else if (dimensions == 1){
+		GIRFAxisParam* axisParam = dynamic_cast<GIRFAxisParam*>(fAxis[0]);
+		GIRFAxisBins* axisBins = dynamic_cast<GIRFAxisBins*>(fAxis[0]);
+		if (axisParam){
+			cout << "Parametrized axis are not yet supported... :(" << endl;
+			return;
+		}
+		if (axisBins){
+			TH1F *pdf = new TH1F("pdf", GetExtName().data(), axisBins->GetSize()-1, axisBins->GetAxisBins().data());
+			for (int i=1;i<=axisBins->GetSize();i++){
+				pdf->SetBinContent(i,fData[i-1]);
+			}
+			TCanvas c1;
+			pdf->Draw();
+			c1.SaveAs("plot.png");
+		}
+	} else if (dimensions == 2){
+//		GIRFAxis axisx = fAxis[0];
+//		GIRFAxis axisy = fAxis[1];
+//		TH2F *pdf = new TH2F("pdf", GetExtName().data(), axisx.GetSize(), GetData());
+//		for (int i=1;i<=axis.GetSize();i++){
+//			pdf->SetBinContent(i,fData[i-1]);
+//		}
+//		pdf->Draw();
+		GIRFAxisParam* axisParam1 = dynamic_cast<GIRFAxisParam*>(fAxis[0]);
+		GIRFAxisBins* axisBins1 = dynamic_cast<GIRFAxisBins*>(fAxis[0]);
+		GIRFAxisParam* axisParam2 = dynamic_cast<GIRFAxisParam*>(fAxis[1]);
+		GIRFAxisBins* axisBins2 = dynamic_cast<GIRFAxisBins*>(fAxis[1]);
+		if (axisParam1 || axisParam2){
+			cout << "Parametrized axis are not yet supported... :(" << endl;
+			return;
+		}
+		if (axisBins1 && axisBins2){
+			TH2F *pdf = new TH2F("pdf", GetExtName().data(), axisBins1->GetSize()-1, axisBins1->GetAxisBins().data(), axisBins2->GetSize()-1, axisBins2->GetAxisBins().data());
+			for (int i=0;i<axisBins1->GetSize();i++){
+				for (int j=0;j<axisBins2->GetSize();j++){
+//					cout << "Data[" << i+1 << "," << j+1 << "] = fData[" << (i*(axisBins2->GetSize()))+j << "] = " << fData[(i*(axisBins1->GetSize()))+j] << endl;
+					pdf->SetBinContent(i+1, j+1, fData[(i*(axisBins2->GetSize()))+j]);
+				}
+			}
+			TCanvas c1;
+			pdf->Draw();
+			c1.SaveAs("plot.png");
+		}
+	}
+
+
+
+
+
+}
+
+
+
+
 
 ////////////////////////////////////////////////////////////////
 //
@@ -125,10 +207,10 @@ std::string GIRFPdf::GetVarUnit() const {
 		axisVarType = "erg*cm^-2*s^-1";
 		break;
 	case kAeff:
-		axisVarType = "m";
+		axisVarType = "m^2";
 		break;
 	case kAeffNoTheta2Cut:
-		axisVarType = "m";
+		axisVarType = "m^2";
 		break;
 	default:
 		cout << "Incorrect variable type.\n";
@@ -137,62 +219,6 @@ std::string GIRFPdf::GetVarUnit() const {
 
 	return axisVarType;
 }
-
-////////////////////////////////////////////////////////////////
-//
-// Check the last Axis ID present within the fits file
-//
-int GIRFPdf::GetLastPdfID(string filename) {
-
-	fitsfile *fptr; /* FITS file pointer, defined in fitsio.h */
-	int status = 0;   		// must be initialized (0 means ok)
-	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-	int single = 0, hdupos, nkeys, ii;
-	int lastID = 0;
-
-	cout << "Opening file " << filename.data() << endl;
-	if (!fits_open_file(&fptr, filename.data(), READONLY, &status)){
-		lastID = GetLastPdfID(fptr);
-	}
-	if (fits_close_file(fptr, &status))
-			cout << "GIRF::Write Error: cannot close file (error code: " << status
-					<< ")" << endl;
-	return lastID;
-}
-
-int GIRFPdf::GetLastPdfID(fitsfile* fptr) {
-
-	int currenthdu = fptr->HDUposition;
-
-	int status = 0;   		// must be initialized (0 means ok)
-	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-	int single = 0, hdutype = IMAGE_HDU, hdunum, nkeys, ii;
-	int lastID = 0;
-	fits_get_num_hdus(fptr, &hdunum, &status);
-
-	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
-	{
-		if (hdutype == IMAGE_HDU) {						// First check if HDU extension
-			if (!fits_read_key_str(fptr, "HDUCLAS2", card, NULL, &status)) {
-				if (!strcmp(card, "DATA")) {
-					if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL,
-							&status)) {
-						if (atoi(card) > lastID) {
-							lastID = atoi(card);
-						}
-					}
-				}
-			}
-		}
-		status = 0;
-		fits_movabs_hdu(fptr, hdupos, &hdutype, &status);
-		if (status)
-			break;
-	}
-	fits_movabs_hdu(fptr, currenthdu + 1, NULL, &status);
-	return lastID;
-}
-
 
 
 
@@ -207,13 +233,12 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 	long* naxes = new long[naxis];
 	long* fpixel = new long[naxis];
 	for (std::vector<GIRFAxis*>::size_type jaxis = 0; jaxis < naxis; jaxis++) {
-		naxes[jaxis] = int(fAxis[jaxis]->GetSize());
+		naxes[jaxis] = int(fAxis[jaxis]->GetSize()-1);
 		fpixel[jaxis] = 1;
 	}
 	vector<int> axisIDs;
 	axisIDs.reserve(naxis);
 	int axisID;
-	// TODO ONLY IF NEEDED!!!!!
 	// write associated axis blocks
 	int firstaxis = 1;
 	for (vector<GIRFAxis*>::iterator axis = fAxis.begin(); axis != fAxis.end();
@@ -223,7 +248,6 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 							<< *status << ")" << endl;
 		else axisIDs.push_back(axisID);
 	}
-
 
 	// write the pdf header
 	if (fits_create_img(fptr, FLOAT_IMG, naxis, naxes, status))
@@ -314,11 +338,11 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	//Get the last Pdf ID of the same class
-	int pdfID = GetLastPdfID(fptr)+1;
+	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
 
 	sprintf(keyword, "HDUCLAS4");
 	usval = ushort(pdfID);
-	sprintf(comment, "Axis ID");
+	sprintf(comment, "Pdf ID");
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
@@ -331,3 +355,50 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 
 	return *status;
 }
+
+
+
+////////////////////////////////////////////////////////////////
+//
+// Write the pdf and the associated axes to the specified
+// file pointer
+//
+void GIRFPdf::Print() const {
+
+	int iAxis=0;
+	cout << "Printing Axes:" << endl;
+	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iAxis++) {
+		cout << "Printing Axis #" << iAxis+1 << endl;
+		(*axis)->Print();
+	}
+	cout << "Printing Pdf content:" << endl;
+	int iData=0;
+	// TODO: This is obviously wrong... but at least printing some numbers...
+
+//	for (int i=0;i<fAxis[0]->GetSize();i++){
+//		for (int j=0;j<fAxis[1]->GetSize();j++){
+//					cout << "Data[" << i+1 << "," << j+1 << "] = fData[" << (i*(fAxis[1]->GetSize()))+j << "] = " << fData[(i*(fAxis[0]->GetSize()))+j] << endl;
+//		}
+//	}
+//	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {
+//		cout << "Printing Axis #" << iData+1 << endl;
+//		for (int i=0;i<(*axis)->GetSize();i++){
+//			cout << fData[i] << endl;
+//		}
+//	}
+
+}
+
+void   GIRFPdf::SetData(float* data){
+	if (data==0) return;
+	fData = data;
+	fIsEmpty=0;
+}
+
+
+
+
+
+
+
+

@@ -2,6 +2,8 @@
 #define G_IRFConfig
 
 #include <string>
+#include <vector>
+#include <GIRFRange.h>
 
 class GIRFConfig {
 public:
@@ -54,6 +56,7 @@ private:
 	ObsMode fObsMode;
 	SubArray fSubArray;
 	HWStatus fHWStatus;
+	GIRFRange fGIRFRange;
 	int LoadConfigFile(std::string filename);
 
 public:
@@ -61,7 +64,13 @@ public:
 	GIRFConfig();
 	GIRFConfig(std::string filename);
 	virtual ~GIRFConfig() {};
+
+	inline std::vector<GIRFAxis::AxisRange> GetAxisRanges() const {return fGIRFRange.GetAxisRanges();}
+	inline void AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax){fGIRFRange.AddAxisRange(varType, valueMin, valueMax);}
+	inline void AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax, bool required){fGIRFRange.AddAxisRange(varType, valueMin, valueMax, required);}
+
 	void SetDefault();
+	void Print();
 };
 
 #endif
