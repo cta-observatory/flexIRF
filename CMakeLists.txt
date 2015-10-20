@@ -9,6 +9,15 @@ find_package(CFITSIO REQUIRED)
 include_directories(${CFITSIO_INCLUDE_DIRS})
 set( EXTRA_LIBS ${EXTRA_LIBS} ${CFITSIO_LIBRARIES} )
 
+## ROOT 
+
+## Include ROOT libraries                                                                                                                                             
+find_package(ROOT REQUIRED)
+include_directories(${ROOT_INCLUDE_DIR})
+set( ROOT_LIBS ${ROOT_LIBS} ${ROOT_LIBRARIES} )
+set( rootinc ${PROJECT_SOURCE_DIR}/include )
+include_directories(${rootinc})
+
 ## Add flexible-IRF code
 set( srcForfIRF ${PROJECT_SOURCE_DIR}/flexirf/src )
 include_directories(${srcForfIRF})
@@ -24,16 +33,9 @@ add_subdirectory (flexirf)
 add_executable( IRFmerger_fitsio ${srcsIRFm} )
 
 ## Link everything
-target_link_libraries( IRFmerger_fitsio ${EXTRA_LIBS} flexirf )
+target_link_libraries( IRFmerger_fitsio ${EXTRA_LIBS} flexirf ${ROOT_LIBS} )
 
-## ROOT 
 
-## Include ROOT libraries                                                                                                                                             
-find_package(ROOT REQUIRED)
-include_directories(${ROOT_INCLUDE_DIR})
-set( ROOT_LIBS ${ROOT_LIBS} ${ROOT_LIBRARIES} )
-set( rootinc ${PROJECT_SOURCE_DIR}/include )
-include_directories(${rootinc})
 
 ##Other tools
 set( srcsIRFg ${PROJECT_SOURCE_DIR}/src/IRFgenerator_rootio.cc )

@@ -264,10 +264,10 @@ void GIRFAxisBins::Resize(float lValue, float hValue){
 	int lbin, hbin;
 	bool lBinFilled=0,hBinFilled=0;
 	for (std::vector<float>::size_type ibin = 0; ibin < fAxisBins.size(); ibin++) {
-		if (fAxisBins[ibin] > lValue && !lBinFilled){ lbin = ibin; lBinFilled=1;}
-		if (fAxisBins[ibin] > hValue && !hBinFilled){ hbin = ibin; hBinFilled=1;}
+		if ((fAxisBins[ibin]-lValue) > 0.000001 && !lBinFilled){ lbin = ibin-1; lBinFilled=1;}
+		if ((fAxisBins[ibin]-hValue) >= 0 && !hBinFilled){ hbin = ibin+1; hBinFilled=1;}
 	}
-	Resize(lbin, hbin);
+	ResizeBins(lbin, hbin);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -279,10 +279,12 @@ void GIRFAxisBins::Resize(float lValue, float hValue, int *lbin, int *hbin){
 
 	bool lBinFilled=0,hBinFilled=0;
 	for (std::vector<float>::size_type ibin = 0; ibin < fAxisBins.size(); ibin++) {
-		if (fAxisBins[ibin] >= lValue && !lBinFilled){ *lbin = ibin; lBinFilled=1;}
-		if (fAxisBins[ibin] > hValue && !hBinFilled){ *hbin = ibin; hBinFilled=1;}
+//		cout << "fAxisBins[" << ibin << "] = " << fAxisBins[ibin] << " and lValue = " << lValue << endl;
+		if ((fAxisBins[ibin]-lValue) > 0.000001 && !lBinFilled){ *lbin = ibin-1; lBinFilled=1;}
+		if ((fAxisBins[ibin]-hValue) >= 0 && !hBinFilled){ *hbin = ibin+1; hBinFilled=1;}
 	}
-	Resize((*lbin), (*hbin));
+//	cout << "lbin = " << *lbin << " & hbin = " << *hbin << endl;
+	ResizeBins((*lbin), (*hbin));
 }
 
 

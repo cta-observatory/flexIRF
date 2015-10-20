@@ -32,9 +32,9 @@ public:
 	GIRFAxis* 				ReadAxis(int axisID);
 	GIRFAxis*				ReadAxis(int axisID, vector<GIRFAxis::AxisRange> axisRanges);
 	inline GIRFPdf 			GetPdf(int pdfPos){GIRFPdf pdf = *fPdfList[pdfPos]; return pdf;};
-	GIRFPdf 				ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config);
-	GIRFPdf 				ReadPdf(int pdfID, GIRFConfig config);
-	GIRFPdf 				ReadPdf(int pdfID);
+	GIRFPdf* 				ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config);
+	GIRFPdf* 				ReadPdf(int pdfID, GIRFConfig config);
+	GIRFPdf* 				ReadPdf(int pdfID);
 
 	int 					Write();
 	inline int 				Write(std::string filename){fFilename=filename; return Write();};

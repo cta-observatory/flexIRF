@@ -385,9 +385,9 @@ GIRFAxis* GIRF::ReadAxis(int axisID, vector<GIRFAxis::AxisRange> axisRanges) {
 // 		Search and extract GIRFPdf object from fitsfile
 //		with specific  PdfVar and GIRFConfig.
 //
-GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
+GIRFPdf* GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 
-	GIRFPdf extractedPdf;
+	GIRFPdf* extractedPdf = new GIRFPdf();
 
 	//**************************************************************//
 	// 		Find all axis containing the valid range.
@@ -425,7 +425,10 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	// 		Choose the preferable one. TODO!!
 	//**************************************************************//
 	int chosenPdfID = PickPreferredPdf(foundPdfs, config);
-
+	if (chosenPdfID == 0) {
+		cout << "Required Pdf dependencies are not present within the FITS file." << endl;
+		return extractedPdf;
+	}
 	//**************************************************************//
 	// 		Extract Pdf ID.
 	//**************************************************************//
@@ -453,7 +456,7 @@ GIRFPdf GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 // 		Read GIRFPdf object from fitsfile with a specific
 //		pdfID
 //
-GIRFPdf GIRF::ReadPdf(int pdfID, GIRFConfig config) {
+GIRFPdf* GIRF::ReadPdf(int pdfID, GIRFConfig config) {
 
 	std::vector<GIRFAxis::AxisRange> axisRanges = config.GetAxisRanges();
 
@@ -462,13 +465,13 @@ GIRFPdf GIRF::ReadPdf(int pdfID, GIRFConfig config) {
 	GIRFPdf::PdfFunc pdfFunc = ReadPdfFunc(pdfID);
 
 
-	GIRFPdf pdfOut(pdfVar, pdfFunc);
+	GIRFPdf* pdfOut = new GIRFPdf(pdfVar, pdfFunc);
 
 	for(std::vector<int>::iterator axisID = pdfAxes.begin(); axisID != pdfAxes.end(); ++axisID) {
-		pdfOut.AddAxis(ReadAxis(*axisID, axisRanges));
+		pdfOut->AddAxis(ReadAxis(*axisID, axisRanges));
 	}
 
-	pdfOut.SetData(ReadPdfData(pdfID, pdfAxes, config.GetAxisRanges()));
+	pdfOut->SetData(ReadPdfData(pdfID, pdfAxes, config.GetAxisRanges()));
 
 
 	return pdfOut;
@@ -571,13 +574,12 @@ GIRFPdf::PdfFunc GIRF::ReadPdfFunc(int pdfID) {
 //
 float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisRange> axisRanges){
 
-	vector<long> lBins, hBins, incVector;
+	vector<long> lBins, hBins, inc;
 	int lBin, hBin, anynull;
 	long nBins=0;
 
 	int iAxis=0;
 	float *array, nulval = 0.;
-	long *fpixel, *lpixel, *inc;
 	GIRFAxis::AxisType axisType;
 	GIRFAxis::VarType varType;
 
@@ -598,23 +600,25 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 		}
 		for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 			if (varType == axisRange->varType){
-//				cout << "Axis #" << *axisID << " is resized using lowRange = " << axisRange->lowRange << " & highRange = " << axisRange->highRange << endl;
+				cout << "Axis #" << *axisID << " is resized using lowRange = " << axisRange->lowRange << " & highRange = " << axisRange->highRange << endl;
+				axis->Print();
 				axis->Resize(axisRange->lowRange, axisRange->highRange, &lBin, &hBin);
-//				cout << "lBin = " << lBin << " and hBin = " << hBin << endl;
+				axis->Print();
+				cout << "lBin = " << lBin << " and hBin = " << hBin << endl;
 				break;
 			}
 		}
 		if (lBin==0 && hBin == 0){
 			lBins.push_back(1);
-			hBins.push_back(axis->GetSize());
+			hBins.push_back(axis->GetSize()-1);
 		} else {
-			lBins.push_back(lBin);
-			hBins.push_back(hBin);
+			lBins.push_back(lBin+1);	//TODO: CHECK!!!!!!!!! Donde va el +1!!?!??!?
+			hBins.push_back(hBin-1);
 		}
-//		cout << "Axis #" << *axisID << " with axis size = " << axis->GetSize() << endl;
-		if (nBins == 0) nBins=axis->GetSize();
-		else nBins*=axis->GetSize();
-		incVector.push_back(1);
+		cout << "Axis #" << *axisID << " with axis size = " << axis->GetSize() << endl;
+		if (nBins == 0) nBins=axis->GetSize()-1;
+		else nBins*=axis->GetSize()-1;
+		inc.push_back(1);
 	}
 
 	cout << "lBins = [ ";
@@ -629,13 +633,13 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 	}
 	cout << "]" << endl;
 
-//	cout << "nBins = " << nBins << endl;
+	cout << "nBins = " << nBins << endl;
 
 	array = (float *) malloc(nBins * sizeof(float));
 
 	GIRFUtils::GoToPdfHDU(fFitsPtr, pdfID);
 
-	if (fits_read_subset(fFitsPtr, TFLOAT, lBins.data(), hBins.data(), incVector.data(), &nulval, array, &anynull, &fStatus)){
+	if (fits_read_subset(fFitsPtr, TFLOAT, lBins.data(), hBins.data(), inc.data(), &nulval, array, &anynull, &fStatus)){
 		CheckStatus();
 		return NULL;
 	}

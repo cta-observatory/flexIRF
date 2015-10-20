@@ -259,22 +259,22 @@ void irfGenND(TFile *paramfile, GIRF* irf,
   int zaxis_size = 0;
 
   if(naxes_array==1){
-    xaxis_size    = estim->GetXaxis()->GetNbins();
+    xaxis_size    = estim->GetXaxis()->GetNbins()+1;
     yaxis_size    = 0;
     zaxis_size    = 0;
-    pdfdata.reserve(xaxis_size);
+    pdfdata.reserve(xaxis_size-1);
   }
   else if(naxes_array==2){
-    xaxis_size    = estim->GetXaxis()->GetNbins();
-    yaxis_size    = estim->GetYaxis()->GetNbins();
+    xaxis_size    = estim->GetXaxis()->GetNbins()+1;
+    yaxis_size    = estim->GetYaxis()->GetNbins()+1;
     zaxis_size    = 0;
-    pdfdata.reserve(xaxis_size*yaxis_size);
+    pdfdata.reserve((xaxis_size-1)*(yaxis_size-1));
   }
   else if(naxes_array==3){
-    xaxis_size    = estim->GetXaxis()->GetNbins();
-    yaxis_size    = estim->GetYaxis()->GetNbins();
-    zaxis_size    = estim->GetYaxis()->GetNbins(); //Making dummy Z-axis
-    pdfdata.reserve(xaxis_size*yaxis_size*zaxis_size);
+    xaxis_size    = estim->GetXaxis()->GetNbins()+1;
+    yaxis_size    = estim->GetYaxis()->GetNbins()+1;
+    zaxis_size    = estim->GetYaxis()->GetNbins()+1; //Making dummy Z-axis
+    pdfdata.reserve((xaxis_size-1)*(yaxis_size-1)*(zaxis_size-1));
   }
   else{
     cout<<"Error when finding axes sizes: "<<endl;
@@ -309,7 +309,7 @@ void irfGenND(TFile *paramfile, GIRF* irf,
   }
     
   if(naxes_array==1){
-    for(int i=1;i<=xaxis_size;i++){
+    for(int i=1;i<xaxis_size;i++){
       
       pdfdata.push_back(estim->GetBinContent(i));
       
@@ -317,8 +317,8 @@ void irfGenND(TFile *paramfile, GIRF* irf,
   }
   
   else if(naxes_array==2){
-    for(int j=1;j<=yaxis_size;j++){
-      for(int i=1;i<=xaxis_size;i++){
+    for(int j=1;j<yaxis_size;j++){
+      for(int i=1;i<xaxis_size;i++){
 	
 	pdfdata.push_back(estim->GetBinContent(i,j));
 	
@@ -326,13 +326,13 @@ void irfGenND(TFile *paramfile, GIRF* irf,
     }//ends j (y-axis)
   }
   else if(naxes_array==3){
-    for(int k=1;k<=zaxis_size;k++){
-      for(int j=1;j<=yaxis_size;j++){
-	for(int i=1;i<=xaxis_size;i++){
+    for(int k=1;k<zaxis_size;k++){
+      for(int j=1;j<yaxis_size;j++){
+    	for(int i=1;i<xaxis_size;i++){
 	  
-	  pdfdata.push_back(estim->GetBinContent(i,j));
+    	  pdfdata.push_back(estim->GetBinContent(i,j));
 	  
-	}//ends i (x-axis)
+    	}//ends i (x-axis)
       }//ends j (y-axis)
     }//ends k (z-axis) 
   }

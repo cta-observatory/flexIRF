@@ -15,9 +15,13 @@
 
 #include "GIRFPdf.h"
 #include "GIRFAxis.h"
+#include "GIRFAxisBins.h"
+#include "GIRFAxisParam.h"
 #include "GIRFUtils.h"
 #include <iostream>
 #include <string.h>
+
+#include "rootincludes.h"
 
 using namespace std;
 
@@ -27,7 +31,7 @@ using namespace std;
 //
 GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc,
 		std::vector<GIRFAxis*>::size_type naxes) :
-		fPdfVar(pdftype), fPdfFunc(pdffunc), fData(0) {
+		fPdfVar(pdftype), fPdfFunc(pdffunc), fData(0), fIsEmpty(1) {
 	fAxis.reserve(naxes);
 }
 
@@ -39,21 +43,68 @@ GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc,
 //
 void GIRFPdf::Draw() const {
 
-	int iAxis=0;
-	cout << "Printing Axes:" << endl;
-	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iAxis++) {
-		cout << "Printing Axis #" << iAxis+1 << endl;
-		(*axis)->Print();
+	if (fIsEmpty) {
+		cout << "Pdf is empty" << endl;
+		return;
 	}
-	cout << "Printing Pdf content:" << endl;
-	int iData=0;
-	// TODO: This is obviously wrong... but at least printing some numbers...
-	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {
-		cout << "Printing Axis #" << iData+1 << endl;
-		for (int i=0;i<(*axis)->GetSize();i++){
-			cout << fData[i] << endl;
+	// Check how many dimensions does the Pdf have:
+	int dimensions = fAxis.size();
+
+	if (dimensions == 0) {
+		cout << "ERROR: Cannot draw empty Pdf." << endl;
+		return;
+	} else if (dimensions > 2){
+		cout << "ERROR: Only Pdfs with dimension lower than 3 are currently supported." << endl;
+		return;
+	} else if (dimensions == 1){
+		GIRFAxisParam* axisParam = dynamic_cast<GIRFAxisParam*>(fAxis[0]);
+		GIRFAxisBins* axisBins = dynamic_cast<GIRFAxisBins*>(fAxis[0]);
+		if (axisParam){
+			cout << "Parametrized axis are not yet supported... :(" << endl;
+			return;
+		}
+		if (axisBins){
+			TH1F *pdf = new TH1F("pdf", GetExtName().data(), axisBins->GetSize()-1, axisBins->GetAxisBins().data());
+			for (int i=1;i<=axisBins->GetSize();i++){
+				pdf->SetBinContent(i,fData[i-1]);
+			}
+			TCanvas c1;
+			pdf->Draw();
+			c1.SaveAs("plot.png");
+		}
+	} else if (dimensions == 2){
+//		GIRFAxis axisx = fAxis[0];
+//		GIRFAxis axisy = fAxis[1];
+//		TH2F *pdf = new TH2F("pdf", GetExtName().data(), axisx.GetSize(), GetData());
+//		for (int i=1;i<=axis.GetSize();i++){
+//			pdf->SetBinContent(i,fData[i-1]);
+//		}
+//		pdf->Draw();
+		GIRFAxisParam* axisParam1 = dynamic_cast<GIRFAxisParam*>(fAxis[0]);
+		GIRFAxisBins* axisBins1 = dynamic_cast<GIRFAxisBins*>(fAxis[0]);
+		GIRFAxisParam* axisParam2 = dynamic_cast<GIRFAxisParam*>(fAxis[1]);
+		GIRFAxisBins* axisBins2 = dynamic_cast<GIRFAxisBins*>(fAxis[1]);
+		if (axisParam1 || axisParam2){
+			cout << "Parametrized axis are not yet supported... :(" << endl;
+			return;
+		}
+		if (axisBins1 && axisBins2){
+			TH2F *pdf = new TH2F("pdf", GetExtName().data(), axisBins1->GetSize()-1, axisBins1->GetAxisBins().data(), axisBins2->GetSize()-1, axisBins2->GetAxisBins().data());
+			for (int i=0;i<axisBins1->GetSize();i++){
+				for (int j=0;j<axisBins2->GetSize();j++){
+//					cout << "Data[" << i+1 << "," << j+1 << "] = fData[" << (i*(axisBins2->GetSize()))+j << "] = " << fData[(i*(axisBins1->GetSize()))+j] << endl;
+					pdf->SetBinContent(i+1, j+1, fData[(i*(axisBins2->GetSize()))+j]);
+				}
+			}
+			TCanvas c1;
+			pdf->Draw();
+			c1.SaveAs("plot.png");
 		}
 	}
+
+
+
+
 
 }
 
@@ -182,7 +233,7 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 	long* naxes = new long[naxis];
 	long* fpixel = new long[naxis];
 	for (std::vector<GIRFAxis*>::size_type jaxis = 0; jaxis < naxis; jaxis++) {
-		naxes[jaxis] = int(fAxis[jaxis]->GetSize());
+		naxes[jaxis] = int(fAxis[jaxis]->GetSize()-1);
 		fpixel[jaxis] = 1;
 	}
 	vector<int> axisIDs;
@@ -323,13 +374,31 @@ void GIRFPdf::Print() const {
 	cout << "Printing Pdf content:" << endl;
 	int iData=0;
 	// TODO: This is obviously wrong... but at least printing some numbers...
-	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {
-		cout << "Printing Axis #" << iData+1 << endl;
-		for (int i=0;i<(*axis)->GetSize();i++){
-			cout << fData[i] << endl;
-		}
-	}
+
+//	for (int i=0;i<fAxis[0]->GetSize();i++){
+//		for (int j=0;j<fAxis[1]->GetSize();j++){
+//					cout << "Data[" << i+1 << "," << j+1 << "] = fData[" << (i*(fAxis[1]->GetSize()))+j << "] = " << fData[(i*(fAxis[0]->GetSize()))+j] << endl;
+//		}
+//	}
+//	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {
+//		cout << "Printing Axis #" << iData+1 << endl;
+//		for (int i=0;i<(*axis)->GetSize();i++){
+//			cout << fData[i] << endl;
+//		}
+//	}
 
 }
+
+void   GIRFPdf::SetData(float* data){
+	if (data==0) return;
+	fData = data;
+	fIsEmpty=0;
+}
+
+
+
+
+
+
 
 
