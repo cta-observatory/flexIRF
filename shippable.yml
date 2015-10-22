@@ -7,6 +7,7 @@ notifications:
 before_install:
     - sudo apt-get install cmake
     - sudo apt-get install libcfitsio3
+    - sudo apt-get install libcfitsio3-dev
     - wget ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3370.tar.gz;
     - tar -xzvf cfitsio3370.tar.gz;
     - cd cfitsio
