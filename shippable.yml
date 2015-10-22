@@ -9,7 +9,7 @@ before_install:
     - wget ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3370.tar.gz;
     - tar -xzvf cfitsio3370.tar.gz;
     - cd cfitsio
-    - ./configure;
+    - ./configure --prefix=$PWD;
     - make;
     - make install; 
     - export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH
