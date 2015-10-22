@@ -68,32 +68,32 @@ int main(int argc, char **argv)
 ////	cout << "axis3==axis4 = " << ((*axis3)==(*axis4)) << endl;
 
 
-//	GIRFConfig config;
-////	config.SetDefault();
-//	config.AddAxisRange(GIRFAxis::kEnergy,-1.7,-0.9, 1);
-//	config.AddAxisRange(GIRFAxis::kPhi, -1,1, 0);
-////	config.Print();
-//	string filename = "/home/thassan/Workspace/IRM_devel/build/alltest.fits";
-//	GIRF irf(filename);
-//	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(GIRFPdf::kBkgRate, config));
-//	if (!effArea || effArea->IsEmpty()) return 2;
-////	effArea.Print();
-//	effArea->Draw();
-
-
-
 	GIRFConfig config;
 //	config.SetDefault();
-	config.AddAxisRange(GIRFAxis::kEnergy_true, -1,1, 1);
-	config.AddAxisRange(GIRFAxis::kEnergy_rec, -1,1, 1);
+	config.AddAxisRange(GIRFAxis::kEnergy,-1.7,-0.9, 1);
 	config.AddAxisRange(GIRFAxis::kPhi, -1,1, 0);
 //	config.Print();
 	string filename = "/home/thassan/Workspace/IRM_devel/build/alltest.fits";
 	GIRF irf(filename);
-	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(GIRFPdf::kEDispersion, config));
+	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(GIRFPdf::kBkgRate, config));
 	if (!effArea || effArea->IsEmpty()) return 2;
-//	effArea->Print();
+//	effArea.Print();
 	effArea->Draw();
+
+
+
+//	GIRFConfig config;
+////	config.SetDefault();
+//	config.AddAxisRange(GIRFAxis::kEnergy_true, -1,1, 1);
+//	config.AddAxisRange(GIRFAxis::kEnergy_rec, -1,1, 1);
+//	config.AddAxisRange(GIRFAxis::kPhi, -1,1, 0);
+////	config.Print();
+//	string filename = "/home/thassan/Workspace/IRM_devel/build/alltest.fits";
+//	GIRF irf(filename);
+//	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(GIRFPdf::kEDispersion, config));
+//	if (!effArea || effArea->IsEmpty()) return 2;
+////	effArea->Print();
+//	effArea->Draw();
 
 
 
