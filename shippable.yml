@@ -5,7 +5,7 @@ os:
 notifications:
     email: false
 before_install:
-    - sudo apt-get install git dpkg-dev make g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev
+    - sudo apt-get install git dpkg-dev make g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev subversion
     - sudo apt-get install cmake
     - sudo apt-get install libcfitsio3
     - sudo apt-get install libcfitsio3-dev
@@ -20,6 +20,12 @@ before_install:
     - echo $LD_LIBRARY_PATH;
     - echo $PATH;
     - cd ..;
+    - svn co http://root.cern.ch/svn/root/tags/v5-34-03 root
+    - cd root
+    - ./configure
+    - make
+    - source bin/thisroot.sh
+    - cd ..
 
 script:
     - . ./setup.sh;
