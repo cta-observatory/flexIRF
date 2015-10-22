@@ -12,8 +12,10 @@ before_install:
     - ./configure --prefix=$PWD;
     - make;
     - make install; 
-    - export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH
-    - export PATH=$PWD/include:$PATH
+    - export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH;
+    - export PATH=$PWD/include:$PATH;
+    - echo $LD_LIBRARY_PATH;
+    - echo $PATH;
     - cd ..;
 
 script:
