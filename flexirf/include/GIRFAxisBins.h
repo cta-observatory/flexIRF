@@ -41,9 +41,9 @@ class GIRFAxisBins : public GIRFAxis
   inline void 	ResizeBins(int lbin, int hbin){ fAxisBins.erase(fAxisBins.begin(),fAxisBins.begin()+lbin);fAxisBins.erase(fAxisBins.begin()+(hbin-lbin),fAxisBins.end());}
   void 			Resize(float lValue, float hValue);
   void 			Resize(float lValue, float hValue, int *lbin, int *hbin);
+  virtual int 	CheckAxisConsistency(); // return 0 if axis is consistent
 
  protected:
-  virtual int 	CheckAxisConsistency(); // return 0 if axis is consistent
 }; 
 
 #endif

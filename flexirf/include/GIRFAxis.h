@@ -86,9 +86,9 @@ public:
 	virtual inline void Resize(int lbin, int hbin){ cout << "ERROR: Resizing Axis of uncertain type." << endl;}
 	virtual inline void Resize(float lValue, float hValue){ cout << "ERROR: Resizing Axis of uncertain type." << endl;}
 	virtual inline void Resize(float lValue, float hValue, int *lbin, int *hbin){ cout << "ERROR: Resizing Axis of uncertain type." << endl;}
+	virtual int		CheckAxisConsistency();
 
 protected:
-	virtual int		CheckAxisConsistency();
 	virtual bool 	CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {return 0;}
 	virtual void 	SetAxisType(AxisType type) {fAxisType = type;}
 	virtual void 	SetAxisType(std::string axisTypeName);

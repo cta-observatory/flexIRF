@@ -7,6 +7,7 @@
 class GIRFAxisParam: public GIRFAxis {
 private:
 	std::vector<float> fAxisParam;
+	bool fFormula;
 	bool fIsLog; // if true, the parameterization will use the log of the variable
 
 public:
@@ -35,9 +36,9 @@ public:
 	virtual inline void Resize(int lbin, int hbin) {;}
 	virtual inline void Resize(float lValue, float hValue) {;}
 	virtual inline void Resize(float lValue, float hValue, int *lbin, int *hbin) {;}
+	virtual int CheckAxisConsistency(); // return 0 if axis is consistent
 
 protected:
-	virtual int CheckAxisConsistency(); // return 0 if axis is consistent
 };
 
 #endif

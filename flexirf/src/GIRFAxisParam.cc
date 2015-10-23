@@ -116,6 +116,7 @@ bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange){
 //
 int GIRFAxisParam::CheckAxisConsistency() {
 	int status = GIRFAxis::CheckAxisConsistency();
+	//TODO: Check there is a function, with all parameters filled!
 	return status;
 }
 

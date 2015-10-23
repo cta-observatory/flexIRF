@@ -124,10 +124,16 @@ GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 int GIRFAxisBins::CheckAxisConsistency() {
 	int status = GIRFAxis::CheckAxisConsistency();
 
+	if (fAxisBins.size() == 0) {
+		cout << "ERROR: empty Axis" << endl;
+		status++;
+	}
 	// check if bins are correctly defined
 	for (unsigned ibin = 0; ibin < fAxisBins.size() - 1; ibin++)
-		if (fAxisBins[ibin] >= fAxisBins[ibin + 1])
+		if (fAxisBins[ibin] >= fAxisBins[ibin + 1]){
+			cout << "ERROR: Axis Bins need to be in increasing order." << endl;
 			status++;
+		}
 
 	// return number of inconsitencies found
 	return status;

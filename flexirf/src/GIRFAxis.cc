@@ -51,9 +51,10 @@ GIRFAxis::GIRFAxis(VarType vartype) :
 //
 int GIRFAxis::CheckAxisConsistency() {
 	int status = 0;
-	if (fVarType <= kNoVarType || fVarType >= kVarMax)
+	if (fVarType <= kNoVarType || fVarType >= kVarMax){
+		cout << "ERROR: Axis has no VarType!" << endl;
 		status++;
-
+	}
 	return status;
 }
 
@@ -277,6 +278,17 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
+
+// Write keywords of each specific Axis type:
+    GIRFAxisBins* binsPointer = dynamic_cast<GIRFAxisBins*>(this);
+    if (binsPointer) {
+    	//TODO:Any GIRFAxisBins specific keyword?
+    }
+
+    GIRFAxisParam* paramPointer = dynamic_cast<GIRFAxisParam*>(this);
+    if (paramPointer) {
+    	//TODO: write expression of parametrization
+    }
 
 // Write in the first column, from first row
 	if (fits_write_col(fptr, TFLOAT, 1, 1, 1, size, data, status))
