@@ -21,7 +21,9 @@ before_install:
     - echo $LD_LIBRARY_PATH;
     - echo $PATH;
     - cd ..;
-
+    - ./setup.sh;
+    - cd build/;
+    - make;
 script:
     - . ./setup.sh;
     - cd build/;
