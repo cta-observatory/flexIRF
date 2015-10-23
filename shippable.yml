@@ -20,19 +20,20 @@ before_install:
     - echo $LD_LIBRARY_PATH;
     - echo $PATH;
     - cd ..;
-    - svn co http://root.cern.ch/svn/root/tags/v5-34-03 root
-    - cd root
-    - ./configure
-    - make
-    - source bin/thisroot.sh
-    - cd ..
+    - wget https://root.cern.ch/download/root_v5.34.32.source.tar.gz;
+    - tar -xzf root_v5.34.32.source.tar.gz;
+    - cd root;
+    - ./configure;
+    - make;
+    - source bin/thisroot.sh;
+    - cd ..;
 
 script:
     - . ./setup.sh;
     - cd build/;
     - make;
-    - ./bin/IRFconverter_root2FITS ../dummy/dummyconfig.txt ../prodfiles/Performance_2Q_Aar_50h_20150505.root
-    - ./bin/IRFgenerator_rootio ../dummy/dummyconfig.txt ../prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root
-    - ./bin/IRFmerger_fitsio ../dummy/dummyconfig.txt ../dummy/dummypdf-2D.txt
-    - ./bin/IRFsimpleTests
+    - ./bin/IRFconverter_root2FITS ../dummy/dummyconfig.txt ../prodfiles/Performance_2Q_Aar_50h_20150505.root;
+    - ./bin/IRFgenerator_rootio ../dummy/dummyconfig.txt ../prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root;
+    - ./bin/IRFmerger_fitsio ../dummy/dummyconfig.txt ../dummy/dummypdf-2D.txt;
+    - ./bin/IRFsimpleTests;
 
