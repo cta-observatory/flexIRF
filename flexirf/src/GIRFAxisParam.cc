@@ -26,8 +26,10 @@ using namespace std;
 // 
 // Construct empty axis object
 //
-GIRFAxisParam::GIRFAxisParam() : GIRFAxis(), fNumParameters(0), fIsLog(0), fAxisConstantParamFilled(0) {
-	fFormula="";
+GIRFAxisParam::GIRFAxisParam() :
+		GIRFAxis(), fIsLog(0), fAxisParameterizationFilled(0){
+
+
 }
 
 ////////////////////////////////////////////////////////////////
@@ -35,9 +37,8 @@ GIRFAxisParam::GIRFAxisParam() : GIRFAxis(), fNumParameters(0), fIsLog(0), fAxis
 // Construct axis object with predefined size
 //
 GIRFAxisParam::GIRFAxisParam(std::vector<float>::size_type size, bool islog) :
-		fIsLog(islog), fNumParameters(0), fAxisConstantParamFilled(0) {
-	fAxisConstantParam.reserve(size);
-	fFormula="";
+		fIsLog(islog), fAxisParameterizationFilled(0) {
+	fAxisParam.constants.reserve(size);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -45,9 +46,8 @@ GIRFAxisParam::GIRFAxisParam(std::vector<float>::size_type size, bool islog) :
 // Construct axis object with predefined data
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog), fNumParameters(0), fAxisConstantParamFilled(0) {
+		GIRFAxis(vartype), fIsLog(islog), fAxisParameterizationFilled(0){
 	SetAxisType(kParam);
-	fFormula="";
 }
 
 ////////////////////////////////////////////////////////////////
@@ -56,12 +56,10 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype,
 		std::vector<float>::size_type size, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog), fNumParameters(0), fAxisConstantParamFilled(0) {
+		GIRFAxis(vartype), fIsLog(islog), fAxisParameterizationFilled(0){
 	SetAxisType(kParam);
-	fAxisConstantParam.reserve(size);
-	fFormula="";
+	fAxisParam.constants.reserve(size);
 }
-
 
 ////////////////////////////////////////////////////////////////
 // 
@@ -69,15 +67,10 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype,
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype, std::vector<float> bins,
 		bool islog) :
-		GIRFAxis(vartype), fIsLog(islog) {
+		GIRFAxis(vartype), fIsLog(islog), fAxisParameterizationFilled(0){
 	SetAxisType(kParam);
-	fAxisConstantParam = bins;
+	fAxisParam.constants = bins;
 
-	int status = CheckAxisConsistency();
-	if (status)
-		cout
-				<< "GIRfAxisConstantParam::GIRFAxisParam: Warning: Axis is NOT consistent ("
-				<< status << ")" << endl;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -99,30 +92,28 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 
 	SetAxisType(kParam);
 
-
-
-
 	long int nRows;
 	int nCol, anynull;
 	float nullfloat = 0.0F;
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	char *longcard;
 	int numVars;
 	fits_get_num_rows(fptr, &nRows, status);
 	fits_get_num_cols(fptr, &nCol, status);
 	float farray[nRows];
 	//TODO: For now, just get one column. In the future maybe Axis should have several columns (low/high bin edges)
+	fits_read_col(fptr, TFLOAT, 1, 1, 1, nRows, &nullfloat, &farray, &anynull,
+			status);
+
 	fits_read_key_str(fptr, "NUMVARS", card, NULL, status);
-	numVars=atoi(card);
+	numVars = atoi(card);
+	fits_read_key_longstr(fptr, "FORMULA", &longcard, NULL, status);
+	SetFormula((string) longcard, nRows, farray, numVars);
 
-	fits_read_col (fptr, TFLOAT, 1, 1, 1, nRows, &nullfloat, &farray, &anynull, status);
-	fits_read_key_str(fptr, "FORMULA", card, NULL, status);
-	SetFormula((string)card, nRows, farray, numVars);
-
-	fIsLog=0;
+	fIsLog = 0;
 
 	fits_read_key_str(fptr, "VARTYPE", card, NULL, status);
-	SetVarType((VarType)atoi(card));
-
+	SetVarType((VarType) atoi(card));
 
 	//TODO: Read everything from fits file.
 
@@ -132,13 +123,17 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 //
 // Check if axis contains AxisRange
 //
-bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange){
+bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange) {
 
 	//TODO: Modify as soon as I add the range of validity!!!
-	if (axisRange.varType != this->GetVarType()) return 0;							//Sanity check
-	else{
-		if (axisRange.lowRange > this->GetRangeMin() && axisRange.highRange < this->GetRangeMax()) return 1;
-		else return 0;
+	if (axisRange.varType != this->GetVarType())
+		return 0;							//Sanity check
+	else {
+		if (axisRange.lowRange > this->GetRangeMin()
+				&& axisRange.highRange < this->GetRangeMax())
+			return 1;
+		else
+			return 0;
 	}
 }
 
@@ -149,7 +144,8 @@ bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange){
 int GIRFAxisParam::CheckAxisConsistency() {
 	int status = GIRFAxis::CheckAxisConsistency();
 	//TODO: Check there is a function, with all parameters filled!
-	if (CheckFormulaEmpty()) status++;
+	if (CheckFormulaEmpty())
+		status++;
 	return status;
 }
 
@@ -169,20 +165,20 @@ void GIRFAxisParam::SetAxis(std::vector<float>::size_type size, float* bins) {
 		fAxisConstantParam.push_back(bins[i]);
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
 // 		Set the parametrized formula of the axis.
 //
-void GIRFAxisParam::SetFormula(string formula, std::vector<float>::size_type numParameters, float* parameters, int numVariables) {
+void GIRFAxisParam::SetFormula(string formula,
+		std::vector<float>::size_type numParameters, float* parameters,
+		int numVariables) {
 
 	fAxisConstantParam.reserve(numParameters);
-	fFormula=formula;
+	fFormula = formula;
 	// Fill vector with arrays
 	for (std::vector<float>::size_type i = 0; i < numParameters; i++)
 		fAxisConstantParam.push_back(parameters[i]);
 }
-
 
 ////////////////////////////////////////////////////////////////
 // 

@@ -258,9 +258,9 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 				<< "GIRFAxis::Write Error: problem writing axis header (error code: "
 				<< *status << ")" << endl;
 
-	char keyword[9];
-	char chval[20];
-	char comment[70];
+	char keyword[FLEN_KEYWORD];
+	char chval[FLEN_CARD];
+	char comment[FLEN_COMMENT];
 	ushort usval;
 
 // write axis type
@@ -288,14 +288,23 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
     GIRFAxisParam* paramPointer = dynamic_cast<GIRFAxisParam*>(this);
     if (paramPointer) {
     	//TODO: write expression of parametrization
-    	//TODO: Write FORMULA will be a long string!!! Better be safe.
-//    	  int fits_write_key_longstr / ffpkls
-//    	      (fitsfile *fptr, char *keyname, char *longstr, char *comment,
-//    	       > int *status)
-//
-//    	  int fits_write_key_longwarn / ffplsw
-//    	      (fitsfile *fptr, > int *status)
-    	//TODO: Write VARNUM, storing the number of variables inside
+    	sprintf(keyword, "FORMULA");
+    	sprintf(comment, "Parameterized formula.");
+    	if (fits_write_key_longstr(fptr, keyword, paramPointer->GetFormula().data(), comment, status))
+    		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+    				<< *status << ")" << endl;
+    	//Required for the long string format.
+    	if (fits_write_key_longwarn(fptr,status))
+    		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+    				<< *status << ")" << endl;
+
+    	sprintf(keyword, "NUMVARS");
+    	usval = ushort(paramPointer->GetNumVars());
+    	sprintf(comment, "Number of variables used in the parameterization.");
+    	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+    		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+    				<< *status << ")" << endl;
+
     }
 
 // Write in the first column, from first row
