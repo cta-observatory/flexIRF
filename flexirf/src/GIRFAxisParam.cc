@@ -26,8 +26,8 @@ using namespace std;
 // 
 // Construct empty axis object
 //
-GIRFAxisParam::GIRFAxisParam() :
-		GIRFAxis() {
+GIRFAxisParam::GIRFAxisParam() : GIRFAxis(), fNumVariables(0), fIsLog(0) {
+	fFormula="";
 }
 
 ////////////////////////////////////////////////////////////////
@@ -35,8 +35,9 @@ GIRFAxisParam::GIRFAxisParam() :
 // Construct axis object with predefined size
 //
 GIRFAxisParam::GIRFAxisParam(std::vector<float>::size_type size, bool islog) :
-		fIsLog(islog) {
+		fIsLog(islog), fNumVariables(0) {
 	fAxisParam.reserve(size);
+	fFormula="";
 }
 
 ////////////////////////////////////////////////////////////////
@@ -44,8 +45,9 @@ GIRFAxisParam::GIRFAxisParam(std::vector<float>::size_type size, bool islog) :
 // Construct axis object with predefined data
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog) {
+		GIRFAxis(vartype), fIsLog(islog), fNumVariables(0) {
 	SetAxisType(kParam);
+	fFormula="";
 }
 
 ////////////////////////////////////////////////////////////////
@@ -54,9 +56,10 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype,
 		std::vector<float>::size_type size, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog) {
+		GIRFAxis(vartype), fIsLog(islog), fNumVariables(0) {
 	SetAxisType(kParam);
 	fAxisParam.reserve(size);
+	fFormula="";
 }
 ////////////////////////////////////////////////////////////////
 // 
@@ -117,6 +120,7 @@ bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange){
 int GIRFAxisParam::CheckAxisConsistency() {
 	int status = GIRFAxis::CheckAxisConsistency();
 	//TODO: Check there is a function, with all parameters filled!
+	if (CheckFormulaEmpty()) status++;
 	return status;
 }
 
