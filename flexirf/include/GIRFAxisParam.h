@@ -50,13 +50,15 @@ public:
 	virtual inline void SetAxisConstants(std::vector<float> axisConstants) { fAxisParam.constants = axisConstants;}
 	virtual void 		SetFormula(string formula, std::vector<float>::size_type numParameters, float* parameters, int numVariables);
 
-	virtual int 		Write(fitsfile* fptr, int& axisID, int* status);
-	virtual bool 		CheckAxisExists(fitsfile* fptr, int& axisID, int* status);
+	virtual int const	Write(fitsfile* fptr, int& axisID, int* status);
+	virtual bool const	CheckAxisExists(fitsfile* fptr, int& axisID, int* status);
 
 	virtual inline void Resize(int lbin, int hbin) {;}
 	virtual inline void Resize(float lValue, float hValue) {;}
 	virtual inline void Resize(float lValue, float hValue, int *lbin, int *hbin) {;}
 	virtual int 		CheckAxisConsistency(); // return 0 if axis is consistent
+
+	virtual void const			Print();
 
 protected:
 

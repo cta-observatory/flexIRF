@@ -151,17 +151,6 @@ bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange) {
 	}
 }
 
-////////////////////////////////////////////////////////////////
-//
-// Check that the vector describe consistently the axis
-//
-int GIRFAxisParam::CheckAxisConsistency() {
-	int status = GIRFAxis::CheckAxisConsistency();
-
-	if (!fAxisParameterizationFilled) status++;
-	//TODO: Check if the function contains the correct number of constants and variables.??
-	return status;
-}
 
 ////////////////////////////////////////////////////////////////
 // 
@@ -211,7 +200,7 @@ void GIRFAxisParam::SetFormula(string formula,
 // 
 // Write the axis to the specified file pointer
 //
-int GIRFAxisParam::Write(fitsfile* fptr, int& axisID, int* status) {
+int const GIRFAxisParam::Write(fitsfile* fptr, int& axisID, int* status) {
 	// fill the data array
 	std::vector<float>::size_type axisSize = fAxisParam.constants.size();
 	float* axisdata = new float[axisSize];
@@ -230,9 +219,8 @@ int GIRFAxisParam::Write(fitsfile* fptr, int& axisID, int* status) {
 //
 // Check if the Axis already exists within the fits file
 //
-bool GIRFAxisParam::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
+bool const GIRFAxisParam::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 
-	bool exists = 0;
 
 	int currenthdu = fptr->HDUposition;
 
@@ -277,9 +265,28 @@ bool GIRFAxisParam::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 	}
 
 	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
-	return exists;
+	return FALSE;
 }
 
+////////////////////////////////////////////////////////////////
+//
+// Check that the vector describe consistently the axis
+//
+int GIRFAxisParam::CheckAxisConsistency() {
+	int status = GIRFAxis::CheckAxisConsistency();
+
+	if (!fAxisParameterizationFilled) status++;
+	//TODO: Check if the function contains the correct number of constants and variables.??
+	return status;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// 	Print the content of the parameterized axis.
+//
+void const GIRFAxisParam::Print() {
+
+}
 
 ////////////////////////////////////////////////////////////////
 //

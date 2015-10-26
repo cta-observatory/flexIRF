@@ -81,9 +81,9 @@ public:
 
 	virtual bool operator==(const GIRFAxis& otherAxis) {return 1;}//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
 
-	virtual int 	Write(fitsfile* fptr, int& axisID, int* status) {*status = WRITE_ERROR;	return *status;}
-	virtual int 	WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);
-	virtual void 	Print() {};
+	virtual int const 	Write(fitsfile* fptr, int& axisID, int* status) {*status = WRITE_ERROR;	return *status;}
+	virtual int const	WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);
+	virtual void const	Print() {};
 
 	virtual bool 	ContainsRange(AxisRange axisRange) {return 0;}
 
@@ -93,9 +93,9 @@ public:
 	virtual int		CheckAxisConsistency();
 
 protected:
-	virtual bool 	CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {return 0;}
-	virtual void 	SetAxisType(AxisType type) {fAxisType = type;}
-	virtual void 	SetAxisType(std::string axisTypeName);
+	virtual bool const	CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {return 0;}
+	virtual void 		SetAxisType(AxisType type) {fAxisType = type;}
+	virtual void 		SetAxisType(std::string axisTypeName);
 
 };
 

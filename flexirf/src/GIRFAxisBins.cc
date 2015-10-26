@@ -195,7 +195,7 @@ void GIRFAxisBins::SetAxis(std::vector<float>::size_type size, float* bins) {
 // 
 // Write the axis to the specified file pointer
 //
-int GIRFAxisBins::Write(fitsfile* fptr, int& axisID, int* status) {
+int const GIRFAxisBins::Write(fitsfile* fptr, int& axisID, int* status) {
 	// fill the data array
 	std::vector<float>::size_type axisSize = fAxisBins.size();
 	float* axisdata = new float[axisSize];
@@ -215,7 +215,7 @@ int GIRFAxisBins::Write(fitsfile* fptr, int& axisID, int* status) {
 //
 // Print Axis content
 //
-void GIRFAxisBins::Print()
+void const GIRFAxisBins::Print()
 {
 	//TODO: Improve print output.
 	std::vector<float>::size_type axisSize = fAxisBins.size();
@@ -228,9 +228,7 @@ void GIRFAxisBins::Print()
 //
 // 		Check if the Axis already exists within the fits file
 //
-bool GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
-
-	bool exists = 0;
+bool const GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 
 	int currenthdu = fptr->HDUposition;
 
@@ -252,7 +250,7 @@ bool GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 									if ((*IRFAxis)==(*this)) {
 										if (!fits_read_key_str(fptr, "HDUCLAS4", card, NULL, status)) {
 											axisID=(ushort)atoi(card);
-											return TRUE;
+											return true;
 										}
 									}
 								}
@@ -267,7 +265,7 @@ bool GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 	}
 
 	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
-	return exists;
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////

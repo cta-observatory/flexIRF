@@ -234,7 +234,7 @@ std::string GIRFAxis::GetVarUnit() const {
 // 
 // Write the header of the axis HDU
 //
-int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
+int const GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 		int* status) {
 
 

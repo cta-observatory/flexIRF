@@ -33,9 +33,9 @@ class GIRFAxisBins : public GIRFAxis
   virtual inline float GetRangeMax() const {if (fAxisBinsFilled) return fAxisBins[fAxisBins.size()-1]; else return 0;}		//TODO: Improve!! they must be in order!!
   virtual inline int   GetSize()     const {return int(fAxisBins.size());}
 
-  virtual int 	Write(fitsfile* fptr, int& axisID, int* status);
-  virtual void 	Print();
-  virtual bool 	CheckAxisExists(fitsfile* fptr, int& axisID, int* status);
+  virtual int const 	Write(fitsfile* fptr, int& axisID, int* status);
+  virtual void const	Print();
+  virtual bool const	CheckAxisExists(fitsfile* fptr, int& axisID, int* status);
 
   inline void 	ResizeBins(int lbin, int hbin){ fAxisBins.erase(fAxisBins.begin(),fAxisBins.begin()+lbin);fAxisBins.erase(fAxisBins.begin()+(hbin-lbin),fAxisBins.end());}
   void 			Resize(float lValue, float hValue);
