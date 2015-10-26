@@ -21,13 +21,12 @@ public:
 private:
 
 	AxisParameterization fAxisParam;
-	bool fIsLog; // if true, the parameterization will use the log of the variable
 	bool fAxisParameterizationFilled;
 
 public:
 	GIRFAxisParam();           // create new empty bin axis
-	GIRFAxisParam(std::vector<float>::size_type size, bool islog = false); // create new bin axis with size
 	GIRFAxisParam(VarType vartype, bool islog = false); // create new axis
+	GIRFAxisParam(VarType vartype, AxisParameterization axisParam, bool islog = false); // create new axis
 	GIRFAxisParam(VarType vartype, std::vector<float>::size_type size,
 			bool islog = false); // create new axis
 	GIRFAxisParam(VarType vartype, std::vector<float> bins, bool islog = false); // create new axis
@@ -41,11 +40,13 @@ public:
 
 	virtual string 		GetFormula(){return fAxisParam.formula;}
 	virtual inline int 	GetNumVars() { return int(fAxisParam.numParameters);}
-	virtual inline int 	GetSize() { return int(fAxisParam.constants.size());}
+	virtual float 		GetRangeMin() const {return float(fAxisParam.validRangeLow);}
+	virtual float 		GetRangeMax() const {return float(fAxisParam.validRangeHigh);}
+	virtual inline int 	GetSize() const { return int(fAxisParam.constants.size());}
 
 	virtual inline void SetAxis(std::vector<float> axisbins) { SetAxisConstants(axisbins);}
 	virtual void 		SetAxis(std::vector<float>::size_type size, float* bins);
-	virtual inline void SetAxisParam(AxisParameterization axisParam, std::vector<float> axisbins);
+	virtual void 		SetAxisParam(AxisParameterization axisParam);
 	virtual inline void SetAxisConstants(std::vector<float> axisConstants) { fAxisParam.constants = axisConstants;}
 	virtual void 		SetFormula(string formula, std::vector<float>::size_type numParameters, float* parameters, int numVariables);
 
@@ -60,6 +61,7 @@ public:
 protected:
 
 	virtual inline bool CheckFormulaEmpty(){if (fAxisParam.formula.empty()) return 1; else return 0;}
+	virtual bool CheckAxisParameterizationFilled();
 
 };
 

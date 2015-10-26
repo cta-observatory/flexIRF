@@ -48,12 +48,13 @@ public:
 	// ID:     PDG particle ID numbering scheme
 
 private:
-	AxisType fAxisType;  // kind of axis (bins or parameterization)
-	VarType fVarType;   // variable described by axis
+	AxisType fAxisType;  		// kind of axis (bins or parameterization)
+	VarType fVarType;   		// variable described by axis
+	bool fIsLog;        		// if true, the interpolation/parameterization will be done on the log of the variable
 
 public:
-	GIRFAxis();                // create new empty axis
-	GIRFAxis(VarType vartype); // create new axis for given variable
+	GIRFAxis();                	// create new empty axis
+	GIRFAxis(VarType vartype); 	// create new axis for given variable
 
 	virtual ~GIRFAxis(){};
 
@@ -69,11 +70,14 @@ public:
 	virtual float 	GetRangeMax() const {return 0;}
 	virtual int 	GetSize() const {return 0;}
 
-	virtual inline std::string GetExtName() const {return GetVarName() + "_" + GetTypeName();}
-	virtual std::string GetTypeName() const;
-	virtual std::string GetVarName() const;
-	static std::string GetVarName(VarType varType);
-	virtual std::string GetVarUnit() const;
+	virtual bool 		IsLog() const {return fIsLog;}
+	virtual inline void	SetLog(bool isLog=1) {fIsLog=isLog;}
+
+	virtual inline std::string 	GetExtName() const {return GetVarName() + "_" + GetTypeName();}
+	virtual std::string 		GetTypeName() const;
+	virtual std::string 		GetVarName() const;
+	static std::string 			GetVarName(VarType varType);
+	virtual std::string 		GetVarUnit() const;
 
 	virtual bool operator==(const GIRFAxis& otherAxis) {return 1;}//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
 

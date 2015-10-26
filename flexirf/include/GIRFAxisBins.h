@@ -8,7 +8,6 @@ class GIRFAxisBins : public GIRFAxis
 {
  private:
   std::vector<float> fAxisBins;
-  bool fIsLog;                    // if true, the interpolation will be done on the log of the variable
   bool fAxisBinsFilled;
  public:
   GIRFAxisBins();           // create new empty bin axis
@@ -24,11 +23,11 @@ class GIRFAxisBins : public GIRFAxis
 
   bool ContainsRange(AxisRange axisRange);
 
-  virtual inline void SetAxisBins(std::vector<float> axisbins) {fAxisBinsFilled=1; fAxisBins=axisbins;}
+  virtual inline void 		SetAxisBins(std::vector<float> axisbins) {fAxisBinsFilled=1; fAxisBins=axisbins;}
   inline std::vector<float> GetAxisBins() const {return fAxisBins;}
 
-  virtual inline void SetAxis(std::vector<float> axisbins)     {SetAxisBins(axisbins);}
-  virtual void SetAxis(std::vector<float>::size_type size,float* bins);
+  virtual inline void 	SetAxis(std::vector<float> axisbins)     {SetAxisBins(axisbins);}
+  virtual void 			SetAxis(std::vector<float>::size_type size,float* bins);
 
   virtual inline float GetRangeMin() const {if (fAxisBinsFilled) return fAxisBins[0]; else return 0;}						//TODO: Improve!! they must be in order!!
   virtual inline float GetRangeMax() const {if (fAxisBinsFilled) return fAxisBins[fAxisBins.size()-1]; else return 0;}		//TODO: Improve!! they must be in order!!

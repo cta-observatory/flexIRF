@@ -27,18 +27,8 @@ using namespace std;
 // Construct empty axis object
 //
 GIRFAxisParam::GIRFAxisParam() :
-		GIRFAxis(), fIsLog(0), fAxisParameterizationFilled(0){
+		GIRFAxis(), fAxisParameterizationFilled(0){
 
-
-}
-
-////////////////////////////////////////////////////////////////
-// 
-// Construct axis object with predefined size
-//
-GIRFAxisParam::GIRFAxisParam(std::vector<float>::size_type size, bool islog) :
-		fIsLog(islog), fAxisParameterizationFilled(0) {
-	fAxisParam.constants.reserve(size);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -46,8 +36,9 @@ GIRFAxisParam::GIRFAxisParam(std::vector<float>::size_type size, bool islog) :
 // Construct axis object with predefined data
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog), fAxisParameterizationFilled(0){
+		GIRFAxis(vartype), fAxisParameterizationFilled(0){
 	SetAxisType(kParam);
+	SetLog(islog);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -56,9 +47,10 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype,
 		std::vector<float>::size_type size, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog), fAxisParameterizationFilled(0){
+		GIRFAxis(vartype), fAxisParameterizationFilled(0){
 	SetAxisType(kParam);
 	fAxisParam.constants.reserve(size);
+	SetLog(islog);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -67,9 +59,10 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype,
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype, std::vector<float> bins,
 		bool islog) :
-		GIRFAxis(vartype), fIsLog(islog), fAxisParameterizationFilled(0){
+		GIRFAxis(vartype), fAxisParameterizationFilled(0){
 	SetAxisType(kParam);
 	fAxisParam.constants = bins;
+	SetLog(islog);
 
 }
 
@@ -79,13 +72,28 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype, std::vector<float> bins,
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype,
 		std::vector<float>::size_type size, float* bins, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog) {
+		GIRFAxis(vartype) {
 	SetAxisType(kParam);
 	SetAxis(size, bins);
+	SetLog(islog);
 }
 
 ////////////////////////////////////////////////////////////////
 // 
+// Construct axis object with predefined vectors (using arrays)
+//
+GIRFAxisParam::GIRFAxisParam(VarType vartype, AxisParameterization axisParam,
+		bool islog) : GIRFAxis(vartype) {
+	fAxisParam = axisParam;
+	SetLog(islog);
+
+	// Check if the axis is properly parameterized
+	CheckAxisParameterizationFilled();
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // Construct axis object directly reading from HDU
 //
 GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
@@ -98,6 +106,7 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
 	char *longcard;
 	int numVars;
+
 	fits_get_num_rows(fptr, &nRows, status);
 	fits_get_num_cols(fptr, &nCol, status);
 	float farray[nRows];
@@ -110,12 +119,15 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 	fits_read_key_longstr(fptr, "FORMULA", &longcard, NULL, status);
 	SetFormula((string) longcard, nRows, farray, numVars);
 
-	fIsLog = 0;
 
 	fits_read_key_str(fptr, "VARTYPE", card, NULL, status);
 	SetVarType((VarType) atoi(card));
 
+	fits_read_key_str(fptr, "ISLOG", card, NULL, status);
+	SetLog((bool)atoi(card));
+
 	//TODO: Read everything from fits file.
+	CheckAxisParameterizationFilled();
 
 }
 
@@ -126,11 +138,13 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange) {
 
 	//TODO: Modify as soon as I add the range of validity!!!
-	if (axisRange.varType != this->GetVarType())
+	if (!fAxisParameterizationFilled) return 0;
+
+	if (axisRange.varType != GetVarType())
 		return 0;							//Sanity check
 	else {
-		if (axisRange.lowRange > this->GetRangeMin()
-				&& axisRange.highRange < this->GetRangeMax())
+		if (axisRange.lowRange > GetRangeMin()
+				&& axisRange.highRange < GetRangeMax())
 			return 1;
 		else
 			return 0;
@@ -143,9 +157,9 @@ bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange) {
 //
 int GIRFAxisParam::CheckAxisConsistency() {
 	int status = GIRFAxis::CheckAxisConsistency();
-	//TODO: Check there is a function, with all parameters filled!
-	if (CheckFormulaEmpty())
-		status++;
+
+	if (!fAxisParameterizationFilled) status++;
+	//TODO: Check if the function contains the correct number of constants and variables.??
 	return status;
 }
 
@@ -153,17 +167,28 @@ int GIRFAxisParam::CheckAxisConsistency() {
 // 
 // 		Set the fAxisParam content.
 //
-void GIRFAxisParam::SetAxis(std::vector<float>::size_type size, float* bins) {
+void GIRFAxisParam::SetAxis(vector<float>::size_type size, float* bins) {
 	// Clear vector
-	fAxisConstantParam.clear();
+	fAxisParam.constants.clear();
 
 	// Resize vector
-	fAxisConstantParam.reserve(size);
+	fAxisParam.constants.reserve(size);
 
 	// Fill vector with arrays
 	for (std::vector<float>::size_type i = 0; i < size; i++)
-		fAxisConstantParam.push_back(bins[i]);
+		fAxisParam.constants.push_back(bins[i]);
+	// Check if the axis is properly parameterized
+	CheckAxisParameterizationFilled();
 }
+
+void GIRFAxisParam::SetAxisParam(AxisParameterization axisParam){
+
+	fAxisParam = axisParam;
+	// Check if the axis is properly parameterized
+	CheckAxisParameterizationFilled();
+
+}
+
 
 ////////////////////////////////////////////////////////////////
 //
@@ -173,11 +198,13 @@ void GIRFAxisParam::SetFormula(string formula,
 		std::vector<float>::size_type numParameters, float* parameters,
 		int numVariables) {
 
-	fAxisConstantParam.reserve(numParameters);
-	fFormula = formula;
+	fAxisParam.constants.reserve(numParameters);
+	fAxisParam.formula = formula;
 	// Fill vector with arrays
 	for (std::vector<float>::size_type i = 0; i < numParameters; i++)
-		fAxisConstantParam.push_back(parameters[i]);
+		fAxisParam.constants.push_back(parameters[i]);
+
+	CheckAxisParameterizationFilled();
 }
 
 ////////////////////////////////////////////////////////////////
@@ -186,10 +213,10 @@ void GIRFAxisParam::SetFormula(string formula,
 //
 int GIRFAxisParam::Write(fitsfile* fptr, int& axisID, int* status) {
 	// fill the data array
-	std::vector<float>::size_type axisSize = fAxisConstantParam.size();
+	std::vector<float>::size_type axisSize = fAxisParam.constants.size();
 	float* axisdata = new float[axisSize];
 	for (std::vector<float>::size_type ibin = 0; ibin < axisSize; ibin++)
-		axisdata[ibin] = fAxisConstantParam[ibin];
+		axisdata[ibin] = fAxisParam.constants[ibin];
 
 	if (!CheckAxisExists(fptr, axisID, status)) {
 		// write the axis header and data
@@ -252,3 +279,22 @@ bool GIRFAxisParam::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 	fits_movabs_hdu(fptr, currenthdu + 1, NULL, status);
 	return exists;
 }
+
+
+////////////////////////////////////////////////////////////////
+//
+// Check if the parameterized axis is filled propperly
+//
+bool GIRFAxisParam::CheckAxisParameterizationFilled(){
+
+	if (fAxisParam.validRangeLow < fAxisParam.validRangeLow && fAxisParam.validRangeLow != fAxisParam.validRangeHigh){
+		if (!fAxisParam.formula.empty()){
+			if (fAxisParam.numConstants == (int) fAxisParam.constants.size()){
+				fAxisParameterizationFilled=1;
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+

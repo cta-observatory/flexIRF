@@ -31,7 +31,7 @@ using namespace std;
 // Construct empty axis object
 //
 GIRFAxis::GIRFAxis() :
-		fAxisType(kNoAxisType), fVarType(GIRFAxis::kNoVarType) {
+		fAxisType(kNoAxisType), fVarType(GIRFAxis::kNoVarType), fIsLog(0) {
 }
 
 ////////////////////////////////////////////////////////////////
@@ -39,10 +39,8 @@ GIRFAxis::GIRFAxis() :
 // Construct empty axis object
 //
 GIRFAxis::GIRFAxis(VarType vartype) :
-		fAxisType(kNoAxisType), fVarType(vartype) {
+		fAxisType(kNoAxisType), fVarType(vartype), fIsLog(false) {
 }
-
-
 
 
 ////////////////////////////////////////////////////////////////
@@ -207,13 +205,13 @@ std::string GIRFAxis::GetVarUnit() const {
 
 	switch (fVarType) {
 	case kEnergy:
-		axisVarType = "log10(TeV)";
+		axisVarType = "TeV";
 		break;
 	case kEnergy_true:
-		axisVarType = "log10(TeV)";
+		axisVarType = "TeV";
 		break;
 	case kEnergy_rec:
-		axisVarType = "log10(TeV)";
+		axisVarType = "TeV";
 		break;
 	case kTheta:
 		axisVarType = "deg";
@@ -279,6 +277,14 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 
+// write IsLog
+	sprintf(keyword, "ISLOG");
+	usval = ushort(fIsLog);
+	sprintf(comment, "If true, logarithm of the variable is stored");
+	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
 // Write keywords of each specific Axis type:
     GIRFAxisBins* binsPointer = dynamic_cast<GIRFAxisBins*>(this);
     if (binsPointer) {
@@ -289,7 +295,7 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
     if (paramPointer) {
     	//TODO: write expression of parametrization
     	sprintf(keyword, "FORMULA");
-    	sprintf(comment, "Parameterized formula.");
+    	sprintf(comment, "Parameterized formula");
     	if (fits_write_key_longstr(fptr, keyword, paramPointer->GetFormula().data(), comment, status))
     		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
     				<< *status << ")" << endl;
@@ -300,7 +306,7 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 
     	sprintf(keyword, "NUMVARS");
     	usval = ushort(paramPointer->GetNumVars());
-    	sprintf(comment, "Number of variables used in the parameterization.");
+    	sprintf(comment, "Number of variables used in the parameterization");
     	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
     		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
     				<< *status << ")" << endl;
@@ -316,19 +322,19 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 // Add class keywords to the HDU.
 	sprintf(keyword, "HDUCLASS");
 	sprintf(chval, "CTA");
-	sprintf(comment, "FITS file following the CTA data format.");
+	sprintf(comment, "FITS file following the CTA data format");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS1");
 	sprintf(chval, "IRM");
-	sprintf(comment, "Instrument Response Model HDU.");
+	sprintf(comment, "Instrument Response Model HDU");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS2");
 	sprintf(chval, "AXIS");
-	sprintf(comment, "Axis HDU.");
+	sprintf(comment, "Axis HDU");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;

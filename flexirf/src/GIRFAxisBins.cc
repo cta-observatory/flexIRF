@@ -26,8 +26,9 @@ using namespace std;
 // 
 // Construct empty axis object
 //
-GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fIsLog(0), fAxisBinsFilled(0){
+GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fAxisBinsFilled(0){
 	SetAxisType(kBins);
+
 }
 
 ////////////////////////////////////////////////////////////////
@@ -35,9 +36,10 @@ GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fIsLog(0), fAxisBinsFilled(0){
 // Construct axis object with predefined size
 //
 GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, bool islog) :
-		fIsLog(islog), fAxisBinsFilled(0) {
+	fAxisBinsFilled(0) {
 	SetAxisType(kBins);
 	fAxisBins.reserve(size);
+	SetLog(islog);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -45,8 +47,9 @@ GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, bool islog) :
 // Construct axis object with predefined data
 //
 GIRFAxisBins::GIRFAxisBins(VarType vartype, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog), fAxisBinsFilled(0) {
+		GIRFAxis(vartype), fAxisBinsFilled(0) {
 	SetAxisType(kBins);
+	SetLog(islog);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -55,8 +58,9 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, bool islog) :
 //
 GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 		bool islog) :
-		GIRFAxis(vartype), fIsLog(islog), fAxisBinsFilled(0) {
+		GIRFAxis(vartype), fAxisBinsFilled(0) {
 	SetAxisType(kBins);
+	SetLog(islog);
 	fAxisBins.reserve(size);
 }
 ////////////////////////////////////////////////////////////////
@@ -64,7 +68,8 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 // Construct axis object with predefined vectors
 //
 GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float> bins, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog) {
+		GIRFAxis(vartype) {
+	SetLog(islog);
 	SetAxisType(kBins);
 	fAxisBins = bins;
 
@@ -80,9 +85,10 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float> bins, bool islog)
 //
 GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 		float* bins, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog) {
+		GIRFAxis(vartype) {
 	SetAxisType(kBins);
 	SetAxis(size, bins);
+	SetLog(islog);
 }
 
 
@@ -106,10 +112,12 @@ GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 	fits_read_col (fptr, TFLOAT, 1, 1, 1, nRows, &nullfloat, &farray, &anynull, status);
 	fAxisBins.assign(farray,farray+nRows);
 	fAxisBinsFilled=1;
-	fIsLog=0;
 
 	fits_read_key_str(fptr, "VARTYPE", card, NULL, status);
 	SetVarType((VarType)atoi(card));
+
+	fits_read_key_str(fptr, "ISLOG", card, NULL, status);
+	SetLog((bool)atoi(card));
 }
 
 
