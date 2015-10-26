@@ -7,10 +7,11 @@
 
 class GIRFAxisParam: public GIRFAxis {
 private:
-	std::vector<float> fAxisParam;
-	int fNumVariables;
+	std::vector<float> fAxisConstantParam;							// Array containing the constant parameters used in fFormula.
+	int fNumParameters;
 	string fFormula;
 	bool fIsLog; // if true, the parameterization will use the log of the variable
+	bool fAxisConstantParamFilled;
 
 public:
 	GIRFAxisParam();           // create new empty bin axis
@@ -27,11 +28,11 @@ public:
 
 	virtual ~GIRFAxisParam() {};
 
-	virtual inline void SetAxisParam(std::vector<float> axisbins) { fAxisParam = axisbins;}
+	virtual inline void SetAxisParam(std::vector<float> axisbins) { fAxisConstantParam = axisbins;}
 	virtual inline void SetAxis(std::vector<float> axisbins) { SetAxisParam(axisbins);}
 	virtual void 		SetAxis(std::vector<float>::size_type size, float* bins);
 	virtual void 		SetFormula(string formula, std::vector<float>::size_type numParameters, float* parameters, int numVariables);
-	virtual inline int 	GetSize() { return int(fAxisParam.size());}
+	virtual inline int 	GetSize() { return int(fAxisConstantParam.size());}
 
 	virtual int 	Write(fitsfile* fptr, int& axisID, int* status);
 	virtual bool 	CheckAxisExists(fitsfile* fptr, int& axisID, int* status);

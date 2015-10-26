@@ -26,7 +26,7 @@ using namespace std;
 // 
 // Construct empty axis object
 //
-GIRFAxisParam::GIRFAxisParam() : GIRFAxis(), fNumVariables(0), fIsLog(0) {
+GIRFAxisParam::GIRFAxisParam() : GIRFAxis(), fNumParameters(0), fIsLog(0), fAxisConstantParamFilled(0) {
 	fFormula="";
 }
 
@@ -35,8 +35,8 @@ GIRFAxisParam::GIRFAxisParam() : GIRFAxis(), fNumVariables(0), fIsLog(0) {
 // Construct axis object with predefined size
 //
 GIRFAxisParam::GIRFAxisParam(std::vector<float>::size_type size, bool islog) :
-		fIsLog(islog), fNumVariables(0) {
-	fAxisParam.reserve(size);
+		fIsLog(islog), fNumParameters(0), fAxisConstantParamFilled(0) {
+	fAxisConstantParam.reserve(size);
 	fFormula="";
 }
 
@@ -45,7 +45,7 @@ GIRFAxisParam::GIRFAxisParam(std::vector<float>::size_type size, bool islog) :
 // Construct axis object with predefined data
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog), fNumVariables(0) {
+		GIRFAxis(vartype), fIsLog(islog), fNumParameters(0), fAxisConstantParamFilled(0) {
 	SetAxisType(kParam);
 	fFormula="";
 }
@@ -56,11 +56,13 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype,
 		std::vector<float>::size_type size, bool islog) :
-		GIRFAxis(vartype), fIsLog(islog), fNumVariables(0) {
+		GIRFAxis(vartype), fIsLog(islog), fNumParameters(0), fAxisConstantParamFilled(0) {
 	SetAxisType(kParam);
-	fAxisParam.reserve(size);
+	fAxisConstantParam.reserve(size);
 	fFormula="";
 }
+
+
 ////////////////////////////////////////////////////////////////
 // 
 // Construct axis object with predefined vectors
@@ -69,12 +71,12 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype, std::vector<float> bins,
 		bool islog) :
 		GIRFAxis(vartype), fIsLog(islog) {
 	SetAxisType(kParam);
-	fAxisParam = bins;
+	fAxisConstantParam = bins;
 
 	int status = CheckAxisConsistency();
 	if (status)
 		cout
-				<< "GIRFAxisParam::GIRFAxisParam: Warning: Axis is NOT consistent ("
+				<< "GIRfAxisConstantParam::GIRFAxisParam: Warning: Axis is NOT consistent ("
 				<< status << ")" << endl;
 }
 
@@ -94,6 +96,33 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype,
 // Construct axis object directly reading from HDU
 //
 GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
+
+	SetAxisType(kParam);
+
+
+
+
+	long int nRows;
+	int nCol, anynull;
+	float nullfloat = 0.0F;
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	int numVars;
+	fits_get_num_rows(fptr, &nRows, status);
+	fits_get_num_cols(fptr, &nCol, status);
+	float farray[nRows];
+	//TODO: For now, just get one column. In the future maybe Axis should have several columns (low/high bin edges)
+	fits_read_key_str(fptr, "NUMVARS", card, NULL, status);
+	numVars=atoi(card);
+
+	fits_read_col (fptr, TFLOAT, 1, 1, 1, nRows, &nullfloat, &farray, &anynull, status);
+	fits_read_key_str(fptr, "FORMULA", card, NULL, status);
+	SetFormula((string)card, nRows, farray, numVars);
+
+	fIsLog=0;
+
+	fits_read_key_str(fptr, "VARTYPE", card, NULL, status);
+	SetVarType((VarType)atoi(card));
+
 
 	//TODO: Read everything from fits file.
 
@@ -126,19 +155,34 @@ int GIRFAxisParam::CheckAxisConsistency() {
 
 ////////////////////////////////////////////////////////////////
 // 
-// Check that the vector describe consistently the axis
+// 		Set the fAxisParam content.
 //
 void GIRFAxisParam::SetAxis(std::vector<float>::size_type size, float* bins) {
 	// Clear vector
-	fAxisParam.clear();
+	fAxisConstantParam.clear();
 
 	// Resize vector
-	fAxisParam.reserve(size);
+	fAxisConstantParam.reserve(size);
 
 	// Fill vector with arrays
 	for (std::vector<float>::size_type i = 0; i < size; i++)
-		fAxisParam.push_back(bins[i]);
+		fAxisConstantParam.push_back(bins[i]);
 }
+
+
+////////////////////////////////////////////////////////////////
+//
+// 		Set the parametrized formula of the axis.
+//
+void GIRFAxisParam::SetFormula(string formula, std::vector<float>::size_type numParameters, float* parameters, int numVariables) {
+
+	fAxisConstantParam.reserve(numParameters);
+	fFormula=formula;
+	// Fill vector with arrays
+	for (std::vector<float>::size_type i = 0; i < numParameters; i++)
+		fAxisConstantParam.push_back(parameters[i]);
+}
+
 
 ////////////////////////////////////////////////////////////////
 // 
@@ -146,10 +190,10 @@ void GIRFAxisParam::SetAxis(std::vector<float>::size_type size, float* bins) {
 //
 int GIRFAxisParam::Write(fitsfile* fptr, int& axisID, int* status) {
 	// fill the data array
-	std::vector<float>::size_type axisSize = fAxisParam.size();
+	std::vector<float>::size_type axisSize = fAxisConstantParam.size();
 	float* axisdata = new float[axisSize];
 	for (std::vector<float>::size_type ibin = 0; ibin < axisSize; ibin++)
-		axisdata[ibin] = fAxisParam[ibin];
+		axisdata[ibin] = fAxisConstantParam[ibin];
 
 	if (!CheckAxisExists(fptr, axisID, status)) {
 		// write the axis header and data

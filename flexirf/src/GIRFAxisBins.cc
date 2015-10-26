@@ -102,7 +102,7 @@ GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 	fits_get_num_rows(fptr, &nRows, status);
 	fits_get_num_cols(fptr, &nCol, status);
 	float farray[nRows];
-	//TODO: For now, just get one column. In the future Axis should have several columns (low/high bin edges)
+	//TODO: For now, just get one column. In the future maybe Axis should have several columns (low/high bin edges)
 	fits_read_col (fptr, TFLOAT, 1, 1, 1, nRows, &nullfloat, &farray, &anynull, status);
 	fAxisBins.assign(farray,farray+nRows);
 	fAxisBinsFilled=1;

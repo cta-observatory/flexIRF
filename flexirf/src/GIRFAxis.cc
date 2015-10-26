@@ -288,6 +288,14 @@ int GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
     GIRFAxisParam* paramPointer = dynamic_cast<GIRFAxisParam*>(this);
     if (paramPointer) {
     	//TODO: write expression of parametrization
+    	//TODO: Write FORMULA will be a long string!!! Better be safe.
+//    	  int fits_write_key_longstr / ffpkls
+//    	      (fitsfile *fptr, char *keyname, char *longstr, char *comment,
+//    	       > int *status)
+//
+//    	  int fits_write_key_longwarn / ffplsw
+//    	      (fitsfile *fptr, > int *status)
+    	//TODO: Write VARNUM, storing the number of variables inside
     }
 
 // Write in the first column, from first row
