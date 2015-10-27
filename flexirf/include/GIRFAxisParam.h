@@ -48,7 +48,8 @@ public:
 	virtual void 		SetAxis(std::vector<float>::size_type size, float* bins);
 	virtual void 		SetAxisParam(AxisParameterization axisParam);
 	virtual inline void SetAxisConstants(std::vector<float> axisConstants) { fAxisParam.constants = axisConstants;}
-	virtual void 		SetFormula(string formula, std::vector<float>::size_type numParameters, float* parameters, int numVariables);
+	void 				SetFormula(string formula, std::vector<float>::size_type numParameters, float* parameters, int numVariables);
+	void 				SetValidRange(float validRangeLow, float validRangeHigh);
 
 	virtual int const	Write(fitsfile* fptr, int& axisID, int* status);
 	virtual bool const	CheckAxisExists(fitsfile* fptr, int& axisID, int* status);

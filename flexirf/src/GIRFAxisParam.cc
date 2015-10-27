@@ -107,6 +107,7 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 	float nullfloat = 0.0F;
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
 	char *longcard;
+	float validRangeLow, validRangeHigh;
 	int numVars;
 
 	fits_get_num_rows(fptr, &nRows, status);
@@ -118,12 +119,20 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 
 	fits_read_key_str(fptr, "NUMVARS", card, NULL, status);
 	numVars = atoi(card);
+
 	fits_read_key_longstr(fptr, "FORMULA", &longcard, NULL, status);
 	SetFormula((string) longcard, nRows, farray, numVars);
 
-
 	fits_read_key_str(fptr, "VARTYPE", card, NULL, status);
 	SetVarType((VarType) atoi(card));
+
+	fits_read_key_str(fptr, "VRANGE_L", card, NULL, status);
+	fAxisParam.validRangeLow = atof(card);
+
+	fits_read_key_str(fptr, "VRANGE_H", card, NULL, status);
+	fAxisParam.validRangeHigh = atof(card);
+
+//	SetValidRange();
 
 	fits_read_key_str(fptr, "ISLOG", card, NULL, status);
 	SetLog((bool)atoi(card));
@@ -146,8 +155,10 @@ bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange) {
 		return 0;							//Sanity check
 	else {
 		if (axisRange.lowRange > GetRangeMin()
-				&& axisRange.highRange < GetRangeMax())
+				&& axisRange.highRange < GetRangeMax()){
 			return 1;
+		}
+
 		else
 			return 0;
 	}
@@ -189,14 +200,31 @@ void GIRFAxisParam::SetFormula(string formula,
 		std::vector<float>::size_type numParameters, float* parameters,
 		int numVariables) {
 
+	fAxisParam.numConstants = numParameters;
 	fAxisParam.constants.reserve(numParameters);
 	fAxisParam.formula = formula;
 	// Fill vector with arrays
 	for (std::vector<float>::size_type i = 0; i < numParameters; i++)
 		fAxisParam.constants.push_back(parameters[i]);
 
+	fAxisParam.numParameters = numVariables;
+
 	CheckAxisParameterizationFilled();
 }
+
+////////////////////////////////////////////////////////////////
+//
+// 		Set the valid range of the parameterization.
+//
+void GIRFAxisParam::SetValidRange(float validRangeLow, float validRangeHigh) {
+
+
+	fAxisParam.validRangeLow = validRangeLow;
+	fAxisParam.validRangeHigh = validRangeHigh;
+
+	CheckAxisParameterizationFilled();
+}
+
 
 ////////////////////////////////////////////////////////////////
 // 
@@ -300,6 +328,7 @@ void const GIRFAxisParam::Print() {
 // Check if the parameterized axis is filled propperly
 //
 bool GIRFAxisParam::CheckAxisParameterizationFilled(){
+
 
 	if (fAxisParam.validRangeLow < fAxisParam.validRangeHigh && fAxisParam.validRangeLow != fAxisParam.validRangeHigh){
 		if (!fAxisParam.formula.empty()){

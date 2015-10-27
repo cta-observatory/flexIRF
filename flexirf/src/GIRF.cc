@@ -290,7 +290,7 @@ GIRFAxis* GIRF::ReadAxis(int axisID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
-	GIRFAxis::AxisType axisType = CheckAxisType(axisID);
+	GIRFAxis::AxisType axisType = static_cast<GIRFAxis::AxisType>(CheckAxisType(axisID));
 
 	int hduPos = CheckAxisHDUpos(axisID);
 	//TODO: Handle status!!
@@ -574,7 +574,7 @@ GIRFPdf::PdfFunc GIRF::ReadPdfFunc(int pdfID) {
 float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisRange> axisRanges){
 
 	vector<long> lBins, hBins, inc;
-	int lBin, hBin, anynull;
+	int lBin, hBin, anynull, axisSize;
 	long nBins=0;
 
 	int iAxis=0;
@@ -590,33 +590,33 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 		switch (axisType){
 			case GIRFAxis::kBins:{
 				axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(*axisID));
+				axisSize=axis->GetSize()-1;
 				break;
 			}
 			case GIRFAxis::kParam:{
 				axis = dynamic_cast<GIRFAxisParam*>(ReadAxis(*axisID));
+				axisSize=axis->GetSize();
 				break;
 			}
 		}
 		for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 			if (varType == axisRange->varType){
 				cout << "Axis #" << *axisID << " is resized using lowRange = " << axisRange->lowRange << " & highRange = " << axisRange->highRange << endl;
-				axis->Print();
 				axis->Resize(axisRange->lowRange, axisRange->highRange, &lBin, &hBin);
-				axis->Print();
 				cout << "lBin = " << lBin << " and hBin = " << hBin << endl;
 				break;
 			}
 		}
 		if (lBin==0 && hBin == 0){
 			lBins.push_back(1);
-			hBins.push_back(axis->GetSize()-1);
+			hBins.push_back(axisSize);
 		} else {
 			lBins.push_back(lBin+1);	//TODO: CHECK!!!!!!!!! Donde va el +1!!?!??!?
 			hBins.push_back(hBin-1);
 		}
 		cout << "Axis #" << *axisID << " with axis size = " << axis->GetSize() << endl;
-		if (nBins == 0) nBins=axis->GetSize()-1;
-		else nBins*=axis->GetSize()-1;
+		if (nBins == 0) nBins=axisSize;
+		else nBins*=axisSize;
 		inc.push_back(1);
 	}
 
@@ -691,7 +691,7 @@ vector<int> GIRF::FindAxisRange(GIRFAxis::AxisRange axisRange){
 											break;
 										}
 										default:{
-											cout << "Invalid axis type\n";
+											cout << "ERROR: Invalid axis type\n";
 											CheckStatus();
 											fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
 											break;

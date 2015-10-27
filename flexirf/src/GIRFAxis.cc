@@ -260,6 +260,7 @@ int const GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastI
 	char chval[FLEN_CARD];
 	char comment[FLEN_COMMENT];
 	ushort usval;
+	float floatValue;
 
 // write axis type
 	sprintf(keyword, "AXISTYPE");
@@ -305,6 +306,20 @@ int const GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastI
     	usval = ushort(paramPointer->GetNumVars());
     	sprintf(comment, "Number of variables used in the parameterization");
     	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+    		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+    				<< *status << ")" << endl;
+
+    	sprintf(keyword, "VRANGE_L");
+    	floatValue = float(paramPointer->GetRangeMin());
+    	sprintf(comment, "Low edge of the parameterization valid range");
+    	if (fits_write_key(fptr, TFLOAT, keyword, &floatValue, comment, status))
+    		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+    				<< *status << ")" << endl;
+
+    	sprintf(keyword, "VRANGE_H");
+    	floatValue = float(paramPointer->GetRangeMax());
+    	sprintf(comment, "High edge of the parameterization valid range");
+    	if (fits_write_key(fptr, TFLOAT, keyword, &floatValue, comment, status))
     		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
     				<< *status << ")" << endl;
 

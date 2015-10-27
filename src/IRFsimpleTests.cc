@@ -134,9 +134,9 @@ int main(int argc, char **argv)
 	mypdf->SetData(pdfdata.data());
 	mypdf->AddAxis(axis1);
 
-	GIRF* irf = new GIRF;
-	irf->AddPdf(mypdf);
-	irf->Write("!paramTest.fits");
+	GIRF* irf2 = new GIRF;
+	irf2->AddPdf(mypdf);
+	irf2->Write("!paramTest.fits");
 
 
 
@@ -146,17 +146,18 @@ int main(int argc, char **argv)
 
 
 
-//	GIRFConfig config;
-////	config.SetDefault();
-//	config.AddAxisRange(GIRFAxis::kEnergy,-1.7,-0.9, 1);
-//	config.AddAxisRange(GIRFAxis::kPhi, -1,1, 0);
-////	config.Print();
+	GIRFConfig config;
+//	config.SetDefault();
+	config.AddAxisRange(GIRFAxis::kEnergy,-1.7,-0.9, 1);
+	config.AddAxisRange(GIRFAxis::kPhi, -1,1, 0);
+//	config.Print();
 //	string filename = "/home/thassan/Workspace/IRM_devel/build/alltest.fits";
-//	GIRF irf(filename);
-//	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(GIRFPdf::kBkgRate, config));
-//	if (!effArea || effArea->IsEmpty()) return 2;
-////	effArea.Print();
-//	effArea->Draw();
+	string filename = "/home/thassan/Workspace/IRM_devel/build/paramTest.fits";
+	GIRF irf(filename);
+	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(GIRFPdf::kAeff, config));
+	if (!effArea || effArea->IsEmpty()) return 2;
+	effArea->Print();
+	effArea->Draw();
 
 
 
@@ -171,7 +172,7 @@ int main(int argc, char **argv)
 //	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(GIRFPdf::kEDispersion, config));
 //	if (!effArea || effArea->IsEmpty()) return 2;
 ////	effArea->Print();
-//	effArea->Draw();
+////	effArea->Draw();
 
 
 

@@ -377,20 +377,21 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 void GIRFPdf::Print() const {
 
 	int iAxis=0;
+	int totalSize=1;
 	cout << "Printing Axes:" << endl;
 	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iAxis++) {
 		cout << "Printing Axis #" << iAxis+1 << endl;
+		if (dynamic_cast<GIRFAxisParam*>(*axis)) totalSize*=(*axis)->GetSize();
+		else if (dynamic_cast<GIRFAxisBins*>(*axis)) totalSize*=(*axis)->GetSize()-1;
 		(*axis)->Print();
 	}
 	cout << "Printing Pdf content:" << endl;
 	int iData=0;
 	// TODO: This is obviously wrong... but at least printing some numbers...
 
-//	for (int i=0;i<fAxis[0]->GetSize();i++){
-//		for (int j=0;j<fAxis[1]->GetSize();j++){
-//					cout << "Data[" << i+1 << "," << j+1 << "] = fData[" << (i*(fAxis[1]->GetSize()))+j << "] = " << fData[(i*(fAxis[0]->GetSize()))+j] << endl;
-//		}
-//	}
+	for (int i=0;i<totalSize;i++){
+		cout << "Data[" << i+1 << "] = " << fData[i] << endl;
+	}
 //	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {
 //		cout << "Printing Axis #" << iData+1 << endl;
 //		for (int i=0;i<(*axis)->GetSize();i++){
