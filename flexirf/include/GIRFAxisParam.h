@@ -39,10 +39,10 @@ public:
 	virtual ~GIRFAxisParam() {};
 
 	virtual string 		GetFormula(){return fAxisParam.formula;}
-	virtual inline int 	GetNumVars() { return int(fAxisParam.numParameters);}
+	virtual inline int 	GetNumVars() const { return int(fAxisParam.numParameters);}
 	virtual float 		GetRangeMin() const {return float(fAxisParam.validRangeLow);}
 	virtual float 		GetRangeMax() const {return float(fAxisParam.validRangeHigh);}
-	virtual inline int 	GetSize() const { return int(fAxisParam.constants.size());}
+	virtual inline int 	GetSize() const { return int(fAxisParam.numParameters);}
 
 	virtual inline void SetAxis(std::vector<float> axisbins) { SetAxisConstants(axisbins);}
 	virtual void 		SetAxis(std::vector<float>::size_type size, float* bins);
@@ -58,7 +58,7 @@ public:
 	virtual inline void Resize(float lValue, float hValue, int *lbin, int *hbin) {;}
 	virtual int 		CheckAxisConsistency(); // return 0 if axis is consistent
 
-	virtual void const			Print();
+	virtual void const	Print();
 
 protected:
 

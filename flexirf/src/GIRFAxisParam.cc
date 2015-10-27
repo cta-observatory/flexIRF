@@ -29,6 +29,7 @@ using namespace std;
 GIRFAxisParam::GIRFAxisParam() :
 		GIRFAxis(), fAxisParameterizationFilled(0){
 
+	SetAxisType(kParam);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -84,6 +85,7 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype,
 //
 GIRFAxisParam::GIRFAxisParam(VarType vartype, AxisParameterization axisParam,
 		bool islog) : GIRFAxis(vartype) {
+	SetAxisType(kParam);
 	fAxisParam = axisParam;
 	SetLog(islog);
 
@@ -285,7 +287,12 @@ int GIRFAxisParam::CheckAxisConsistency() {
 // 	Print the content of the parameterized axis.
 //
 void const GIRFAxisParam::Print() {
-
+	cout << "GIRFAxisParam:" << endl;
+	cout << "formula = " << fAxisParam.formula << endl;
+	cout << "numConstants = " << fAxisParam.numConstants << endl;
+	cout << "numParameters = " << fAxisParam.numParameters << endl;
+	cout << "valid Range = { " << fAxisParam.validRangeLow << ", " << fAxisParam.validRangeHigh << "}" << endl;
+	//TODO: print constants
 }
 
 ////////////////////////////////////////////////////////////////
@@ -294,7 +301,7 @@ void const GIRFAxisParam::Print() {
 //
 bool GIRFAxisParam::CheckAxisParameterizationFilled(){
 
-	if (fAxisParam.validRangeLow < fAxisParam.validRangeLow && fAxisParam.validRangeLow != fAxisParam.validRangeHigh){
+	if (fAxisParam.validRangeLow < fAxisParam.validRangeHigh && fAxisParam.validRangeLow != fAxisParam.validRangeHigh){
 		if (!fAxisParam.formula.empty()){
 			if (fAxisParam.numConstants == (int) fAxisParam.constants.size()){
 				fAxisParameterizationFilled=1;

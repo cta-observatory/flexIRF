@@ -285,6 +285,7 @@ int const GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastI
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 
+
 // Write keywords of each specific Axis type:
     GIRFAxisBins* binsPointer = dynamic_cast<GIRFAxisBins*>(this);
     if (binsPointer) {
@@ -297,10 +298,6 @@ int const GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastI
     	sprintf(keyword, "FORMULA");
     	sprintf(comment, "Parameterized formula");
     	if (fits_write_key_longstr(fptr, keyword, paramPointer->GetFormula().data(), comment, status))
-    		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-    				<< *status << ")" << endl;
-    	//Required for the long string format.
-    	if (fits_write_key_longwarn(fptr,status))
     		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
     				<< *status << ")" << endl;
 
@@ -363,6 +360,12 @@ int const GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastI
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
+
+	//Required for the long string format.
+	if (fits_write_key_longwarn(fptr,status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
 
 	return *status;
 }

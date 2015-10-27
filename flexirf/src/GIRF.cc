@@ -221,7 +221,6 @@ int GIRF::Write() {
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< fStatus << ")" << endl;
 	// write pdf blocks and associated axes
-
 	for (vector<GIRFPdf*>::iterator pdf = fPdfList.begin();
 			pdf != fPdfList.end(); ++pdf)
 		if ((*pdf)->Write(fFitsPtr, &fStatus))

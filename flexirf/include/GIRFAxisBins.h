@@ -31,7 +31,7 @@ class GIRFAxisBins : public GIRFAxis
 
   virtual inline float GetRangeMin() const {if (fAxisBinsFilled) return fAxisBins[0]; else return 0;}						//TODO: Improve!! they must be in order!!
   virtual inline float GetRangeMax() const {if (fAxisBinsFilled) return fAxisBins[fAxisBins.size()-1]; else return 0;}		//TODO: Improve!! they must be in order!!
-  virtual inline int   GetSize()     const {return int(fAxisBins.size());}
+  virtual inline int   GetSize()     const {return int(fAxisBins.size()-1);}
 
   virtual int const 	Write(fitsfile* fptr, int& axisID, int* status);
   virtual void const	Print();

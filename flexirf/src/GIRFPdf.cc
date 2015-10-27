@@ -18,6 +18,7 @@
 #include "GIRFAxisBins.h"
 #include "GIRFAxisParam.h"
 #include "GIRFUtils.h"
+#include <stdlib.h>
 #include <iostream>
 #include <string.h>
 
@@ -228,12 +229,13 @@ std::string GIRFPdf::GetVarUnit() const {
 // file pointer
 //
 int GIRFPdf::Write(fitsfile* fptr, int* status) {
+
 	// create arrays with size and first entry of every dimension to be saved (1 is first, not 0)
 	int naxis = int(fAxis.size());
 	long* naxes = new long[naxis];
 	long* fpixel = new long[naxis];
 	for (std::vector<GIRFAxis*>::size_type jaxis = 0; jaxis < naxis; jaxis++) {
-		naxes[jaxis] = int(fAxis[jaxis]->GetSize()-1);
+		naxes[jaxis] = int(fAxis[jaxis]->GetSize());
 		fpixel[jaxis] = 1;
 	}
 	vector<int> axisIDs;
@@ -249,10 +251,11 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 		else axisIDs.push_back(axisID);
 	}
 
+
+
 	// write the pdf header
 	if (fits_create_img(fptr, FLOAT_IMG, naxis, naxes, status))
-		cout
-				<< "GIRFPdf::Write Error: problem writing axis header (error code: "
+		cout << "GIRFPdf::Write Error: problem writing axis header (error code: "
 				<< *status << ")" << endl;
 
 	// write keywords to the header
@@ -278,7 +281,6 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 						<< *status << ")" << endl;
 	}
 
-	// TODO: Check if it already exists!
 	// write pdf name
 	sprintf(keyword, "EXTNAME");
 	sprintf(chval, "%s", GetExtName().data());
@@ -349,6 +351,15 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 
 	// write the pdf data
 	long nentries = GetSize();
+
+//  For testing purposes:
+//	float *array;
+//	array = (float *) calloc(nentries+1, abs(FLOAT_IMG)/8);
+//	for (int i=0;i<=nentries;i++) array[i]=fData[i];
+
+//	if (fits_write_img(fptr, TFLOAT, 1, nentries, array, status))
+//			cout << "GIRFPdf::Write Error: problem writing axis data (error code: "
+//					<< *status << ")" << endl;
 	if (fits_write_pix(fptr, TFLOAT, fpixel, nentries, fData, status))
 		cout << "GIRFPdf::Write Error: problem writing axis data (error code: "
 				<< *status << ")" << endl;
