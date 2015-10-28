@@ -410,7 +410,8 @@ void makeFITS(std::vector<float> pdf_data, string histname,
           break;
 
         default:
-          IRFAxis[iaxis] = new GIRFAxisParam(vartype,size,theaxis,islog);
+        	//TODO: Currently not supporting parameterized axes.
+//          IRFAxis[iaxis] = new GIRFAxisParam(vartype,size,theaxis,islog);
           break;
 
         }

@@ -41,7 +41,7 @@ GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc,
 ////////////////////////////////////////////////////////////////
 //
 // 		Draw Pdf content
-//
+//	TODO: Just 1 and 2 dimensional IRFs can be currently drawn.
 void GIRFPdf::Draw() const {
 
 	if (fIsEmpty) {
@@ -61,7 +61,12 @@ void GIRFPdf::Draw() const {
 		GIRFAxisParam* axisParam = dynamic_cast<GIRFAxisParam*>(fAxis[0]);
 		GIRFAxisBins* axisBins = dynamic_cast<GIRFAxisBins*>(fAxis[0]);
 		if (axisParam){
-			cout << "Parametrized axis are not yet supported... :(" << endl;
+			cout << "Formula: " << axisParam->GetFormula().data() << endl;
+			TF1* pdf = new TF1(GetExtName().data(), axisParam->GetFormula().data(), (float) axisParam->GetRangeMin(), (float) axisParam->GetRangeMax());
+			for (int i=0;i<axisParam->GetNumPars();i++) pdf->SetParameter(i,fData[i]);
+			TCanvas c1;
+			pdf->Draw();
+			c1.SaveAs("plot.png");
 			return;
 		}
 		if (axisBins){
@@ -91,6 +96,7 @@ void GIRFPdf::Draw() const {
 		}
 		if (axisBins1 && axisBins2){
 			TH2F *pdf = new TH2F("pdf", GetExtName().data(), axisBins1->GetSize()-1, axisBins1->GetAxisBins().data(), axisBins2->GetSize()-1, axisBins2->GetAxisBins().data());
+
 			for (int i=0;i<axisBins1->GetSize();i++){
 				for (int j=0;j<axisBins2->GetSize();j++){
 //					cout << "Data[" << i+1 << "," << j+1 << "] = fData[" << (i*(axisBins2->GetSize()))+j << "] = " << fData[(i*(axisBins1->GetSize()))+j] << endl;

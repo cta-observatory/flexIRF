@@ -72,14 +72,14 @@ int main(int argc, char **argv)
 //	GIRFAxis* axis1;
 	GIRFAxisParam* axis1 = new GIRFAxisParam(GIRFAxis::kEnergy, (bool)1);
 	GIRFAxisParam::AxisParameterization axisPar;
-	axisPar.constants.push_back(3.);
-	axisPar.constants.push_back(0.55);
-	axisPar.constants.push_back(9999.3);
-	axisPar.numConstants = 3;
-	axisPar.formula = "[1]*(x]/[0])*exp([2])";
+//	axisPar.constants.push_back(3.);
+//	axisPar.constants.push_back(0.55);
+//	axisPar.constants.push_back(9999.3);
+//	axisPar.numConstants = 3;
+	axisPar.formula = "[1]*(x/[0])*exp([2])";
 	axisPar.validRangeLow= -2;
 	axisPar.validRangeHigh= 2;
-	axisPar.numParameters= 5;
+	axisPar.numParameters= 3;
 	axis1->SetAxisParam(axisPar);
 	axis1->Print();
 

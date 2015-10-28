@@ -387,7 +387,8 @@ void irfGenND(TFile *paramfile, GIRF* irf,
           IRFAxis[iaxis] = new GIRFAxisBins(var_type,size,theaxis,islog);
           break;
         default:
-          IRFAxis[iaxis] = new GIRFAxisParam(var_type,size,theaxis,islog);
+        	//TODO: Currently not supporting parameterized axes.
+//          IRFAxis[iaxis] = new GIRFAxisParam(var_type,size,theaxis,islog);
           break;
         }
       

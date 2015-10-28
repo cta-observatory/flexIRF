@@ -303,7 +303,7 @@ int const GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastI
     				<< *status << ")" << endl;
 
     	sprintf(keyword, "NUMVARS");
-    	usval = ushort(paramPointer->GetNumVars());
+    	usval = ushort(paramPointer->GetNumPars());
     	sprintf(comment, "Number of variables used in the parameterization");
     	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
     		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
