@@ -91,7 +91,7 @@ void GIRFPdf::Draw() const {
 		GIRFAxisParam* axisParam2 = dynamic_cast<GIRFAxisParam*>(fAxis[1]);
 		GIRFAxisBins* axisBins2 = dynamic_cast<GIRFAxisBins*>(fAxis[1]);
 		if (axisParam1 || axisParam2){
-			cout << "Parametrized axis are not yet supported... :(" << endl;
+			cout << "2D Parametrized axis are not yet supported... (yet!) :)" << endl;
 			return;
 		}
 		if (axisBins1 && axisBins2){
