@@ -151,8 +151,7 @@ int main(int argc, char **argv)
 	config.AddAxisRange(GIRFAxis::kEnergy,-1.7,-0.9, 1);
 	config.AddAxisRange(GIRFAxis::kPhi, -1,1, 0);
 //	config.Print();
-//	string filename = "/home/thassan/Workspace/IRM_devel/build/alltest.fits";
-	string filename = "/home/thassan/Workspace/IRM_devel/build/paramTest.fits";
+	string filename = "paramTest.fits";
 	GIRF irf(filename);
 	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(GIRFPdf::kAeff, config));
 	if (!effArea || effArea->IsEmpty()) return 2;
