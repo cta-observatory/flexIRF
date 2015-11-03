@@ -173,10 +173,10 @@ std::string GIRFPdf::GetVarName() const {
 		axisVarType = "DIFFSENS";
 		break;
 	case kAeff:
-		axisVarType = "AEFF";
+		axisVarType = "EFFAREA";
 		break;
 	case kAeffNoTheta2Cut:
-		axisVarType = "AEFFNOT2CUT";
+		axisVarType = "EFFANOT2CUT";
 		break;
 	default:
 		cout << "Incorrect variable type.\n";
@@ -269,24 +269,6 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 	char chval[20];
 	char comment[70];
 	ushort usval;
-
-
-	// write the indeces linking to the relevant axes
-	for (int jaxis = 0; jaxis < naxis; jaxis++) {
-		sprintf(keyword, "AXISID%d", jaxis + 1);
-		usval = ushort(axisIDs[jaxis]);
-		sprintf(comment, "Axis describing dimension #%d", jaxis + 1);
-		if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
-			cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
-					<< *status << ")" << endl;
-		sprintf(keyword, "CTYPE%d", jaxis + 1);
-		sprintf(chval, "%s", GetVarName().data());
-		sprintf(comment, "Axis %d units", jaxis + 1);
-			if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
-				cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
-						<< *status << ")" << endl;
-	}
-
 	// write pdf name
 	sprintf(keyword, "EXTNAME");
 	sprintf(chval, "%s", GetExtName().data());
@@ -302,6 +284,38 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 		if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 			cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
 					<< *status << ")" << endl;
+
+	int axisloop=1;
+	for (vector<GIRFAxis*>::iterator axis = fAxis.begin(); axis != fAxis.end();
+			++axis, axisloop++){
+		sprintf(keyword, "CTYPE%d", axisloop);
+		sprintf(chval, "%s", (*axis)->GetVarName().data());
+		sprintf(comment, "Axis %d type", axisloop);
+			if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+				cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+						<< *status << ")" << endl;
+
+		sprintf(keyword, "CUNIT%d", axisloop);
+		sprintf(chval, "%s", (*axis)->GetVarUnit().data());
+		sprintf(comment, "Axis %d units", axisloop);
+			if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+				cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+						<< *status << ")" << endl;
+
+
+	}
+	// write the indeces linking to the relevant axes
+	for (int jaxis = 0; jaxis < naxis; jaxis++) {
+		sprintf(keyword, "AXISID%d", jaxis + 1);
+		usval = ushort(axisIDs[jaxis]);
+		sprintf(comment, "Axis describing dimension #%d", jaxis + 1);
+		if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+			cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+					<< *status << ")" << endl;
+	}
+
+
+
 
 	// write pdf var
 	sprintf(keyword, "PDFVAR");
