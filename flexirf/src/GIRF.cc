@@ -89,11 +89,11 @@ int GIRF::CheckStatus(){
 //
 // Get axis type with specific ID
 //
-GIRFAxis::AxisType GIRF::CheckAxisType(int axisID) {
+AxisType GIRF::CheckAxisType(int axisID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
-	GIRFAxis::AxisType axisType = GIRFAxis::kNoAxisType;
+	AxisType axisType = kNoAxisType;
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
 	int hdutype = BINARY_TBL, hdunum;
 	char axisIDkeyword[20];
@@ -110,9 +110,9 @@ GIRFAxis::AxisType GIRF::CheckAxisType(int axisID) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &fStatus)) { 	// Now we know this is the axis we want.
 						if (!strcmp(card, axisIDkeyword)) {
 							if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &fStatus)) {
-								if (!strcmp(card, "BINS")) axisType = GIRFAxis::kBins;
-								else if (!strcmp(card, "PARAM")) axisType = GIRFAxis::kParam;
-								else axisType = GIRFAxis::kNoAxisType;
+								if (!strcmp(card, "BINS")) axisType = kBins;
+								else if (!strcmp(card, "PARAM")) axisType = kParam;
+								else axisType = kNoAxisType;
 							}
 						}
 					}
@@ -133,7 +133,7 @@ GIRFAxis::AxisType GIRF::CheckAxisType(int axisID) {
 //
 // Get axis variable with specific ID
 //
-GIRFAxis::VarType GIRF::CheckAxisVarType(int axisID) {
+VarType GIRF::CheckAxisVarType(int axisID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -154,7 +154,7 @@ GIRFAxis::VarType GIRF::CheckAxisVarType(int axisID) {
 						if (!strcmp(card, axisIDkeyword)) {
 							// Now we know this is the axis we want.
 							if (!fits_read_key_str(fFitsPtr, "VARTYPE", card, NULL, &fStatus)) {
-								return static_cast<GIRFAxis::VarType>(atoi(card));
+								return static_cast<VarType>(atoi(card));
 							}
 						}
 					}
@@ -167,7 +167,7 @@ GIRFAxis::VarType GIRF::CheckAxisVarType(int axisID) {
 	}
 //TODO: Handle status and errors: No axis with that ID... Unknown axis type... etc...
 	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
-	return GIRFAxis::kNoVarType;
+	return kNoVarType;
 }
 
 
@@ -242,7 +242,7 @@ int GIRF::CheckAxisHDUpos(int axisID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
-	GIRFAxis::AxisType axisType = GIRFAxis::kNoAxisType;
+	AxisType axisType = kNoAxisType;
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
 	int hdutype = BINARY_TBL, hdunum;
 	char axisIDkeyword[20];
@@ -290,7 +290,7 @@ GIRFAxis* GIRF::ReadAxis(int axisID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
-	GIRFAxis::AxisType axisType = static_cast<GIRFAxis::AxisType>(CheckAxisType(axisID));
+	AxisType axisType = static_cast<AxisType>(CheckAxisType(axisID));
 
 	int hduPos = CheckAxisHDUpos(axisID);
 	//TODO: Handle status!!
@@ -304,25 +304,25 @@ GIRFAxis* GIRF::ReadAxis(int axisID) {
 
 	switch (axisType){
 
-	case GIRFAxis::kBins:{
+	case kBins:{
 		GIRFAxisBins *axisBins = new GIRFAxisBins(fFitsPtr, &fStatus);
 		CheckStatus();
 		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
 		return axisBins;
 	}
-	case GIRFAxis::kParam:{
+	case kParam:{
 		GIRFAxisParam *axisParam = new GIRFAxisParam(fFitsPtr, &fStatus);
 		CheckStatus();
 		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
 		return axisParam;
 	}
-	default:
-
+	default:{
 		cout << "Invalid axis type\n";
 		CheckStatus();
 		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
 		return NULL;
 		break;
+	}
 	}
 
 }
@@ -332,12 +332,12 @@ GIRFAxis* GIRF::ReadAxis(int axisID) {
 // Get axis object from fitsfile with the range defined
 // within AxisRanges
 //
-GIRFAxis* GIRF::ReadAxis(int axisID, vector<GIRFAxis::AxisRange> axisRanges) {
+GIRFAxis* GIRF::ReadAxis(int axisID, vector<AxisRange> axisRanges) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
-	GIRFAxis::AxisType axisType = CheckAxisType(axisID);
-	GIRFAxis::VarType varType = CheckAxisVarType(axisID);
+	AxisType axisType = CheckAxisType(axisID);
+	VarType varType = CheckAxisVarType(axisID);
 
 	int hduPos = CheckAxisHDUpos(axisID);
 	//TODO: Handle status!!
@@ -351,28 +351,28 @@ GIRFAxis* GIRF::ReadAxis(int axisID, vector<GIRFAxis::AxisRange> axisRanges) {
 
 	switch (axisType){
 
-	case GIRFAxis::kBins:{
+	case kBins:{
 		GIRFAxisBins *axisBins = new GIRFAxisBins(fFitsPtr, &fStatus);
-		for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+		for(std::vector<AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 			if (axisRange->varType == varType) axisBins->Resize(axisRange->lowRange, axisRange->highRange);
 		}
 		CheckStatus();
 		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
-		return axisBins;
+		return dynamic_cast<GIRFAxis*>(axisBins);
 	}
-	case GIRFAxis::kParam:{
+	case kParam:{
 		GIRFAxisParam *axisParam = new GIRFAxisParam(fFitsPtr, &fStatus);
 		CheckStatus();
 		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
-		return axisParam;
+		return dynamic_cast<GIRFAxis*>(axisParam);
 	}
-	default:
-
+	default:{
 		cout << "Invalid axis type\n";
 		CheckStatus();
 		fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
 		return NULL;
 		break;
+	}
 	}
 
 }
@@ -384,7 +384,7 @@ GIRFAxis* GIRF::ReadAxis(int axisID, vector<GIRFAxis::AxisRange> axisRanges) {
 // 		Search and extract GIRFPdf object from fitsfile
 //		with specific  PdfVar and GIRFConfig.
 //
-GIRFPdf* GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
+GIRFPdf* GIRF::ReadPdf(PdfVar pdfVar, GIRFConfig config) {
 
 	GIRFPdf* extractedPdf = new GIRFPdf();
 
@@ -392,7 +392,7 @@ GIRFPdf* GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 	// 		Find all axis containing the valid range.
 	//**************************************************************//
 
-	std::vector<GIRFAxis::AxisRange> axisRanges = config.GetAxisRanges();
+	std::vector<AxisRange> axisRanges = config.GetAxisRanges();
 //	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 //		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;
 //	}
@@ -457,11 +457,11 @@ GIRFPdf* GIRF::ReadPdf(GIRFPdf::PdfVar pdfVar, GIRFConfig config) {
 //
 GIRFPdf* GIRF::ReadPdf(int pdfID, GIRFConfig config) {
 
-	std::vector<GIRFAxis::AxisRange> axisRanges = config.GetAxisRanges();
+	std::vector<AxisRange> axisRanges = config.GetAxisRanges();
 
 	vector<int> pdfAxes = GetPdfAxisIDs(pdfID);
-	GIRFPdf::PdfVar pdfVar = ReadPdfVar(pdfID);
-	GIRFPdf::PdfFunc pdfFunc = ReadPdfFunc(pdfID);
+	PdfVar pdfVar = ReadPdfVar(pdfID);
+	PdfFunc pdfFunc = ReadPdfFunc(pdfID);
 
 
 	GIRFPdf* pdfOut = new GIRFPdf(pdfVar, pdfFunc);
@@ -483,7 +483,7 @@ GIRFPdf* GIRF::ReadPdf(int pdfID, GIRFConfig config) {
 // 		Read GIRFPdf::PdfVar object from fitsfile with a
 //		specific pdfID
 //
-GIRFPdf::PdfVar GIRF::ReadPdfVar(int pdfID) {
+PdfVar GIRF::ReadPdfVar(int pdfID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -503,7 +503,7 @@ GIRFPdf::PdfVar GIRF::ReadPdfVar(int pdfID) {
 						if (atoi(card) == pdfID){
 							// Current HDU is the pdf we want.
 							if (!fits_read_key_str(fFitsPtr, "PDFVAR", card, NULL, &status)) {
-								GIRFPdf::PdfVar pdfVar = static_cast<GIRFPdf::PdfVar>(atoi(card));
+								PdfVar pdfVar = static_cast<PdfVar>(atoi(card));
 								return pdfVar;
 							}
 						}
@@ -518,7 +518,7 @@ GIRFPdf::PdfVar GIRF::ReadPdfVar(int pdfID) {
 	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &status);
 
 	cout << "ERROR: Pdf with no PdfVar!" << endl;
-	return static_cast<GIRFPdf::PdfVar>(0);
+	return static_cast<PdfVar>(0);
 
 }
 
@@ -527,7 +527,7 @@ GIRFPdf::PdfVar GIRF::ReadPdfVar(int pdfID) {
 // 		Read GIRFPdf::PdfFunc object from fitsfile with a
 //		specific pdfID
 //
-GIRFPdf::PdfFunc GIRF::ReadPdfFunc(int pdfID) {
+PdfFunc GIRF::ReadPdfFunc(int pdfID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -547,7 +547,7 @@ GIRFPdf::PdfFunc GIRF::ReadPdfFunc(int pdfID) {
 						if (atoi(card) == pdfID){
 							// Current HDU is the pdf we want.
 							if (!fits_read_key_str(fFitsPtr, "PDFFUNC", card, NULL, &status)) {
-								GIRFPdf::PdfFunc pdfVar = static_cast<GIRFPdf::PdfFunc>(atoi(card));
+								PdfFunc pdfVar = static_cast<PdfFunc>(atoi(card));
 								return pdfVar;
 							}
 						}
@@ -562,7 +562,7 @@ GIRFPdf::PdfFunc GIRF::ReadPdfFunc(int pdfID) {
 	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &status);
 
 	cout << "ERROR: Pdf with no PdfFunc!" << endl;
-	return static_cast<GIRFPdf::PdfFunc>(0);
+	return static_cast<PdfFunc>(0);
 
 }
 
@@ -571,7 +571,7 @@ GIRFPdf::PdfFunc GIRF::ReadPdfFunc(int pdfID) {
 // 		Read data from fitsfile from a Data HDU with a
 //		specific pdfID
 //
-float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisRange> axisRanges){
+float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axisRanges){
 
 	vector<long> lBins, hBins, inc;
 	int lBin, hBin, anynull, axisSize;
@@ -579,8 +579,8 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 
 	int iAxis=0;
 	float *array, nulval = 0.;
-	GIRFAxis::AxisType axisType;
-	GIRFAxis::VarType varType;
+	AxisType axisType;
+	VarType varType;
 
 	for(std::vector<int>::iterator axisID = pdfAxes.begin(); axisID != pdfAxes.end(); ++axisID, iAxis++) {
 		GIRFAxis *axis;
@@ -588,18 +588,18 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 		axisType = CheckAxisType(*axisID);
 		varType = CheckAxisVarType(*axisID);
 		switch (axisType){
-			case GIRFAxis::kBins:{
+			case kBins:{
 				axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(*axisID));
 				axisSize=axis->GetSize()-1;
 				break;
 			}
-			case GIRFAxis::kParam:{
+			case kParam:{
 				axis = dynamic_cast<GIRFAxisParam*>(ReadAxis(*axisID));
 				axisSize=axis->GetSize();
 				break;
 			}
 		}
-		for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+		for(std::vector<AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 			if (varType == axisRange->varType){
 				cout << "Axis #" << *axisID << " is resized using lowRange = " << axisRange->lowRange << " & highRange = " << axisRange->highRange << endl;
 				axis->Resize(axisRange->lowRange, axisRange->highRange, &lBin, &hBin);
@@ -657,7 +657,7 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<GIRFAxis::AxisR
 //
 // 		Return all axis IDs matching AxisRange.
 //
-vector<int> GIRF::FindAxisRange(GIRFAxis::AxisRange axisRange){
+vector<int> GIRF::FindAxisRange(AxisRange axisRange){
 	vector<int> foundAxisID;
 
 	int currenthdu = fFitsPtr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...
@@ -667,7 +667,7 @@ vector<int> GIRF::FindAxisRange(GIRFAxis::AxisRange axisRange){
 	int single = 0, hdutype, hdunum;
 	fits_get_num_hdus(fFitsPtr, &hdunum, &status);
 
-	GIRFAxis::AxisType axisType;
+	AxisType axisType;
 	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
@@ -677,15 +677,15 @@ vector<int> GIRF::FindAxisRange(GIRFAxis::AxisRange axisRange){
 					if (!fits_read_key_str(fFitsPtr, "VARTYPE", card, NULL, &status)) {
 						if (atoi(card) == axisRange.varType) {
 							if (!fits_read_key_str(fFitsPtr, "AXISTYPE", card, NULL, &status)) {
-								axisType=static_cast<GIRFAxis::AxisType>(atoi(card));
+								axisType=static_cast<AxisType>(atoi(card));
 								if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
 									switch(axisType){
-										case GIRFAxis::kBins:{
+										case kBins:{
 											GIRFAxisBins *axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(atoi(card)));
 											if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
 											break;
 										}
-										case GIRFAxis::kParam:{
+										case kParam:{
 											GIRFAxisParam *axis = dynamic_cast<GIRFAxisParam*>(ReadAxis(atoi(card)));
 											if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
 											break;
@@ -723,12 +723,12 @@ vector<int> GIRF::FindAxisRange(GIRFAxis::AxisRange axisRange){
 //
 //		TODO: For now, just takes all AxisRanges present in the
 //		FITS file, and ignores the rest.
-vector< vector<int> > GIRF::FindAxisRanges(std::vector<GIRFAxis::AxisRange> axisRanges){
+vector< vector<int> > GIRF::FindAxisRanges(std::vector<AxisRange> axisRanges){
 
 	vector< vector<int> > axisIDs, emptyVector;
 	vector<int> foundIDs;
 	int loop=0;
-	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange, loop++) {
+	for(std::vector<AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange, loop++) {
 		foundIDs = FindAxisRange(*axisRange);
 //		for(vector<int>::iterator foundID = foundIDs.begin(); foundID != foundIDs.end(); ++foundID){
 //			cout << "In loop " << loop << " found axis ID = " << *foundID << endl;
@@ -749,7 +749,7 @@ vector< vector<int> > GIRF::FindAxisRanges(std::vector<GIRFAxis::AxisRange> axis
 //
 // 		Return Pdfs IDs pointing at all axisIDs.
 //
-vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar){
+vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, PdfVar pdfVar){
 
 	vector<int> pdfAxes;
 
@@ -794,7 +794,7 @@ vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, GIRFPdf::PdfVar pdfVar
 //
 // 		Return all pdf IDs matching the Pdf type pdfVar.
 //
-vector<int> GIRF::FindPdfsOfType(GIRFPdf::PdfVar pdfVar){
+vector<int> GIRF::FindPdfsOfType(PdfVar pdfVar){
 
 	vector<int> foundPdfIDs;
 

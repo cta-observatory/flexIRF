@@ -6,25 +6,26 @@
 #include "fitsio.h"
 #include "GIRFAxis.h"
 
+
+enum PdfVar {kNoPdfVar=0,
+	 kEfficiency,
+	 kEDispersion,
+	 kPsf,
+	 kBkgRate,
+	 kBkgRateSqDeg,
+	 kDiffSens,
+	 kAeff,
+	 kAeffNoTheta2Cut,
+	 kPdfVarMax}; // allowed Pdfs
+
+enum PdfFunc  {kNoPdfFunc=0,
+	 kNumber,
+	 kGaussian,
+	 k2DGaussian,
+	 kPdfFuncMax}; // parametrization for the Pdf
+
 class GIRFPdf
 {
- public:
-  enum PdfVar {kNoPdfVar=0,
-		 kEfficiency,
-		 kEDispersion,
-		 kPsf,
-		 kBkgRate,
-		 kBkgRateSqDeg,
-		 kDiffSens,
-		 kAeff,
-		 kAeffNoTheta2Cut,
-		 kPdfVarMax}; // allowed Pdfs
-
-  enum PdfFunc  {kNoPdfFunc=0,
-		 kNumber,
-		 kGaussian,
-		 k2DGaussian,
-		 kPdfFuncMax}; // parametrization for the Pdf
 
  private:
   PdfVar  fPdfVar;
@@ -34,7 +35,7 @@ class GIRFPdf
   float*  fData;
 
  public:
-  GIRFPdf(PdfVar pdftype=kNoPdfVar,PdfFunc pdffunc=kNoPdfFunc,std::vector<GIRFAxis*>::size_type naxes=0); // create new pdf table for a given PdfVar
+  GIRFPdf(PdfVar pdftype=kNoPdfVar,PdfFunc pdffunc=kNoPdfFunc,unsigned long naxes=0); // create new pdf table for a given PdfVar
   virtual ~GIRFPdf(){};
 
   inline int    AddAxis(GIRFAxis* axis)  {if (!axis->CheckAxisConsistency()) fAxis.push_back(axis); return int(fAxis.size());} // insert axis in the list

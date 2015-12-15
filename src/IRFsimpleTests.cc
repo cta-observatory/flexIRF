@@ -6,19 +6,21 @@
 !                                                                                                                                          
 \* ======================================================================== */
 
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <iterator>
-#include <iomanip>
-#include <math.h>
+//#include <iostream>
+//#include <sstream>
+//#include <fstream>
+//#include <string>
+//#include <iterator>
+//#include <iomanip>
+//#include <math.h>
 
 //GIRF includes
-#include "GIRF.h"
+//#include "GIRF.h"
 
 //FITS includes
-#include "fitsio.h"
+//#include "fitsio.h"
+
+//#include "rootincludes.h"
 
 using namespace std;
 
@@ -34,7 +36,7 @@ using namespace std;
 // Main code starts here
 
 
-int main(int argc, char **argv)
+int main()
 {
 //	GIRFAxisBins axis1;
 //	GIRFAxisBins axis2;
@@ -68,95 +70,93 @@ int main(int argc, char **argv)
 ////	cout << "axis3==axis4 = " << ((*axis3)==(*axis4)) << endl;
 
 
+//	cout << "Funciona" << endl;
+
+	return 5;
+
 
 //	GIRFAxis* axis1;
-	GIRFAxisParam* axis1 = new GIRFAxisParam(GIRFAxis::kEnergy, (bool)1);
-	GIRFAxisParam::AxisParameterization axisPar;
-//	axisPar.constants.push_back(3.);
-//	axisPar.constants.push_back(0.55);
-//	axisPar.constants.push_back(9999.3);
-//	axisPar.numConstants = 3;
-	axisPar.formula = "[1]*(x/[0])*exp([2])";
-	axisPar.validRangeLow= -2;
-	axisPar.validRangeHigh= 2;
-	axisPar.numParameters= 3;
-	axis1->SetAxisParam(axisPar);
-	axis1->Print();
-
-	vector<float> values;
-	values.push_back(1.);
-	values.push_back(2.);
-	values.push_back(3.);
-	values.push_back(4.);
-	values.push_back(5.);
-	values.push_back(6.);
-	values.push_back(7.);
-	values.push_back(8.);
-	values.push_back(9.);
-	values.push_back(10.);
-	values.push_back(11.);
-	values.push_back(12.);
-	values.push_back(13.);
-	values.push_back(14.);
-	values.push_back(15.);
-	values.push_back(16.);
-
-
-//    GIRFAxis::AxisType axis_type = GIRFAxis::kBins;
-//    GIRFAxis::VarType  var_type  = GIRFAxis::kEnergy;
-//    bool               islog    = 1;
-//    int                size     = 3;
-//    float*             theaxis  = values.data();
-//
-//	axis1 = new GIRFAxisBins(var_type,size,theaxis,islog);
+//	GIRFAxisParam* axis1 = new GIRFAxisParam(kEnergy, (bool)1);
+//	AxisParameterization axisPar;
+////	axisPar.constants.push_back(3.);
+////	axisPar.constants.push_back(0.55);
+////	axisPar.constants.push_back(9999.3);
+////	axisPar.numConstants = 3;
+//	axisPar.formula = "[1]*(x/[0])*exp([2])";
+//	axisPar.validRangeLow= -2;
+//	axisPar.validRangeHigh= 2;
+//	axisPar.numParameters= 3;
+//	axis1->SetAxisParam(axisPar);
 //	axis1->Print();
-
-
-	GIRFPdf*   mypdf   = new GIRFPdf(GIRFPdf::kAeff,GIRFPdf::kNumber);
-	vector<float> pdfdata;
-//	pdfdata.reserve(15);
-//	pdfdata.push_back(0);
-	pdfdata.push_back(0.354);
-	pdfdata.push_back(0.4559);
-	pdfdata.push_back(0.98);
-	pdfdata.push_back(1.54);
-	pdfdata.push_back(2.222);
-	pdfdata.push_back(2.4021);
-	pdfdata.push_back(2.4021);
-	pdfdata.push_back(2.4021);
-	pdfdata.push_back(2.4021);
-	pdfdata.push_back(2.4021);
-	pdfdata.push_back(2.4021);
-	pdfdata.push_back(2.4021);
-	pdfdata.push_back(2.4021);
-	pdfdata.push_back(2.4021);
-	pdfdata.push_back(2.4021);
-	mypdf->SetData(pdfdata.data());
-	mypdf->AddAxis(axis1);
-
-	GIRF* irf2 = new GIRF;
-	irf2->AddPdf(mypdf);
-	irf2->Write("!paramTest.fits");
-
-
-
-
-
-
-
-
-
-	GIRFConfig config;
-//	config.SetDefault();
-	config.AddAxisRange(GIRFAxis::kEnergy,-1.7,-0.9, 1);
-	config.AddAxisRange(GIRFAxis::kPhi, -1,1, 0);
-//	config.Print();
-	string filename = "paramTest.fits";
-	GIRF irf(filename);
-	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(GIRFPdf::kAeff, config));
-	if (!effArea || effArea->IsEmpty()) return 2;
-	effArea->Print();
-	effArea->Draw();
+//
+//	vector<float> values;
+//	values.push_back(1.);
+//	values.push_back(2.);
+//	values.push_back(3.);
+//	values.push_back(4.);
+//	values.push_back(5.);
+//	values.push_back(6.);
+//	values.push_back(7.);
+//	values.push_back(8.);
+//	values.push_back(9.);
+//	values.push_back(10.);
+//	values.push_back(11.);
+//	values.push_back(12.);
+//	values.push_back(13.);
+//	values.push_back(14.);
+//	values.push_back(15.);
+//	values.push_back(16.);
+//
+//
+////    GIRFAxis::AxisType axis_type = GIRFAxis::kBins;
+////    GIRFAxis::VarType  var_type  = GIRFAxis::kEnergy;
+////    bool               islog    = 1;
+////    int                size     = 3;
+////    float*             theaxis  = values.data();
+////
+////	axis1 = new GIRFAxisBins(var_type,size,theaxis,islog);
+////	axis1->Print();
+//
+//
+//	GIRFPdf*   mypdf   = new GIRFPdf(kAeff,kNumber);
+//	vector<float> pdfdata;
+////	pdfdata.reserve(15);
+////	pdfdata.push_back(0);
+//	pdfdata.push_back(0.354);
+//	pdfdata.push_back(0.4559);
+//	pdfdata.push_back(0.98);
+//	pdfdata.push_back(1.54);
+//	pdfdata.push_back(2.222);
+//	pdfdata.push_back(2.4021);
+//	pdfdata.push_back(2.4021);
+//	pdfdata.push_back(2.4021);
+//	pdfdata.push_back(2.4021);
+//	pdfdata.push_back(2.4021);
+//	pdfdata.push_back(2.4021);
+//	pdfdata.push_back(2.4021);
+//	pdfdata.push_back(2.4021);
+//	pdfdata.push_back(2.4021);
+//	pdfdata.push_back(2.4021);
+//	mypdf->SetData(pdfdata.data());
+//	mypdf->AddAxis(axis1);
+//
+//
+//	GIRF* irf2 = new GIRF;
+//	irf2->AddPdf(mypdf);
+//	irf2->Write("!paramTest.fits");
+//
+//
+//	GIRFConfig config;
+////	config.SetDefault();
+//	config.AddAxisRange(kEnergy,-1.7,-0.9, 1);
+//	config.AddAxisRange(kPhi, -1,1, 0);
+////	config.Print();
+//	string filename = "paramTest.fits";
+//	GIRF irf(filename);
+//	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(kAeff, config));
+//	if (!effArea || effArea->IsEmpty()) return 2;
+//	effArea->Print();
+////	effArea->Draw();
 
 
 

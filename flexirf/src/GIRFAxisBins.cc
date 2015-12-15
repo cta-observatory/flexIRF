@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "GIRFAxisBins.h"
+#include "GIRFAxis.h"
 #include "string.h"
 
 using namespace std;
@@ -166,7 +167,7 @@ bool GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
 //
 // Check if axis contains AxisRange
 //
-bool GIRFAxisBins::ContainsRange(GIRFAxis::AxisRange axisRange){
+bool GIRFAxisBins::ContainsRange(AxisRange axisRange){
 	if (axisRange.varType != this->GetVarType()) return 0;							//Sanity check
 	else{
 		if (axisRange.lowRange > this->GetRangeMin() && axisRange.highRange < this->GetRangeMax()) return 1;

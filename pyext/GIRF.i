@@ -1,30 +1,12 @@
-#ifndef G_IRF
-#define G_IRF
 
-#include <vector>
-#include <string>
-
-#include "GIRFAxis.h"
-#include "GIRFAxisBins.h"
-#include "GIRFAxisParam.h"
-#include "GIRFPdf.h"
-#include "GIRFConfig.h"
-#include "GIRFRange.h"
-#include "GIRFUtils.h"
+%{
+/* Put headers and other declarations here that are needed for compilation */
+#define SWIG
+#include "GIRF.h"
+	
+%}
 
 class GIRF {
-
-#ifdef SWIG
-public:
-#else
-private:
-#endif
-	std::vector<GIRFPdf*> fPdfList;
-	std::string fFilename;
-	fitsfile* fFitsPtr;
-	int fStatus;
-	bool fFITSopened;
-
 public:
 	GIRF();
 	GIRF(std::string filename);
@@ -46,15 +28,10 @@ public:
 	int 					OpenFITS();
 	int 					CreateFITS();
 
-#ifdef SWIG
-public:
-#else
-protected:
-#endif
-
+	// protected
 	int 					CheckAxisHDUpos(int axisID);
-	AxisType 		CheckAxisType(int axisID);
-	VarType 		CheckAxisVarType(int axisID);
+	AxisType 				CheckAxisType(int axisID);
+	VarType 				CheckAxisVarType(int axisID);
 	bool 					CheckPdfPointsToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfAxisIDs);
 	vector<int> 			FindAxisRange(AxisRange axisRange);
 	vector< vector<int> > 	FindAxisRanges(std::vector<AxisRange> axisRanges);
@@ -69,5 +46,4 @@ protected:
 	float*  				ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axisRanges);
 };
 
-#endif
 

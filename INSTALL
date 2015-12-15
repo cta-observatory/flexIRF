@@ -1,8 +1,0 @@
-Build using:
- . ./setup.sh
-
-which creates the build/ subdirectory and runs CMake to configure your build. After this, cd into the build/ subdirectory and run 
-
- make
-
-to build the full project

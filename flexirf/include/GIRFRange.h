@@ -8,17 +8,17 @@
 class GIRFRange {
 
 private:
-	std::vector<GIRFAxis::AxisRange> fAxisRanges;
+	std::vector<AxisRange> fAxisRanges;
 //	int LoadConfigFile(std::string filename);
 
 public:
-    inline void AddAxisRange(GIRFAxis::AxisRange axisRange)  {fAxisRanges.push_back(axisRange);} 		// insert axis range in the list
-    void AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax); 		// insert axis range in the list
-    void AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax, bool required);
+    inline void AddAxisRange(AxisRange axisRange)  {fAxisRanges.push_back(axisRange);} 		// insert axis range in the list
+    void AddAxisRange(VarType varType, float valueMin, float valueMax); 		// insert axis range in the list
+    void AddAxisRange(VarType varType, float valueMin, float valueMax, bool required);
 
 	GIRFRange();
 	virtual ~GIRFRange() {};
-	inline std::vector<GIRFAxis::AxisRange> GetAxisRanges() const {return fAxisRanges;}
+	inline std::vector<AxisRange> GetAxisRanges() const {return fAxisRanges;}
 	inline uint GetNumAxisRanges() const {return fAxisRanges.size();}
 
 };

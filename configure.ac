@@ -1,0 +1,330 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+AC_PREREQ([2.69])
+AC_INIT(irm, 0.6, thassan@ifae.es)
+AC_CONFIG_MACRO_DIR([m4])
+AM_INIT_AUTOMAKE([gnu no-dependencies -Wno-portability subdir-objects])
+
+AC_OUTPUT
+AC_CONFIG_SRCDIR([src/IRFgenerator_rootio.cc])
+AC_CONFIG_HEADER([config.h])
+LT_INIT
+ACLOCAL_AMFLAGS="-I m4"
+
+
+
+#############################################################################
+# Determine source directory for unit testing                               #
+#############################################################################
+PACKAGE_SOURCE=`pwd`
+AC_DEFINE_UNQUOTED([PACKAGE_SOURCE], "${PACKAGE_SOURCE}", [Location where source is installed])
+AC_SUBST(PACKAGE_SOURCE)
+
+
+#############################################################################
+# Check for programs that are required by automake                          #
+#############################################################################
+AC_PROG_MAKE_SET
+
+
+#############################################################################
+# Determine the build and host system type                                  #
+#############################################################################
+AC_CANONICAL_HOST
+
+
+#############################################################################
+# Check for valid C++ compiler.  This has to come before the check for      #
+# header files, otherwise we won't detect if the C++ compiler is missing.   #
+#                                                                           #
+# A special kluge was added for Mac OS X >=10.7. As Apple switched to clang #
+# we search from this version on for the clang compiler.                    #
+#############################################################################
+# Set default compiler lists
+cxx_list="g++ c++ gpp aCC CC cxx cc++ cl.exe FCC KCC RCC xlC_r xlC clang++"
+cc_list="gcc cc cl.exe clang"
+
+# Check if we have Mac OS X >= 10.7
+if test `uname -s` = "Darwin"; then
+  if test `sw_vers -productVersion | sed 's/\(10\.[[0-9]]*\).*/\1/'` '>' 10.6; then
+    cxx_list="clang++ g++ c++ gpp aCC CC cxx cc++ cl.exe FCC KCC RCC xlC_r xlC"
+    cc_list="clang gcc cc cl.exe"
+  fi
+fi
+
+# Our language is C++
+AC_LANG(C++)
+AC_PROG_CXX($cxx_list)
+AC_PROG_CC($cc_list)
+
+# Checks for programs.
+#AC_PROG_CXX
+#AC_PROG_CC
+#AC_CANONICAL_HOST
+#AC_LIBOBJ
+
+
+# Checks for libraries.
+ROOT_PATH
+
+# Checks for header files.
+AC_CHECK_HEADERS([stdlib.h string.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_CHECK_HEADER_STDBOOL
+AC_C_INLINE
+
+
+
+#############################################################################
+# Check for cfitsio library                                                 #
+# ------------------------------------------------------------------------- #
+# We check first in the gammalib directory, then in the standard paths and  #
+# finally we perform system dependent checks. These are:                    #
+# - Darwin: /opt/local (MacPorts)                                           #
+# - Linux:  headers in /usr/include/libcfitsio0 (OpenSUSE)                  #
+#           /usr/local (FreeBSD)                                            #
+#############################################################################
+has_cfitsio="no"
+CFITSIO=
+LIBS_CFITSIO=
+LIBDIR_CFITSIO=
+INCDIR_CFITSIO=
+AC_SUBST(CFITSIO)
+AC_SUBST(LIBS_CFITSIO)
+AC_SUBST(LIBDIR_CFITSIO)
+AC_SUBST(INCDIR_CFITSIO)
+
+# Check if we want to use cfitsio
+AC_ARG_WITH([cfitsio],
+            [AS_HELP_STRING([--with-cfitsio],
+                            [Use CFITSIO library [default=yes]])],
+            [],
+            [with_cfitsio=yes])
+
+# If we want to use cfitsio, then search the library now
+if [test "x$with_cfitsio" = "xyes"]; then
+
+    # Set host specific cfitsio dependencies
+    cfitsio_deps=
+    case $host in
+        *-*-solaris*) cfitsio_deps="-lm -lsocket" ;;
+        *)            cfitsio_deps="-lm" ;;
+    esac
+
+    # First check if cfitsio exists in $gammalib_prefix
+    
+    # Next search for cfitsio in standard path
+    AC_CHECK_LIB([cfitsio], [ffpss],
+                 [AC_MSG_NOTICE([cfitsio found])
+                  AC_CHECK_HEADER([fitsio.h],
+                                  [has_cfitsio="yes"
+                                   AC_MSG_NOTICE([cfitsio headers found])],
+                                  [], [])],
+                 [], [${cfitsio_deps}])
+fi
+
+# If we have ncurses and readline then add readline support to GammaLib
+if [test "x$has_cfitsio" = "xyes"]; then
+    AC_DEFINE([HAVE_LIBCFITSIO], [1], [Define if cfitsio library is available])
+    LIBS="${LIBS} -lcfitsio ${cfitsio_deps}"
+    LIBS_CFITSIO="-lcfitsio ${cfitsio_deps}"
+    CFITSIO="cfitsio"
+fi
+AM_CONDITIONAL(WITH_CFITSIO, test "x$has_cfitsio" = "xyes")
+
+#############################################################################
+# Add compiler flags                                                        #
+#############################################################################
+if [test "x$INCDIR_CFITSIO" != x]; then
+    CPPFLAGS="$CPPFLAGS -I$INCDIR_CFITSIO"
+fi
+
+
+
+# For SWIG
+#AC_DISABLE_STATIC
+#AC_PROG_LIBTOOL
+#AM_PATH_PYTHON(3.4)
+#AC_PATH_PROG([SWIG], [swig])
+#SWIG_ENABLE_CXX
+#SWIG_PYTHON
+
+# Do we have swig?
+#AC_PATH_PROG([SWIG], [swig])
+#if test "$SWIG"; then
+#  has_swig="yes"
+#fi
+#AM_PATH_PYTHON(2.2)
+#AC_PROG_SWIG
+#SWIG_ENABLE_CXX
+#SWIG_PYTHON
+#AX_PKG_SWIG(1.3.17, [], [ AC_MSG_ERROR([SWIG is required to build..]) ])
+#AX_SWIG_ENABLE_CXX
+#AX_SWIG_MULTI_MODULE_SUPPORT
+#AX_SWIG_PYTHON
+
+#check for swig
+#AC_CHECK_PROGS([SWIG],[swig],["noswig"])
+
+
+#############################################################################
+# Checks if Python bindings are to be build                                 #
+# ------------------------------------------------------------------------- #
+# Python binding requires Python and either the files gammalib_wrap.cpp and #
+# gammalib.py or swig to create these files.  The following conditionals    #
+# are set:                                                                  #
+# WITH_PYTHON - Python bindings will be built                               #
+# HAVE_SWIG   - swig is available                                           #
+#############################################################################
+# Initialise flags
+enable_python="no"
+has_python="no"
+has_python_h="no"
+has_swig="no"
+
+# Python binding enabled?
+AC_ARG_ENABLE([python-binding],
+              AS_HELP_STRING([--enable-python-binding],
+                             [build python binding [default=yes]]),
+              [ac_enable_python_binding="$enableval"],
+              [ac_enable_python_binding="yes"])
+if test "x$ac_enable_python_binding" = "xno"; then
+  AC_MSG_NOTICE([Python binding for girf will not be built])
+  AC_MSG_NOTICE([Enable Python binding module building with --enable-python-binding])
+else
+
+  # Do we have Python and Python.h?
+  AM_PATH_PYTHON([2.2],
+                 [has_python="yes"],
+                 [AC_MSG_WARN([Python >= 2.2 not found. Python >= 2.2 is required to build python binding. Python can be obtained from http://www.python.org])])
+
+  # It would really be weired if Python has not been found, as barely every system has Python. Maybe
+  # it was not found because the autoconf is so old, and in an early version of the AM_PATH_PYTHON
+  # there were no [Action-if-found] and [Action-if-not-found] arguments, hence $has_python is possibly
+  # badly set. However, the Python executable and version should be set correctly, and we can test
+  # for this to see whether Python is really there or not.
+  if test "x$has_python" = "xno"; then
+    AM_PYTHON_CHECK_VERSION([$PYTHON], [${PYTHON_VERSION}],
+                            [has_python="yes"
+                             AC_MSG_NOTICE([Wow! You're running a pretty old system. Found Python nevertheless:-)])],
+                            [AC_MSG_WARN([Python not found.])])
+  fi
+
+  # If we have Python then verify the presence of the header and set some flags
+  if test "x$has_python" = "xyes"; then
+
+    # Set opening and closing symbols to make setup.py compatible for versions 2 and 3
+    if test ${PYTHON_VERSION} '<' 3; then
+      PYTHON_OPEN=" "
+      PYTHON_CLOSE=""
+    else
+      PYTHON_OPEN="("
+      PYTHON_CLOSE=")"
+    fi
+    AC_SUBST(PYTHON_OPEN)  
+    AC_SUBST(PYTHON_CLOSE)
+
+    # Do we have distutils?
+    AC_MSG_CHECKING([for the distutils Python package])
+    ac_distutils_result=`$PYTHON -c "import distutils" 2>&1`
+    if test -z "$ac_distutils_result"; then
+      AC_MSG_RESULT([yes])
+    else
+      AC_MSG_RESULT([no])
+    fi
+
+    # If we have distutils then get python path from distutils ...
+    if test -z "$ac_distutils_result"; then
+      if test ${PYTHON_VERSION} '<' 3; then
+        python_path=`$PYTHON -c "import distutils.sysconfig; \
+                                 print distutils.sysconfig.get_python_inc();"`
+      else
+        python_path=`$PYTHON -c "import distutils.sysconfig; \
+                                 print(distutils.sysconfig.get_python_inc());"`
+      fi                                         
+      if test -n "${python_path}"; then
+        AC_CHECK_HEADERS($python_path/Python.h, [has_python_h="yes"], [has_python_h="no"]) 
+        python_path="-I$python_path"
+      fi
+      PYTHON_CPPFLAGS=$python_path
+      CPPFLAGS="${CPPFLAGS} ${python_path}"
+      AC_SUBST([PYTHON_CPPFLAGS])
+
+    # ... otherwise check for includes relative to exectuable (obsolete?)
+    else                             
+                             
+      # Determine include path for python
+      AC_PATH_PROG(PY_INCLUDE, python)  
+      PY_INCLUDE=`echo $PY_INCLUDE | sed -e "s/bin/include/"`
+      PY_INCLUDE="$PY_INCLUDE$PYTHON_VERSION"
+  
+      # Check if we have Python.h
+      AC_CHECK_HEADERS($PY_INCLUDE/Python.h, [has_python_h="yes"], [has_python_h="no"])
+  
+    fi
+
+    # Signal missing Python headers
+    if test "x$has_python_h" = "xno"; then
+      AC_MSG_WARN([No Python header file "Python.h" found. Please install appropriate Python development package.])
+    fi
+  
+  fi
+
+  # Do we have swig?
+  AC_PATH_PROG([SWIG], [swig])
+  if test "$SWIG"; then
+    has_swig="yes"
+  fi
+
+
+fi
+AM_CONDITIONAL(HAVE_SWIG, test "x$has_swig" = "xyes")
+AM_CONDITIONAL(WITH_PYTHON, test "x$enable_python" = "xyes")
+
+# Set Python environment
+if test "x$enable_python" = "xyes"; then
+
+  # Initialise Python environment
+  PYTHON_BUILD_PREFIX=
+  PYTHON_EXTRA_LIBS=
+
+  # Solaris Sun Studio compiler kluge (to prevent from using pycc for swig
+  # compilation)
+  case $host in
+    *-*-solaris*)
+      if test "${CC}" = cc; then
+        PYTHON_BUILD_PREFIX="CC=CC"
+        PYTHON_EXTRA_LIBS="Cstd"
+      fi
+      ;;
+  esac
+
+  # Set Python environment
+  AC_SUBST(PYTHON_BUILD_PREFIX)
+  AC_SUBST(PYTHON_EXTRA_LIBS)
+
+fi
+
+
+
+
+
+
+
+
+AC_CONFIG_FILES([Makefile
+                 flexirf/Makefile
+                 src/Makefile
+                 pyext/Makefile
+                 pyext/setup.py])
+
+
+
+
+
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+
+AC_OUTPUT

@@ -25,13 +25,13 @@ using namespace std;
 // Declare functions here
 //
 
-void irfGenND(TFile *f, string histname, 
-	      const GIRFAxis::AxisType axistype[], 
-	      const GIRFAxis::VarType vartype[],
+void IRFgenerator_rootio_irfGenND(TFile *f, string histname,
+	      const AxisType axistype[],
+	      const VarType vartype[],
 	      const int naxes);
-void makeFITS(vector <float> pdfdata, string fitsname, 
-	      const GIRFAxis::AxisType axistype[], 
-	      const GIRFAxis::VarType vartype[], 
+void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string fitsname,
+	      const AxisType axistype[],
+	      const VarType vartype[],
 	      const int axissize[], const bool  axisislog[], 
 	      float *axis[], const int naxes);
 
@@ -96,36 +96,36 @@ int main(int argc, char **argv)
       exit(EXIT_FAILURE);
     }
     
-    GIRFAxis::AxisType axistype[naxes[i]];
-    GIRFAxis::VarType vartype[naxes[i]];
+    AxisType axistype[naxes[i]];
+    VarType vartype[naxes[i]];
     
     switch(i)
       {
       case 0: //Energy Resolution for E (kEnergy) v. Offset (kTheta)
-	axistype[0]   = GIRFAxis::kBins;
-	vartype[0]    = GIRFAxis::kEnergy;	
-	irfGenND(f, histname[i], axistype, vartype, naxes[i]);
+	axistype[0]   = kBins;
+	vartype[0]    = kEnergy;
+	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       case 1: //Energy Bias for E (kEnergy) v. Offset (kTheta)
-	axistype[0]   = GIRFAxis::kBins;
-	//	vartype[0]    = GIRFAxis::kEnergy, vartype[1] = GIRFAxis::kTheta;	
-	vartype[0]    = GIRFAxis::kEnergy;	
-	irfGenND(f, histname[i], axistype, vartype, naxes[i]);
+	axistype[0]   = kBins;
+	//	vartype[0]    = kEnergy, vartype[1] = kTheta;
+	vartype[0]    = kEnergy;
+	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       case 2: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
-	axistype[0]   = GIRFAxis::kBins;
-	vartype[0]    = GIRFAxis::kEnergy;	
-	irfGenND(f, histname[i], axistype, vartype, naxes[i]);
+	axistype[0]   = kBins;
+	vartype[0]    = kEnergy;
+	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       case 3: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
-	axistype[0]   = GIRFAxis::kBins;
-	vartype[0]    = GIRFAxis::kEnergy;
-	irfGenND(f, histname[i], axistype, vartype, naxes[i]);
+	axistype[0]   = kBins;
+	vartype[0]    = kEnergy;
+	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       case 4: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
-	axistype[0]   = GIRFAxis::kBins, axistype[1] = GIRFAxis::kBins;
-	vartype[0]    = GIRFAxis::kEnergy, vartype[1] = GIRFAxis::kTheta;	
-	irfGenND(f, histname[i], axistype, vartype, naxes[i]);
+	axistype[0]   = kBins, axistype[1] = kBins;
+	vartype[0]    = kEnergy, vartype[1] = kTheta;
+	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       }
             
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
   
 }//ends main
 
-void irfGenND(TFile *paramfile, string histname, const GIRFAxis::AxisType axistype[], const GIRFAxis::VarType vartype[], const int naxesArr)
+void IRFgenerator_rootio_irfGenND(TFile *paramfile, string histname, const AxisType axistype[], const VarType vartype[], const int naxesArr)
 {
 
   //Estimator histogram from analysis file
@@ -256,18 +256,18 @@ void irfGenND(TFile *paramfile, string histname, const GIRFAxis::AxisType axisty
     exit(EXIT_FAILURE);
   }
 
-  makeFITS(pdfdata, histname, axistype, vartype, axissize, axisislog, axis, naxesArr);
+  IRFgenerator_rootio_makeFITS(pdfdata, histname, axistype, vartype, axissize, axisislog, axis, naxesArr);
   
 }//end irfGenND
 
-void makeFITS(vector <float> pdfdata, string histname, 
-	      const GIRFAxis::AxisType axistype[], const GIRFAxis::VarType vartype[], 
+void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
+	      const AxisType axistype[], const VarType vartype[],
 	      const int axissize[], const bool  axisislog[], 
 	      float *axis[], int naxes)
 {
   
   // declare and fill pdf                                                                                                           
-  GIRFPdf*   mypdf   = new GIRFPdf(GIRFPdf::kEfficiency,GIRFPdf::kNumber);
+  GIRFPdf*   mypdf   = new GIRFPdf(kEfficiency,kNumber);
   mypdf->SetData(&pdfdata[0]);
   
   GIRFAxis** IRFAxis = new GIRFAxis*[naxes];
@@ -277,8 +277,8 @@ void makeFITS(vector <float> pdfdata, string histname,
     {
       
       // simpler notation                                                                         
-      GIRFAxis::AxisType axis_type = axistype[iaxis];
-      GIRFAxis::VarType  var_type  = vartype[iaxis];
+      AxisType axis_type = axistype[iaxis];
+      VarType  var_type  = vartype[iaxis];
       bool               islog    = axisislog[iaxis];
       int                size     = axissize[iaxis];
       float*             theaxis  = axis[iaxis];
@@ -286,7 +286,7 @@ void makeFITS(vector <float> pdfdata, string histname,
       // fill the GIRF axis objects                                                                      
       switch(axis_type)
         {
-        case GIRFAxis::kBins:
+        case kBins:
           IRFAxis[iaxis] = new GIRFAxisBins(var_type,size,theaxis,islog);
           break;
         default:

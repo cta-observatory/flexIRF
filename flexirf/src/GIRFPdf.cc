@@ -30,9 +30,8 @@ using namespace std;
 // 
 // Construct pdf table with type
 //
-GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc,
-		std::vector<GIRFAxis*>::size_type naxes) :
-		fPdfVar(pdftype), fPdfFunc(pdffunc), fData(0), fIsEmpty(1) {
+GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc, unsigned long naxes) : fPdfFunc(pdffunc), fData(0), fIsEmpty(1) {
+	fPdfVar = pdftype;
 	fAxis.reserve(naxes);
 }
 

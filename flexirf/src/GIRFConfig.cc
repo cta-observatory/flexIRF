@@ -70,7 +70,7 @@ void GIRFConfig::SetDefault() {
 	fObsMode = kPoint;
 	fSubArray = kFull;
 	fWeather.Transmitance = 1;
-	fWeather.molProfile = kAverage;
+	fWeather.molProfile = kAverageProf;
 	fHWStatus.reflectivity = 1;
 	fHWStatus.trigger = kStandard;
 
@@ -90,8 +90,8 @@ void GIRFConfig::Print() {
 	cout << "reflectivity = " << fHWStatus.reflectivity << endl;
 	cout << "trigger = " << fHWStatus.trigger << endl;
 
-	std::vector<GIRFAxis::AxisRange> axisRanges = GetAxisRanges();
-	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+	std::vector<AxisRange> axisRanges = GetAxisRanges();
+	for(std::vector<AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;;
 	}
 

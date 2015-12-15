@@ -7,38 +7,35 @@
 
 using namespace std;
 
+
+enum AxisType {
+	kNoAxisType = 0,
+	kBins,
+	kParam,
+	kAxisMax
+};     // allowed axis types
+
+enum VarType {
+	kNoVarType = 0,
+	kEnergy,
+	kEnergy_true,
+	kEnergy_rec,
+	kTheta,
+	kPhi,
+	kID,
+	kVarMax
+}; // allowed variables
+
+struct AxisRange {
+	VarType varType;
+	float lowRange;
+	float highRange;
+	bool required;
+};
+
 class GIRFAxis {
 public:
 
-//  enum FormatType {kNoFormatType=0,							TODO: Solution to write axis inside Data HDU header?
-//		 kHDU,
-//		 kHeader,
-//		 kFormatMax};     // allowed axis types
-
-	enum AxisType {
-		kNoAxisType = 0,
-		kBins,
-		kParam,
-		kAxisMax
-	};     // allowed axis types
-
-	enum VarType {
-		kNoVarType = 0,
-		kEnergy,
-		kEnergy_true,
-		kEnergy_rec,
-		kTheta,
-		kPhi,
-		kID,
-		kVarMax
-	}; // allowed variables
-
-	struct AxisRange {
-		VarType varType;
-		float lowRange;
-		float highRange;
-		bool required;
-	};
 	// for the time being units are:
 	// Energy: GeV
 	// Energy_true: GeV

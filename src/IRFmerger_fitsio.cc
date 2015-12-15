@@ -28,8 +28,8 @@ using namespace std;
 //
 
 void makeFITS(std::vector<float> pdf_data, string fitsname, 
-	      const GIRFAxis::AxisType axis_type[], 
-	      const GIRFAxis::VarType var_type[], 
+	      const AxisType axis_type[],
+	      const VarType var_type[],
 	      const int axis_size[], const bool  axisislog[], 
 	      float *axis[], const int naxes);
 
@@ -346,46 +346,46 @@ int main(int argc, char **argv)
   
   //The new axis is Phi and parameterized 
   new_axistype=first_axistypes;
-  new_axistype.push_back(GIRFAxis::kParam);
+  new_axistype.push_back(kParam);
   new_vartype=first_valtypes;
-  new_vartype.push_back(GIRFAxis::kPhi);
+  new_vartype.push_back(kPhi);
 
-  GIRFAxis::AxisType axis_type[new_axis_num];
-  GIRFAxis::VarType var_type[new_axis_num];
+  AxisType axis_type[new_axis_num];
+  VarType var_type[new_axis_num];
 
   for(int i=0; i<new_axis_num; i++){
-    axis_type[i]=static_cast<GIRFAxis::AxisType>(new_axistype[i]);
+    axis_type[i]=static_cast<AxisType>(new_axistype[i]);
   }
   for(int i=0; i<new_axis_num; i++){
-    var_type[i]=static_cast<GIRFAxis::VarType>(new_vartype[i]);
+    var_type[i]=static_cast<VarType>(new_vartype[i]);
   }
   
   makeFITS(fulldata, histname, axis_type, var_type, axis_size.data(), axisislog, axis.data(), new_axis_num);
 
-  cout<<endl;
+  cout<<endl;Main
   cout<<"Merged "<<filecount<<" fits files into "<<histname<<".fits"<<endl;
   cout<<endl;
   
 }//Ends main
 
 void makeFITS(std::vector<float> pdf_data, string histname, 
-	      const GIRFAxis::AxisType axis_type[], const GIRFAxis::VarType var_type[], 
+	      const AxisType axis_type[], const VarType var_type[],
 	      const int axis_size[], const bool  axisislog[], 
 	      float *axis[], int naxes)
 {
   
   //Declare and fill pdf                                                                                                           
-  GIRFPdf*   mypdf   = new GIRFPdf(GIRFPdf::kEfficiency,GIRFPdf::kNumber);
+  GIRFPdf*   mypdf   = new GIRFPdf(kEfficiency,kNumber);
   mypdf->SetData(pdf_data.data());
 
   //Declare and fill pdf                                                                                                           
-  GIRFPdf*   mypdf2   = new GIRFPdf(GIRFPdf::kEDispersion,GIRFPdf::kGaussian);
+  GIRFPdf*   mypdf2   = new GIRFPdf(kEDispersion,kGaussian);
   mypdf2->SetData(pdf_data.data());
 
-  GIRFPdf*   mypdf3   = new GIRFPdf(GIRFPdf::kEDispersion,GIRFPdf::kGaussian);
+  GIRFPdf*   mypdf3   = new GIRFPdf(kEDispersion,kGaussian);
   mypdf3->SetData(pdf_data.data());
 
-  GIRFPdf*   mypdf4   = new GIRFPdf(GIRFPdf::kEDispersion,GIRFPdf::kGaussian);
+  GIRFPdf*   mypdf4   = new GIRFPdf(kEDispersion,kGaussian);
   mypdf4->SetData(pdf_data.data());
 
   GIRFAxis** IRFAxis = new GIRFAxis*[naxes];
@@ -395,8 +395,8 @@ void makeFITS(std::vector<float> pdf_data, string histname,
     {
       
       //Simpler notation                                                                         
-      GIRFAxis::AxisType axistype = axis_type[iaxis];
-      GIRFAxis::VarType  vartype  = var_type[iaxis];
+      AxisType axistype = axis_type[iaxis];
+      VarType  vartype  = var_type[iaxis];
       bool               islog    = axisislog[iaxis];
       int                size     = axis_size[iaxis];
       float*             theaxis  = axis[iaxis];
@@ -404,7 +404,7 @@ void makeFITS(std::vector<float> pdf_data, string histname,
       //Fill the GIRF axis objects                                                                      
       switch(axistype)
         {
-        case GIRFAxis::kBins:
+        case kBins:
 
           IRFAxis[iaxis] = new GIRFAxisBins(vartype,size,theaxis,islog);
           break;

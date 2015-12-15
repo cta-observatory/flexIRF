@@ -9,6 +9,7 @@ class GIRFAxisBins : public GIRFAxis
  private:
   std::vector<float> fAxisBins;
   bool fAxisBinsFilled;
+
  public:
   GIRFAxisBins();           // create new empty bin axis
   GIRFAxisBins(std::vector<float>::size_type size,bool islog=false);   // create new bin axis with size

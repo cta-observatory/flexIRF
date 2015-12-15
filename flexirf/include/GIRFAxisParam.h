@@ -5,16 +5,15 @@
 #include <string>
 #include "GIRFAxis.h"
 
+
+struct AxisParameterization{
+	float validRangeLow;
+	float validRangeHigh;
+	int numParameters;
+	string formula;
+};
+
 class GIRFAxisParam: public GIRFAxis {
-
-
-public:
-	struct AxisParameterization{
-		float validRangeLow;
-		float validRangeHigh;
-		int numParameters;
-		string formula;
-	};
 
 private:
 
@@ -26,6 +25,7 @@ public:
 	GIRFAxisParam(VarType vartype, bool islog = false); // create new axis
 	GIRFAxisParam(VarType vartype, AxisParameterization axisParam, bool islog = false); // create new axis
 	GIRFAxisParam(fitsfile* fptr, int* status);
+
 
 	bool ContainsRange(AxisRange axisRange);
 

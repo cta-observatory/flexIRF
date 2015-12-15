@@ -214,7 +214,7 @@ int GIRFUtils::GetLastPdfID(fitsfile* fptr) {
 	return lastID;
 }
 
-vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<GIRFAxis::AxisRange> axisRanges){
+vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<AxisRange> axisRanges){
 
 	vector<int> axisIDs, foundIDs;
 
@@ -225,7 +225,7 @@ vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<GIRFAxis::Axi
 	if (fits_open_file(&fptr, filename.data(), READONLY, &status)) {
 		cout << "ERROR " << status << " while trying to open the FITS file." << endl;
 	}
-	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
+	for(std::vector<AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 		foundIDs = FindAxisRange(fptr, *axisRange);
 //		axisIDs.push_back(ID);
 		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;
@@ -243,7 +243,7 @@ vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<GIRFAxis::Axi
 // 		Return all axis IDs matching AxisRange.
 //
 //
-vector<int> GIRFUtils::FindAxisRange(fitsfile *fptr, GIRFAxis::AxisRange axisRange){
+vector<int> GIRFUtils::FindAxisRange(fitsfile *fptr, AxisRange axisRange){
 	vector<int> foundAxisID;
 
 	int currenthdu = fptr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...

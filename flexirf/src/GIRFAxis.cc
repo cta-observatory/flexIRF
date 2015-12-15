@@ -31,7 +31,7 @@ using namespace std;
 // Construct empty axis object
 //
 GIRFAxis::GIRFAxis() :
-		fAxisType(kNoAxisType), fVarType(GIRFAxis::kNoVarType), fIsLog(0) {
+		fAxisType(kNoAxisType), fVarType(kNoVarType), fIsLog(0) {
 }
 
 ////////////////////////////////////////////////////////////////

@@ -5,6 +5,41 @@
 #include <vector>
 #include <GIRFRange.h>
 
+
+enum MolProfile {
+	kNoMolProfile = 0,
+	kAverageProf,
+	kSummerProf,
+	kWinterProf,
+	kSpringProf,
+	kAutumnProf,
+	kMolProfileMax
+};
+
+enum NSBLevel {
+	kNoNSBLevel = 0, kExtragalactic, kGalactic, kNSBLevelMax
+};
+
+enum ObsMode {
+	kNoObsMode = 0, kPoint, kDivergent, kObsModeMax
+};
+enum SubArray {
+	kNoSubArray = 0, kFull, kLSTs, kMSTSSTs, kSubArrayMax
+};
+enum Trigger {
+	kNoTrigger = 0, kStandard, kHighDTs, kTriggerMax
+};
+
+struct HWStatus {
+	float reflectivity;
+	Trigger trigger;
+};
+
+struct Weather {
+	float Transmitance;
+	MolProfile molProfile;
+};
+
 class GIRFConfig {
 public:
 
@@ -14,38 +49,6 @@ public:
 	//	The GIRF.GetPdf should select the ranges they want.
 	//
 	//////////////////////////////////////////////////////////
-	enum MolProfile {
-		kNoMolProfile = 0,
-		kAverage,
-		kSummer,
-		kWinter,
-		kSpring,
-		kAutumn,
-		kMolProfileMax
-	};
-
-	enum NSBLevel {
-		kNoNSBLevel = 0, kExtragalactic, kGalactic, kNSBLevelMax
-	};
-
-	enum ObsMode {
-		kNoObsMode = 0, kPoint, kDivergent, kObsModeMax
-	};
-	enum SubArray {
-		kNoSubArray = 0, kFull, kLSTs, kMSTSSTs, kSubArrayMax
-	};
-	enum Trigger {
-		kNoTrigger = 0, kStandard, kHighDTs, kTriggerMax
-	};
-	struct HWStatus {
-		float reflectivity;
-		Trigger trigger;
-	};
-
-	struct Weather {
-		float Transmitance;
-		MolProfile molProfile;
-	};
 
 	// TODO
 	// Add Event selection... Pointing direction... Etc....
@@ -65,9 +68,9 @@ public:
 	GIRFConfig(std::string filename);
 	virtual ~GIRFConfig() {};
 
-	inline std::vector<GIRFAxis::AxisRange> GetAxisRanges() const {return fGIRFRange.GetAxisRanges();}
-	inline void AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax){fGIRFRange.AddAxisRange(varType, valueMin, valueMax);}
-	inline void AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax, bool required){fGIRFRange.AddAxisRange(varType, valueMin, valueMax, required);}
+	inline std::vector<AxisRange> GetAxisRanges() const {return fGIRFRange.GetAxisRanges();}
+	inline void AddAxisRange(VarType varType, float valueMin, float valueMax){fGIRFRange.AddAxisRange(varType, valueMin, valueMax);}
+	inline void AddAxisRange(VarType varType, float valueMin, float valueMax, bool required){fGIRFRange.AddAxisRange(varType, valueMin, valueMax, required);}
 
 	void SetDefault();
 	void Print();

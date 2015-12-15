@@ -1,7 +1,12 @@
+.settings
+.autotools
+.idea
+
 # Eclipse 	  #
 ###################
 .project
 .cproject
+.pydevproject
 
 # Compiled source #
 ###################
@@ -11,6 +16,21 @@
 *.exe
 *.o
 *.so
+*.log
+*.pyc
+*.lo
+*.la
+*.aux
+*.idx
+*.out
+*.pdf
+*.synctex.gz
+*.toc
+*.Pi
+*.Tpi
+.DS_Store
+
+
 
 # Packages #
 ############
@@ -33,7 +53,26 @@
 
 # OS generated files #
 ######################
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+m4/libtool.m4
+m4/lt*m4
+config.*
+configure
+girf.pc
 .DS_Store
+install-sh
+libtool
+ltmain.sh
+missing
+compile
+.deps
+stamp-h1
+depcomp
+test-driver
+testconf.shDS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
@@ -45,3 +84,18 @@ shippable.yml~
 # Some GIRF folders  #
 ######################
 build/
+.libs/
+src/.deps/
+src/.dirstamp
+
+#  From compilation  #
+######################
+
+pyext/build/
+pyext/setup.py
+pyext/girf/__init__.py
+pyext/girf/irf.py
+pyext/girf/irf_wrap.cpp
+flexirf/src/.dirstamp
+py-compile
+

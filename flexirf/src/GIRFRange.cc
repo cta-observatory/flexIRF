@@ -37,9 +37,9 @@ GIRFRange::GIRFRange() {
 // Construct object: read config file if available. If not,
 // set default values.
 //
-void GIRFRange::AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax){
+void GIRFRange::AddAxisRange(VarType varType, float valueMin, float valueMax){
 
-	GIRFAxis::AxisRange axisRange;
+	AxisRange axisRange;
 
 	axisRange.varType = varType;
 	axisRange.lowRange = valueMin;
@@ -49,9 +49,9 @@ void GIRFRange::AddAxisRange(GIRFAxis::VarType varType, float valueMin, float va
 	fAxisRanges.push_back(axisRange);
 }
 
-void GIRFRange::AddAxisRange(GIRFAxis::VarType varType, float valueMin, float valueMax, bool required){
+void GIRFRange::AddAxisRange(VarType varType, float valueMin, float valueMax, bool required){
 
-	GIRFAxis::AxisRange axisRange;
+	AxisRange axisRange;
 
 	axisRange.varType = varType;
 	axisRange.lowRange = valueMin;

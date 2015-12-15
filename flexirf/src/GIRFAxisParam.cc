@@ -110,7 +110,7 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 //
 // Check if axis contains AxisRange
 //
-bool GIRFAxisParam::ContainsRange(GIRFAxis::AxisRange axisRange) {
+bool GIRFAxisParam::ContainsRange(AxisRange axisRange) {
 
 	//TODO: Modify as soon as I add the range of validity!!!
 	if (!fAxisParameterizationFilled) return 0;
