@@ -98,4 +98,12 @@ pyext/girf/irf.py
 pyext/girf/irf_wrap.cpp
 flexirf/src/.dirstamp
 py-compile
+pyext/girf/convert.py
+pyext/girf/convert_wrap.cpp
+pyext/girf/simpleTest.py
+pyext/girf/simpleTest_wrap.cpp
+src/IRFconverter_root2FITS
+src/IRFsimpleTests
+
+
 
