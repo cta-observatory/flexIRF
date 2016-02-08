@@ -6,7 +6,13 @@ notifications:
     email: false
 before_install:
     - sudo apt-get install git dpkg-dev make g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev
-    - sudo apt-get install cmake autoconf
+    - sudo apt-get install cmake
+
+    # Update autoconf to 1.69
+    - sudo add-apt-repository ppa:dns/gnu -y
+    - sudo apt-get update -q
+    - sudo apt-get install --only-upgrade autoconf
+
     - sudo apt-get install libcfitsio3
     - sudo apt-get install libcfitsio3-dev
     - export PATH=/usr/local:$PATH;
