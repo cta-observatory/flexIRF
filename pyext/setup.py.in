@@ -69,7 +69,7 @@ include_dirs         = ['@top_srcdir@/include']
 install_files        = glob.glob('@top_srcdir@/pyext/*.i')
 library_dirs         = ['../src/.libs', '../flexirf/.libs', '@ROOTLIBDIR@']
 runtime_library_dirs = ['../src/.libs', '../flexirf/.libs', '@ROOTLIBDIR@']
-libraries            = ['irm']
+libraries            = []
 
 # Add install directory to runtime library path
 if os.path.exists('@prefix@/lib'):
