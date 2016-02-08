@@ -362,7 +362,7 @@ int main(int argc, char **argv)
   
   makeFITS(fulldata, histname, axis_type, var_type, axis_size.data(), axisislog, axis.data(), new_axis_num);
 
-  cout<<endl;Main
+  cout<<endl;
   cout<<"Merged "<<filecount<<" fits files into "<<histname<<".fits"<<endl;
   cout<<endl;
   
