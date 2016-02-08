@@ -72,7 +72,7 @@ int main()
 
 	cout << "Funciona" << endl;
 
-	return 5;
+	return 0;
 
 
 //	GIRFAxis* axis1;

@@ -5,7 +5,7 @@ Build git version using:
 ./configure
 make
 
-Although we DON'T recomend it, if you want to link generated libraries into your "/usr/local/share" do:
+Although we DON'T recommend it, if you want to link generated libraries into your "/usr/local/share" do:
 (sudo) make install
 
 == Documentation ==
