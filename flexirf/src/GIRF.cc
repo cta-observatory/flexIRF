@@ -195,31 +195,36 @@ int GIRF::Write() {
 
 
 	// write extra keywords (so far just an example)
-	char keyword[] = "ORIGIN";
-	char keyval[] = "CTA Consortium";
-	char comment[] = "Organization responsible";
+	char keyword[FLEN_KEYWORD] = "ORIGIN";
+	char keyval[FLEN_VALUE] = "CTA Consortium";
+	char comment[FLEN_COMMENT] = "Organization responsible";
 	if (fits_write_key(fFitsPtr, TSTRING, keyword, &keyval, comment, &fStatus))
 		cout << "GIRF::Write Error: cannot write keyword (error code: "
 				<< fStatus << ")" << endl;
+
 	// write HDUCLASS hierarchy
 	sprintf(keyword, "HDUCLASS");
 	sprintf(keyval, "CTA");
 	sprintf(comment, "FITS file following the CTA data format.");
+
 	if (fits_write_key(fFitsPtr, TSTRING, keyword, &keyval, comment, &fStatus))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< fStatus << ")" << endl;
+
 	sprintf(keyword, "HDUCLAS1");
 	sprintf(keyval, "IRM");
 	sprintf(comment, "Instrument Response Model HDU.");
 	if (fits_write_key(fFitsPtr, TSTRING, keyword, &keyval, comment, &fStatus))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< fStatus << ")" << endl;
+
 	sprintf(keyword, "HDUCLAS2");
 	sprintf(keyval, "PRIMARY");
 	sprintf(comment, "PRIMARY HDU.");
 	if (fits_write_key(fFitsPtr, TSTRING, keyword, &keyval, comment, &fStatus))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< fStatus << ")" << endl;
+
 	// write pdf blocks and associated axes
 	for (vector<GIRFPdf*>::iterator pdf = fPdfList.begin();
 			pdf != fPdfList.end(); ++pdf)

@@ -5,7 +5,7 @@ Build git version using:
 ./configure
 make
 
-If you want to link generated libraries into your "/usr/local/share" do:
+Although we DON'T recomend it, if you want to link generated libraries into your "/usr/local/share" do:
 (sudo) make install
 
 == Documentation ==
@@ -17,7 +17,7 @@ command from the build directory to convert the root histograms in the performan
 
 Example -
 
-./src/IRFconverter_root2FITS dummy/dummyconfig.txt prodfiles/Performance_2Q_Aar_50h_20150505.root
+./bin/IRFconverter_root2FITS dummy/dummyconfig.txt prodfiles/Performance_2Q_Aar_50h_20150505.root
 
 Output will be
 
@@ -33,7 +33,7 @@ Example -
 
 In the parent directory run
 
-./bin/IRFgenerator_rootio ../dummy/dummyconfig.txt ../prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root
+./bin/IRFgenerator_rootio dummy/dummyconfig.txt prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root
 
 Output will be 
 
@@ -55,11 +55,11 @@ Example -
 
 In the build directory run
 
-./bin/IRFmerger_fitsio ../dummy/dummyconfig.txt ../dummy/dummypdf-2D.txt
+./bin/IRFmerger_fitsio dummy/dummyconfig.txt dummy/dummypdf-2D.txt
 
 or 
 
-./bin/IRFmerger_fitsio ../dummy/dummyconfig.txt ../dummy/dummypdf-3D.txt
+./bin/IRFmerger_fitsio dummy/dummyconfig.txt dummy/dummypdf-3D.txt
 
 Output will be 
 

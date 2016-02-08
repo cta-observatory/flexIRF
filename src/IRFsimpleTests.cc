@@ -15,7 +15,7 @@
 //#include <math.h>
 
 //GIRF includes
-//#include "GIRF.h"
+#include "GIRF.h"
 
 //FITS includes
 //#include "fitsio.h"
@@ -38,39 +38,39 @@ using namespace std;
 
 int main()
 {
-//	GIRFAxisBins axis1;
-//	GIRFAxisBins axis2;
+	GIRFAxisBins axis1;
+	GIRFAxisBins axis2;
+
+	vector<float> vect1, vect2;
+	for (int i=0;i<10;i++){
+		vect1.push_back(i*3.1416);
+		vect2.push_back(i*3.14);
+	}
+	axis1.SetAxisBins(vect1);
+	axis2.SetAxisBins(vect2);
+	axis1.SetVarType(kEnergy);
+//	cout << "axis1.GetRangeMin() = " << axis1.GetRangeMin() << endl;
+//	cout << "axis2.GetRangeMin() = " << axis2.GetRangeMin() << endl;
 //
-//	vector<float> vect1, vect2;
-//	for (int i=0;i<10;i++){
-//		vect1.push_back(i*3.1416);
-//		vect2.push_back(i*3.14);
-//	}
-//	axis1.SetAxisBins(vect1);
-//	axis2.SetAxisBins(vect2);
-//	axis1.SetVarType(GIRFAxis::kEnergy);
-////	cout << "axis1.GetRangeMin() = " << axis1.GetRangeMin() << endl;
-////	cout << "axis2.GetRangeMin() = " << axis2.GetRangeMin() << endl;
-////
-////	cout << "axis1.GetRangeMax() = " << axis1.GetRangeMax() << endl;
-////	cout << "axis2.GetRangeMax() = " << axis2.GetRangeMax() << endl;
-////
-////	cout << "(axis1==axis2) = " << (axis1==axis2) << endl;
-////
-////	cout << "axis1.GetExtName() = " << axis1.GetExtName().data() << endl;
-//	int lastID = GIRFUtils::GetLastAxisID("alltest.fits");
-////	cout << "lastID = " << lastID << endl;
+//	cout << "axis1.GetRangeMax() = " << axis1.GetRangeMax() << endl;
+//	cout << "axis2.GetRangeMax() = " << axis2.GetRangeMax() << endl;
 //
-//	GIRFAxisBins* axis3;
-//	GIRFAxisBins* axis4;
-//	axis3 = new GIRFAxisBins();
-//	axis4 = new GIRFAxisBins();
-//	axis3->SetAxisBins(vect1);
-//	axis4->SetAxisBins(vect2);
-////	cout << "axis3==axis4 = " << ((*axis3)==(*axis4)) << endl;
+//	cout << "(axis1==axis2) = " << (axis1==axis2) << endl;
+//
+//	cout << "axis1.GetExtName() = " << axis1.GetExtName().data() << endl;
+	int lastID = GIRFUtils::GetLastAxisID("alltest.fits");
+//	cout << "lastID = " << lastID << endl;
+
+	GIRFAxisBins* axis3;
+	GIRFAxisBins* axis4;
+	axis3 = new GIRFAxisBins();
+	axis4 = new GIRFAxisBins();
+	axis3->SetAxisBins(vect1);
+	axis4->SetAxisBins(vect2);
+	cout << "axis3==axis4 = " << ((*axis3)==(*axis4)) << endl;
 
 
-//	cout << "Funciona" << endl;
+	cout << "Funciona" << endl;
 
 	return 5;
 

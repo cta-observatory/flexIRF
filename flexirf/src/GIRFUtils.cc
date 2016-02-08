@@ -111,10 +111,16 @@ int GIRFUtils::GetLastAxisID(string filename) {
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
 	int single = 0, hdupos, nkeys, ii;
 	int lastID = 0;
+	char errorCard[FLEN_ERRMSG]; /* max length of a FITSIO status text string */
 
 	cout << "Opening file " << filename.data() << endl;
 	if (!fits_open_file(&fptr, filename.data(), READONLY, &status)) {
 		lastID = GetLastAxisID(fptr);
+	} else {
+		cout << "Failed to open file: " << filename.data() << endl;
+		fits_get_errstatus(status, errorCard);
+		cout << "Error code: " << errorCard << endl;
+		return status;
 	}
 	if (fits_close_file(fptr, &status))
 		cout << "GIRF::Write Error: cannot close file (error code: " << status
