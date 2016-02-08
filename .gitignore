@@ -84,6 +84,7 @@ shippable.yml~
 # Some GIRF folders  #
 ######################
 build/
+bin/
 .libs/
 src/.deps/
 src/.dirstamp

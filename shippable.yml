@@ -46,8 +46,8 @@ before_install:
 #    - cd build/;
 #    - make;
 script:
-    - ./bin/IRFconverter_root2FITS ../dummy/dummyconfig.txt ../prodfiles/Performance_2Q_Aar_50h_20150505.root;
-    - ./bin/IRFgenerator_rootio ../dummy/dummyconfig.txt ../prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root;
+    - ./bin/IRFconverter_root2FITS dummy/dummyconfig.txt prodfiles/Performance_2Q_Aar_50h_20150505.root;
+    - ./bin/IRFgenerator_rootio dummy/dummyconfig.txt prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root;
     - ./bin/IRFsimpleTests;
 
-#    - ./bin/IRFmerger_fitsio ../dummy/dummyconfig.txt ../dummy/dummypdf-2D.txt;
+#    - ./bin/IRFmerger_fitsio dummy/dummyconfig.txt dummy/dummypdf-2D.txt;
