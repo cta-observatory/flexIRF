@@ -149,27 +149,27 @@ void IRFgenerator_rootio_irfGenND(TFile *paramfile, string histname, const AxisT
   //declare the axes and link them to pdf                                                                           
   float* axis[naxesArr];
 
-  int xaxis_size = 0;
-  int yaxis_size = 0;
-  int zaxis_size = 0;
+  int xaxisBins = 0;
+  int yaxisBins = 0;
+  int zaxisBins = 0;
 
   if(naxesArr==1){
-    xaxis_size    = estim->GetXaxis()->GetNbins();
-    yaxis_size    = 0;
-    zaxis_size    = 0;
-    pdfdata.reserve(xaxis_size);
+	  xaxisBins    = estim->GetXaxis()->GetNbins();
+	  yaxisBins    = 0;
+	  zaxisBins    = 0;
+    pdfdata.reserve(xaxisBins);
   }
   else if(naxesArr==2){
-    xaxis_size    = estim->GetXaxis()->GetNbins();
-    yaxis_size    = estim->GetYaxis()->GetNbins();
-    zaxis_size    = 0;
-    pdfdata.reserve(xaxis_size*yaxis_size);
+	  xaxisBins    = estim->GetXaxis()->GetNbins();
+	  yaxisBins    = estim->GetYaxis()->GetNbins();
+	  zaxisBins    = 0;
+    pdfdata.reserve(xaxisBins*yaxisBins);
   }
   else if(naxesArr==3){
-    xaxis_size    = estim->GetXaxis()->GetNbins();
-    yaxis_size    = estim->GetYaxis()->GetNbins();
-    zaxis_size    = estim->GetYaxis()->GetNbins(); //Making dummy Z-axis
-    pdfdata.reserve(xaxis_size*yaxis_size*zaxis_size);
+	  xaxisBins    = estim->GetXaxis()->GetNbins();
+	  yaxisBins    = estim->GetYaxis()->GetNbins();
+	  zaxisBins    = estim->GetYaxis()->GetNbins(); //Making dummy Z-axis
+    pdfdata.reserve(xaxisBins*yaxisBins*zaxisBins);
   }
   else{
     cout<<"Error when finding axes sizes: "<<endl;
@@ -177,32 +177,32 @@ void IRFgenerator_rootio_irfGenND(TFile *paramfile, string histname, const AxisT
     exit(EXIT_FAILURE);
   }
 
-  const int   axissize[]   = {xaxis_size, yaxis_size, zaxis_size};
+  const int   axissize[]   = {xaxisBins+1, yaxisBins+1, zaxisBins+1};
   const bool  axisislog[]  = {true, false, false};
   
   // actual data: axes and pdf parameters                                             
   // Pull out bin width and loop to fill this array 
-  float xaxis_vals[xaxis_size];
-  float yaxis_vals[yaxis_size];
-  float zaxis_vals[zaxis_size];
+  float xaxis_vals[axissize[0]];
+  float yaxis_vals[axissize[1]];
+  float zaxis_vals[axissize[2]];
 
   cout<<" - Building fits file with the following dimensions - "<<endl;
-  cout<<"X: "<<xaxis_size<<" Y: "<<yaxis_size<<" Z: "<<zaxis_size<<endl;
+  cout<<"X: "<<axissize[0]<<" Y: "<<axissize[1]<<" Z: "<<axissize[2]<<endl;
    
-  for(int i=1;i<=xaxis_size;i++){
+  for(int i=1;i<=axissize[0];i++){
     xaxis_vals[i-1]=estim->GetXaxis()->GetBinLowEdge(i);
   }
   
-  for(int j=1;j<=yaxis_size;j++){
+  for(int j=1;j<=axissize[1];j++){
     yaxis_vals[j-1]=estim->GetYaxis()->GetBinLowEdge(j);
   }
 
-  for(int k=1;k<=zaxis_size;k++){
+  for(int k=1;k<=axissize[2];k++){
     zaxis_vals[k-1]=estim->GetYaxis()->GetBinLowEdge(k);
   }
     
   if(naxesArr==1){
-      for(int i=1;i<=xaxis_size;i++){
+      for(int i=1;i<=axissize[0];i++){
 	  
 	pdfdata.push_back(estim->GetBinContent(i));
 	
@@ -210,8 +210,8 @@ void IRFgenerator_rootio_irfGenND(TFile *paramfile, string histname, const AxisT
   }
 
   else if(naxesArr==2){
-      for(int j=1;j<=yaxis_size;j++){
-	for(int i=1;i<=xaxis_size;i++){
+      for(int j=1;j<=axissize[1];j++){
+	for(int i=1;i<=axissize[0];i++){
 	  
 	pdfdata.push_back(estim->GetBinContent(i,j));
 	
@@ -219,9 +219,9 @@ void IRFgenerator_rootio_irfGenND(TFile *paramfile, string histname, const AxisT
       }//ends j (y-axis)
   }
   else if(naxesArr==3){
-    for(int k=1;k<=zaxis_size;k++){
-      for(int j=1;j<=yaxis_size;j++){
-	for(int i=1;i<=xaxis_size;i++){
+    for(int k=1;k<=axissize[2];k++){
+      for(int j=1;j<=axissize[1];j++){
+	for(int i=1;i<=axissize[0];i++){
 	  
 	pdfdata.push_back(estim->GetBinContent(i,j));
 	
@@ -269,7 +269,7 @@ void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
   // declare and fill pdf                                                                                                           
   GIRFPdf*   mypdf   = new GIRFPdf(kEfficiency,kNumber);
   mypdf->SetData(&pdfdata[0]);
-  
+
   GIRFAxis** IRFAxis = new GIRFAxis*[naxes];
 
   // fill the axes                                                                                                                      
@@ -305,5 +305,5 @@ void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
   // Write the IRF to file                                                                                            
   string fitsout="!"+histname+".fits";
   irf->Write(fitsout);
-  
+
 }//ends makeFITS

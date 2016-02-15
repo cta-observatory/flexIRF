@@ -89,6 +89,18 @@ bin/
 src/.deps/
 src/.dirstamp
 
+# Some GIRF generated files  #
+##############################
+AngRes.fits
+BGRate.fits
+DiffSens.fits
+EffectiveAreaEtrue.fits
+MigMatrix.fits
+alltest.fits
+
+
+
+
 #  From compilation  #
 ######################
 

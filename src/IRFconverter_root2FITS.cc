@@ -258,27 +258,27 @@ void IRFconverter_root2FITS_irfGenND(TFile *paramfile, GIRF* irf,
   //declare the axes and link them to pdf                                                                           
   float* axis[naxes_array];
 
-  int xaxis_size = 0;
-  int yaxis_size = 0;
-  int zaxis_size = 0;
+  int xaxisBins = 0;
+  int yaxisBins = 0;
+  int zaxisBins = 0;
 
   if(naxes_array==1){
-    xaxis_size    = estim->GetXaxis()->GetNbins()+1;
-    yaxis_size    = 0;
-    zaxis_size    = 0;
-    pdfdata.reserve(xaxis_size-1);
+	  xaxisBins    = estim->GetXaxis()->GetNbins();
+	  yaxisBins    = 0;
+	  zaxisBins    = 0;
+    pdfdata.reserve(xaxisBins);
   }
   else if(naxes_array==2){
-    xaxis_size    = estim->GetXaxis()->GetNbins()+1;
-    yaxis_size    = estim->GetYaxis()->GetNbins()+1;
-    zaxis_size    = 0;
-    pdfdata.reserve((xaxis_size-1)*(yaxis_size-1));
+	  xaxisBins    = estim->GetXaxis()->GetNbins();
+	  yaxisBins    = estim->GetYaxis()->GetNbins();
+	  zaxisBins    = 0;
+    pdfdata.reserve((xaxisBins)*(yaxisBins));
   }
   else if(naxes_array==3){
-    xaxis_size    = estim->GetXaxis()->GetNbins()+1;
-    yaxis_size    = estim->GetYaxis()->GetNbins()+1;
-    zaxis_size    = estim->GetYaxis()->GetNbins()+1; //Making dummy Z-axis
-    pdfdata.reserve((xaxis_size-1)*(yaxis_size-1)*(zaxis_size-1));
+	  xaxisBins    = estim->GetXaxis()->GetNbins();
+	  yaxisBins    = estim->GetYaxis()->GetNbins();
+	  zaxisBins    = estim->GetYaxis()->GetNbins(); //Making dummy Z-axis
+    pdfdata.reserve((xaxisBins)*(yaxisBins)*(zaxisBins));
   }
   else{
     cout<<"Error when finding axes sizes: "<<endl;
@@ -286,34 +286,34 @@ void IRFconverter_root2FITS_irfGenND(TFile *paramfile, GIRF* irf,
     exit(EXIT_FAILURE);
   }
 
-  const int   axissize[]   = {xaxis_size, yaxis_size, zaxis_size};
+  const int   axissize[]   = {xaxisBins+1, yaxisBins+1, zaxisBins+1};
   const bool  axisislog[]  = {true, false, false};
   
   //Actual data: axes and pdf parameters                                             
   //Pull out bin width and loop to fill this array 
-  float xaxis_vals[xaxis_size];
-  float yaxis_vals[yaxis_size];
-  float zaxis_vals[zaxis_size];
+  float xaxis_vals[axissize[0]];
+  float yaxis_vals[axissize[1]];
+  float zaxis_vals[axissize[2]];
 
   cout<<" - Building fits file with the following dimensions - "<<endl;
-  cout<<" - X: "<<xaxis_size<<endl;
-  cout<<" - Y: "<<yaxis_size<<endl;
-  cout<<" - Z: "<<zaxis_size<<endl;
+  cout<<" - X: "<<axissize[0]<<endl;
+  cout<<" - Y: "<<axissize[1]<<endl;
+  cout<<" - Z: "<<axissize[2]<<endl;
    
-  for(int i=1;i<=xaxis_size;i++){
+  for(int i=1;i<=axissize[0];i++){
     xaxis_vals[i-1]=estim->GetXaxis()->GetBinLowEdge(i);
   }
   
-  for(int j=1;j<=yaxis_size;j++){
+  for(int j=1;j<=axissize[1];j++){
     yaxis_vals[j-1]=estim->GetYaxis()->GetBinLowEdge(j);
   }
 
-  for(int k=1;k<=zaxis_size;k++){
+  for(int k=1;k<=axissize[2];k++){
     zaxis_vals[k-1]=estim->GetYaxis()->GetBinLowEdge(k);
   }
     
   if(naxes_array==1){
-    for(int i=1;i<xaxis_size;i++){
+    for(int i=1;i<axissize[0];i++){
       
       pdfdata.push_back(estim->GetBinContent(i));
       
@@ -321,8 +321,8 @@ void IRFconverter_root2FITS_irfGenND(TFile *paramfile, GIRF* irf,
   }
   
   else if(naxes_array==2){
-    for(int j=1;j<yaxis_size;j++){
-      for(int i=1;i<xaxis_size;i++){
+    for(int j=1;j<axissize[1];j++){
+      for(int i=1;i<axissize[0];i++){
 	
 	pdfdata.push_back(estim->GetBinContent(i,j));
 	
@@ -330,9 +330,9 @@ void IRFconverter_root2FITS_irfGenND(TFile *paramfile, GIRF* irf,
     }//ends j (y-axis)
   }
   else if(naxes_array==3){
-    for(int k=1;k<zaxis_size;k++){
-      for(int j=1;j<yaxis_size;j++){
-    	for(int i=1;i<xaxis_size;i++){
+    for(int k=1;k<axissize[2];k++){
+      for(int j=1;j<axissize[1];j++){
+    	for(int i=1;i<axissize[0];i++){
 	  
     	  pdfdata.push_back(estim->GetBinContent(i,j));
 	  
