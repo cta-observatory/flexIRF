@@ -41,7 +41,7 @@ GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc, unsigned long naxes) : fPdfFun
 //
 // 		Draw Pdf content
 //	TODO: Just 1 and 2 dimensional IRFs can be currently drawn.
-void GIRFPdf::Draw() const {
+void GIRFPdf::Draw(string filename, string drawOption) const {
 
 	if (fIsEmpty) {
 		cout << "Pdf is empty" << endl;
@@ -64,12 +64,13 @@ void GIRFPdf::Draw() const {
 			TF1* pdf = new TF1(GetExtName().data(), axisParam->GetFormula().data(), (float) axisParam->GetRangeMin(), (float) axisParam->GetRangeMax());
 			for (int i=0;i<axisParam->GetNumPars();i++) pdf->SetParameter(i,fData[i]);
 			TCanvas c1;
+			if (drawOption.find("logy"))
 			pdf->Draw();
 			c1.SaveAs("plot.png");
 			return;
 		}
 		if (axisBins){
-			TH1F *pdf = new TH1F("pdf", GetExtName().data(), axisBins->GetSize()-1, axisBins->GetAxisBins().data());
+			TH1F *pdf = new TH1F("pdf", GetExtName().data(), axisBins->GetSize(), axisBins->GetAxisBins().data());
 			for (int i=1;i<=axisBins->GetSize();i++){
 				pdf->SetBinContent(i,fData[i-1]);
 			}
@@ -397,6 +398,11 @@ void GIRFPdf::Print() const {
 
 	int iAxis=0;
 	int totalSize=1;
+	cout << endl;
+	cout << "*******************************************" << endl;
+	cout << "***          Printing GIRFPdf           ***" << endl;
+	cout << "*******************************************" << endl;
+	cout << "" << endl;
 	cout << "Printing Axes:" << endl;
 	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iAxis++) {
 		cout << "Printing Axis #" << iAxis+1 << endl;
@@ -411,6 +417,7 @@ void GIRFPdf::Print() const {
 	for (int i=0;i<totalSize;i++){
 		cout << "Data[" << i+1 << "] = " << fData[i] << endl;
 	}
+	cout << "*******************************************" << endl;
 //	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {
 //		cout << "Printing Axis #" << iData+1 << endl;
 //		for (int i=0;i<(*axis)->GetSize();i++){

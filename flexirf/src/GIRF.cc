@@ -398,9 +398,7 @@ GIRFPdf* GIRF::ReadPdf(PdfVar pdfVar, GIRFConfig config) {
 	//**************************************************************//
 
 	std::vector<AxisRange> axisRanges = config.GetAxisRanges();
-//	for(std::vector<GIRFAxis::AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
-//		cout << "axisRange->varType = " << axisRange->varType << ", lowRange = " << axisRange->lowRange << ", highRange = " << axisRange->highRange << endl;
-//	}
+
 	vector< vector<int> > ids = FindAxisRanges(axisRanges);
 
 	if (ids.empty()) {
@@ -408,13 +406,13 @@ GIRFPdf* GIRF::ReadPdf(PdfVar pdfVar, GIRFConfig config) {
 		return extractedPdf;
 	}
 
-	cout << "ids:" << endl;
-	for(std::vector< vector<int> >::iterator idrow = ids.begin(); idrow != ids.end(); ++idrow) {
-		for(std::vector<int>::iterator id = idrow->begin(); id != idrow->end(); ++id) {
-			cout << " " << *id << " ";
-		}
-		cout << endl;
-	}
+//	cout << "ids:" << endl;
+//	for(std::vector< vector<int> >::iterator idrow = ids.begin(); idrow != ids.end(); ++idrow) {
+//		for(std::vector<int>::iterator id = idrow->begin(); id != idrow->end(); ++id) {
+//			cout << " " << *id << " ";
+//		}
+//		cout << endl;
+//	}
 
 
 	//**************************************************************//
@@ -437,7 +435,7 @@ GIRFPdf* GIRF::ReadPdf(PdfVar pdfVar, GIRFConfig config) {
 	// 		Extract Pdf ID.
 	//**************************************************************//
 
-	cout << "Pdf #" << chosenPdfID << " was chosen." << endl;
+//	cout << "Pdf #" << chosenPdfID << " was chosen." << endl;
 	extractedPdf = ReadPdf(chosenPdfID, config);
 
 //	for(std::vector<int>::iterator foundAxisID = ids.begin(); foundAxisID != ids.end(); ++foundAxisID) {
@@ -606,9 +604,9 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axis
 		}
 		for(std::vector<AxisRange>::iterator axisRange = axisRanges.begin(); axisRange != axisRanges.end(); ++axisRange) {
 			if (varType == axisRange->varType){
-				cout << "Axis #" << *axisID << " is resized using lowRange = " << axisRange->lowRange << " & highRange = " << axisRange->highRange << endl;
+//				cout << "Axis #" << *axisID << " is resized using lowRange = " << axisRange->lowRange << " & highRange = " << axisRange->highRange << endl;
 				axis->Resize(axisRange->lowRange, axisRange->highRange, &lBin, &hBin);
-				cout << "lBin = " << lBin << " and hBin = " << hBin << endl;
+//				cout << "lBin = " << lBin << " and hBin = " << hBin << endl;
 				break;
 			}
 		}
@@ -619,25 +617,25 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axis
 			lBins.push_back(lBin+1);	//TODO: CHECK!!!!!!!!! Donde va el +1!!?!??!?
 			hBins.push_back(hBin-1);
 		}
-		cout << "Axis #" << *axisID << " with axis size = " << axis->GetSize() << endl;
+//		cout << "Axis #" << *axisID << " with axis size = " << axis->GetSize() << endl;
 		if (nBins == 0) nBins=axisSize;
 		else nBins*=axisSize;
 		inc.push_back(1);
 	}
 
-	cout << "lBins = [ ";
-	for(std::vector<long>::iterator lbin = lBins.begin(); lbin != lBins.end(); ++lbin) {
-		cout << *lbin << " ";
-	}
-	cout << "]" << endl;
+//	cout << "lBins = [ ";
+//	for(std::vector<long>::iterator lbin = lBins.begin(); lbin != lBins.end(); ++lbin) {
+//		cout << *lbin << " ";
+//	}
+//	cout << "]" << endl;
 
-	cout << "hBins = [ ";
-	for(std::vector<long>::iterator hbin = hBins.begin(); hbin != hBins.end(); ++hbin) {
-		cout << *hbin << " ";
-	}
-	cout << "]" << endl;
+//	cout << "hBins = [ ";
+//	for(std::vector<long>::iterator hbin = hBins.begin(); hbin != hBins.end(); ++hbin) {
+//		cout << *hbin << " ";
+//	}
+//	cout << "]" << endl;
 
-	cout << "nBins = " << nBins << endl;
+//	cout << "nBins = " << nBins << endl;
 
 	array = (float *) malloc(nBins * sizeof(float));
 
@@ -764,14 +762,14 @@ vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, PdfVar pdfVar){
 	vector< vector<int> > foundPdfsAxisIDs = GetPdfAxisIDs(pdfsIDOfCorrectType);
 
 
-	cout << "foundPdfsAxisIDs:" << endl;
-	for(std::vector< vector<int> >::iterator pdf = foundPdfsAxisIDs.begin(); pdf != foundPdfsAxisIDs.end(); ++pdf) {
-		cout << "This pdf points to the axes: ";
-		for(std::vector<int>::iterator pdfID = pdf->begin(); pdfID != pdf->end(); ++pdfID) {
-			cout << *pdfID << ", ";
-		}
-		cout << endl;
-	}
+//	cout << "foundPdfsAxisIDs:" << endl;
+//	for(std::vector< vector<int> >::iterator pdf = foundPdfsAxisIDs.begin(); pdf != foundPdfsAxisIDs.end(); ++pdf) {
+//		cout << "This pdf points to the axes: ";
+//		for(std::vector<int>::iterator pdfID = pdf->begin(); pdfID != pdf->end(); ++pdfID) {
+//			cout << *pdfID << ", ";
+//		}
+//		cout << endl;
+//	}
 
 //	cout << "axisIDs:" << endl;
 //	for(std::vector< vector<int> >::iterator axis = axisIDs.begin(); axis != axisIDs.end(); ++axis) {
@@ -786,11 +784,11 @@ vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, PdfVar pdfVar){
 
 	vector<int> correctPdfIDs = FindPdfsPointingToAxisIDs(axisIDs, pdfsIDOfCorrectType, foundPdfsAxisIDs);
 
-	cout << "correctPdfIDs: ";
-	for(std::vector<int>::iterator pdfID = correctPdfIDs.begin(); pdfID != correctPdfIDs.end(); ++pdfID) {
-		cout << *pdfID << " ";
-	}
-	cout << endl;
+//	cout << "correctPdfIDs: ";
+//	for(std::vector<int>::iterator pdfID = correctPdfIDs.begin(); pdfID != correctPdfIDs.end(); ++pdfID) {
+//		cout << *pdfID << " ";
+//	}
+//	cout << endl;
 
 	return correctPdfIDs;
 }
@@ -895,7 +893,7 @@ vector< vector<int> > GIRF::GetPdfAxisIDs(vector<int> pdfIDs){
 	vector< vector<int> > foundPdfsAxisIDs;
 
 	for(std::vector<int>::iterator pdfID = pdfIDs.begin(); pdfID != pdfIDs.end(); ++pdfID) {
-		cout << "Pdf #" << *pdfID << " is of correct type!!" << endl;
+//		cout << "Pdf #" << *pdfID << " is of correct type!!" << endl;
 		foundPdfsAxisIDs.push_back(GetPdfAxisIDs(*pdfID));
 	}
 
@@ -943,7 +941,7 @@ bool GIRF::CheckPdfPointsToAxisIDs(vector< vector<int> > axisIDs, vector<int> pd
 //
 int GIRF::PickPreferredPdf(vector<int> foundPdfs, GIRFConfig config){
 
-	cout << "foundPdfs.size() = " << foundPdfs.size() << endl;
+//	cout << "foundPdfs.size() = " << foundPdfs.size() << endl;
 	if (foundPdfs.size() == 0) return 0;
 
 	//TODO!!!!!!!!!!!!!

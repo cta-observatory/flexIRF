@@ -25,8 +25,8 @@ alltest.fits
 
 IRFgenerator_rootio:
 
-For the moment, this program reads in a dummy configuration file (located in IRM/dummy/dummyconfig.txt) 
-and a CTA analysis file (located in IRM/prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root) 
+For the moment, this program reads in a dummy configuration file (located in dummy/dummyconfig.txt) 
+and a CTA MC analysis file (located in prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root) 
 and generates three fits files ( Ebias_offaxis.fits (2D), ERes_offaxis.fits (2D) and AngRes_offaxis.fits (3D) ) in the build directory
 
 Example -
@@ -41,8 +41,8 @@ ERes_offaxis.fits, Ebias_offaxis.fits and AngRes_offaxis.fits
 
 IRFmerger_fitsio:
 
-Reads in a dummy configuration file (located in IRM/dummy/dummyconfig.txt)
-and a filelist of fits files to merge (located in IRM/dummy/, can merge 2D or 3D fits file with dummypdf-2D.txt or dummypdf-3D.txt)
+Reads in a dummy configuration file (located in dummy/dummyconfig.txt)
+and a filelist of fits files to merge (located in dummy/, can merge 2D or 3D fits file with dummypdf-2D.txt or dummypdf-3D.txt)
 and creates a fits cube called "datacube_test.fits" (of dimensions 21 * 7 * 25, or 21 * 7 * 7 * 25)
 
 dummypdf-2D.txt has 25 instances of the "ERes_offaxis.fits" which is a 21 * 7 2D fits file. The "Z" axis is arbitrary (of 25 bins) and for testing only. 

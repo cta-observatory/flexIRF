@@ -146,17 +146,17 @@ int main()
 //	irf2->Write("!paramTest.fits");
 //
 //
-//	GIRFConfig config;
-////	config.SetDefault();
-//	config.AddAxisRange(kEnergy,-1.7,-0.9, 1);
-//	config.AddAxisRange(kPhi, -1,1, 0);
-////	config.Print();
-//	string filename = "paramTest.fits";
-//	GIRF irf(filename);
-//	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(kAeff, config));
-//	if (!effArea || effArea->IsEmpty()) return 2;
-//	effArea->Print();
-////	effArea->Draw();
+	GIRFConfig config;
+//	config.SetDefault();
+	config.AddAxisRange(kEnergy,-1.7,-0.9, 1);
+	config.AddAxisRange(kPhi, -1,1, 0);
+//	config.Print();
+	string filename = "paramTest.fits";
+	GIRF irf(filename);
+	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(kAeff, config));
+	if (!effArea || effArea->IsEmpty()) return 2;
+	effArea->Print();
+//	effArea->Draw();
 
 
 
