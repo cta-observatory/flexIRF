@@ -64,9 +64,10 @@ void GIRFPdf::Draw(string filename, string drawOption) const {
 			TF1* pdf = new TF1(GetExtName().data(), axisParam->GetFormula().data(), (float) axisParam->GetRangeMin(), (float) axisParam->GetRangeMax());
 			for (int i=0;i<axisParam->GetNumPars();i++) pdf->SetParameter(i,fData[i]);
 			TCanvas c1;
-			if (drawOption.find("logy"))
+			if (drawOption.find("logy")) c1.SetLogy();
 			pdf->Draw();
-			c1.SaveAs("plot.png");
+			if (filename == "") c1.SaveAs("plot.png");
+			else c1.SaveAs(filename.data());
 			return;
 		}
 		if (axisBins){
@@ -75,8 +76,11 @@ void GIRFPdf::Draw(string filename, string drawOption) const {
 				pdf->SetBinContent(i,fData[i-1]);
 			}
 			TCanvas c1;
+			std::size_t logY = drawOption.find("logY");
+			if (logY!=std::string::npos) c1.SetLogy();
 			pdf->Draw();
-			c1.SaveAs("plot.png");
+			if (filename == "") c1.SaveAs("plot.png");
+			else c1.SaveAs(filename.data());
 		}
 	} else if (dimensions == 2){
 //		GIRFAxis axisx = fAxis[0];
@@ -394,7 +398,7 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 // Write the pdf and the associated axes to the specified
 // file pointer
 //
-void GIRFPdf::Print() const {
+void GIRFPdf::Print(int sanity) const {
 
 	int iAxis=0;
 	int totalSize=1;
@@ -410,12 +414,17 @@ void GIRFPdf::Print() const {
 		else if (dynamic_cast<GIRFAxisBins*>(*axis)) totalSize*=(*axis)->GetSize()-1;
 		(*axis)->Print();
 	}
-	cout << "Printing Pdf content:" << endl;
+	if (totalSize > sanity) cout << "Printing Pdf content (just first " << sanity << " values):" << endl;
+	else cout << "Printing Pdf content:" << endl;
 	int iData=0;
 	// TODO: This is obviously wrong... but at least printing some numbers...
 
+	int pdfPrintedValues=0;
 	for (int i=0;i<totalSize;i++){
-		cout << "Data[" << i+1 << "] = " << fData[i] << endl;
+		if (pdfPrintedValues < sanity){
+			cout << "Data[" << i+1 << "] = " << fData[i] << endl;
+			pdfPrintedValues++;
+		}
 	}
 	cout << "*******************************************" << endl;
 //	for(std::vector<GIRFAxis*>::const_iterator axis = fAxis.begin(); axis != fAxis.end(); ++axis, iData++) {

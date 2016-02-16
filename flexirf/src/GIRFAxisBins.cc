@@ -170,7 +170,9 @@ bool GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
 bool GIRFAxisBins::ContainsRange(AxisRange axisRange){
 	if (axisRange.varType != this->GetVarType()) return 0;							//Sanity check
 	else{
-		if (axisRange.lowRange > this->GetRangeMin() && axisRange.highRange < this->GetRangeMax()) return 1;
+//		cout << "axisRange.lowRange = " << axisRange.lowRange << " & " << " axisRange.highRange = " << axisRange.highRange << endl;
+//		cout << "this->GetRangeMin() = " << this->GetRangeMin() << " & " << " this->GetRangeMax() = " << this->GetRangeMax() << endl;
+		if (axisRange.lowRange >= this->GetRangeMin() && axisRange.highRange <= this->GetRangeMax()) return 1;
 		else return 0;
 	}
 }

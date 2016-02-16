@@ -713,7 +713,7 @@ vector<int> GIRF::FindAxisRange(AxisRange axisRange){
 
 	}
 
-	if (foundAxisID.empty()) cout << "Axis of type " <<  GIRFAxis::GetVarName(axisRange.varType).data() << " between " << axisRange.lowRange << " and " << axisRange.highRange << " is not present in the FITS file!!!" << endl;
+	if (foundAxisID.empty()) cout << "WARNING: Axis of type " <<  GIRFAxis::GetVarName(axisRange.varType).data() << " between " << axisRange.lowRange << " and " << axisRange.highRange << " is not present in the FITS file." << endl;
 
 	fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &status);
 

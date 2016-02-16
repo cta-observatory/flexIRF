@@ -44,7 +44,7 @@ int main()
 	config.SetDefault();
 
 //	Select energy range between -1.7 and -0.9. Set the axis range as mandatory (if range is not present, stop with an error).
-	config.AddAxisRange(kEnergy,-1.7,0.9, 1);
+	config.AddAxisRange(kEnergy,-2,2, 1);
 //	Select Phi angle between -1 and 1. Set the axis range as optional (if range is not present in the file, continue with a warning).
 	config.AddAxisRange(kPhi, -1,1, 0);
 //	Print current CTAconfig values.
@@ -58,7 +58,7 @@ int main()
 //	Extract desired IRF of type "kAeff" (effective area) using the GCTAConfig object we just generated
 	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(kAeff, config));
 	effArea->Print();
-	effArea->Draw();
+	effArea->Draw("", "logY");
 
 	return 0;
 }//Ends main

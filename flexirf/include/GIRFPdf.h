@@ -39,7 +39,7 @@ class GIRFPdf
   virtual ~GIRFPdf(){};
 
   inline int    AddAxis(GIRFAxis* axis)  {if (!axis->CheckAxisConsistency()) fAxis.push_back(axis); return int(fAxis.size());} // insert axis in the list
-  virtual void 	Draw(string filename, string drawOption) const;
+  virtual void 	Draw(string filename="", string drawOption="") const;
   inline float* GetData()                const {return fData;}
   inline float* GetDataEntry(int ientry) const {return fData+ientry*GetNEntriesPerBin(fPdfFunc);}
   inline long   GetSize()                const {long tot=1;for(uint i=0;i<fAxis.size();i++) tot*=int(fAxis[i]->GetSize()); return tot;}
@@ -66,7 +66,7 @@ class GIRFPdf
   }
 
   virtual int Write(fitsfile* fptr,int* status);
-  virtual void Print() const;
+  virtual void Print(int sanity=30) const;
 };
 
 #endif
