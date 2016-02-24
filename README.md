@@ -45,7 +45,7 @@ bin/IRFsimpleReadIrf
 ```
 Note the use of the "GIRFConfig" class, used to extract the IRF with a specific configuration and valid range. 
 
-**More examples will be soon be added.**
+**More examples will soon be added.**
 
 
 The following are older and more complicated (and nearly deprecated) examples. 
