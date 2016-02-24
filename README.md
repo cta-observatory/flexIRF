@@ -10,9 +10,12 @@ Installation
 --------------
 
 Build git version using:
+
+```shell
 ./autogen.sh
 ./configure
 make
+```
 
 Although we DON'T recommend it, if you want to link generated libraries into your "/usr/local/share" do:
 (sudo) make install
@@ -24,26 +27,28 @@ Although this project still lacks propper documentation, several very simple mac
 
 IRFsimpleWriteIrf.cc:
 
-This simple macro generates a fits file "testEffArea.fits" containing a mock effective area into a FITS file. To run it, simple execute:
+This simple macro generates a fits file "testEffArea.fits" containing a mock effective area into a FITS file. To run it, simply execute:
 
+```shell
 bin/IRFsimpleWriteIrf
+```
 
 It shows how "AxisType", "VarType" and other variables are used in the definition of a "GIRFAxis" object, and then how the IRF element is created using a "GIRFPdf" and introduced into the generic "GIRF".
 
 
 IRFsimpleReadIrf.cc:
 
-Similarly as the previous example, this macro reads a fits file "testEffArea.fits" containing a mock effective area into a FITS file. To run it, simple execute:
+Similarly as the previous example, this macro reads a the previously generated "testEffArea.fits", loading it into a GIRF object, extracting the effective area as a "GIRFPdf" and printing (& drawing, if you have ROOT properly installed, generating the "plot.png" file). To run it, execute:
 
+```shell
 bin/IRFsimpleReadIrf
+```
+Note the use of the "GIRFConfig" class, used to extract the IRF with a specific configuration and valid range. 
 
-It shows how "AxisType", "VarType" and other variables are used in the definition of a "GIRFAxis" object, and then how the IRF element is created using a "GIRFPdf" and introduced into the generic "GIRF".
-
-
-
-
+**More examples will be soon be added.**
 
 
+The following are older and more complicated (and nearly deprecated) examples. 
 
 IRFconverter_root2FITS:
 
@@ -52,7 +57,9 @@ command from the build directory to convert the root histograms in the performan
 
 Example -
 
-./bin/IRFconverter_root2FITS dummy/dummyconfig.txt prodfiles/Performance_2Q_Aar_50h_20150505.root
+```shell
+bin/IRFconverter_root2FITS dummy/dummyconfig.txt prodfiles/Performance_2Q_Aar_50h_20150505.root
+```
 
 Output will be
 
@@ -68,7 +75,9 @@ Example -
 
 In the parent directory run
 
+```shell
 ./bin/IRFgenerator_rootio dummy/dummyconfig.txt prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root
+```
 
 Output will be 
 
@@ -90,15 +99,17 @@ Example -
 
 In the build directory run
 
+```shell
 ./bin/IRFmerger_fitsio dummy/dummyconfig.txt dummy/dummypdf-2D.txt
+```
 
 or 
 
+```shell
 ./bin/IRFmerger_fitsio dummy/dummyconfig.txt dummy/dummypdf-3D.txt
+```
 
-Output will be 
-
-datacube_test.fits
+Output will be "datacube_test.fits".
 
 
 
