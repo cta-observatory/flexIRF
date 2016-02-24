@@ -83,6 +83,3 @@ Output will be
 
 ERes_offaxis.fits, Ebias_offaxis.fits and AngRes_offaxis.fits
 
-
-
-
