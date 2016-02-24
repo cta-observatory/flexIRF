@@ -48,7 +48,7 @@ Note the use of the "GIRFConfig" class, used to extract the IRF with a specific 
 **More examples will soon be added.**
 
 
-The following are older and more complicated (and nearly deprecated) examples. 
+The following are older and more complicated (working, but nearly deprecated) examples. 
 
 IRFconverter_root2FITS:
 
@@ -83,33 +83,6 @@ Output will be
 
 ERes_offaxis.fits, Ebias_offaxis.fits and AngRes_offaxis.fits
 
-IRFmerger_fitsio:
-
-Reads in a dummy configuration file (located in dummy/dummyconfig.txt)
-and a filelist of fits files to merge (located in dummy/, can merge 2D or 3D fits file with dummypdf-2D.txt or dummypdf-3D.txt)
-and creates a fits cube called "datacube_test.fits" (of dimensions 21 * 7 * 25, or 21 * 7 * 7 * 25)
-
-dummypdf-2D.txt has 25 instances of the "ERes_offaxis.fits" which is a 21 * 7 2D fits file. The "Z" axis is arbitrary (of 25 bins) and for testing only. 
-
-and
-
-dummypdf-3D.txt has 25 instances of the "AngRes_offaxis.fits" which is a 21 * 7 * 7 3D fits file. The "Z" axis is arbitrary (of 25 bins) and for testing only. 
-
-Example -
-
-In the build directory run
-
-```shell
-./bin/IRFmerger_fitsio dummy/dummyconfig.txt dummy/dummypdf-2D.txt
-```
-
-or 
-
-```shell
-./bin/IRFmerger_fitsio dummy/dummyconfig.txt dummy/dummypdf-3D.txt
-```
-
-Output will be "datacube_test.fits".
 
 
 
