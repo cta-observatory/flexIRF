@@ -1,6 +1,6 @@
 
 # what flags you want to pass to the C compiler & linker
-#AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_builddir)/flexirf/include @ROOTCFLAGS@		#Compiles!!!
+#AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_builddir)/flexirf/include @ROOTCFLAGS@		
 AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_builddir)/flexirf/include @ROOTCFLAGS@
 
 #AM_LDFLAGS = -L@ROOTLIBDIR@ @ROOTGLIBS@ @ROOTLIBS@ @LIBS@  -L$(top_builddir)/flexirf -lstdc++ -lgirf
@@ -38,15 +38,9 @@ __top_builddir__bin_IRFsimpleReadIrf_SOURCES = IRFsimpleReadIrf.cc
 __top_builddir__bin_IRFsimpleReadIrf_CXXFLAGS = ${AM_CPPFLAGS}
 __top_builddir__bin_IRFsimpleReadIrf_LDFLAGS = ${AM_LDFLAGS} 
 
-
-__top_builddir__bin_IRFsimpleTests_SOURCES = IRFsimpleTests.cc
-__top_builddir__bin_IRFsimpleTests_CXXFLAGS = ${AM_CPPFLAGS}
-__top_builddir__bin_IRFsimpleTests_LDFLAGS = ${AM_LDFLAGS}  
-
-
-# Build libtool library for ctools. This is needed to provide
-# a shared library that can be loaded for python bindings. We do
-# not have to build this library if no python bindings are used.
+# __top_builddir__bin_IRFsimpleTests_SOURCES = IRFsimpleTests.cc
+# __top_builddir__bin_IRFsimpleTests_CXXFLAGS = ${AM_CPPFLAGS}
+# __top_builddir__bin_IRFsimpleTests_LDFLAGS = ${AM_LDFLAGS}  
       
                       
 

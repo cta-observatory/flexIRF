@@ -80,6 +80,8 @@ testconf.shDS_Store
 ehthumbs.db
 Thumbs.db
 shippable.yml~
+README.md~
+README~
 
 # Some GIRF folders  #
 ######################
@@ -104,7 +106,6 @@ plot.png
 
 #  From compilation  #
 ######################
-
 pyext/build/
 pyext/setup.py
 pyext/girf/__init__.py
