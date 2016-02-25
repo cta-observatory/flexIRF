@@ -62,13 +62,134 @@ AC_CANONICAL_HOST
 cxx_list="g++ c++ gpp aCC CC cxx cc++ cl.exe FCC KCC RCC xlC_r xlC clang++"
 cc_list="gcc cc cl.exe clang"
 
-# Check if we have Mac OS X >= 10.7
+# Check if we have Mac OS X >= 10.7, >= 10.9 and >= 10.11
 if test `uname -s` = "Darwin"; then
-  if test `sw_vers -productVersion | sed 's/\(10\.[[0-9]]*\).*/\1/'` '>' 10.6; then
+  version=`sw_vers -productVersion | sed 's/\(10\.[[0-9]]*\).*/\1/' | sed -e 's/\.//g'`
+  if [ test $version -ge 107 ]; then
     cxx_list="clang++ g++ c++ gpp aCC CC cxx cc++ cl.exe FCC KCC RCC xlC_r xlC"
     cc_list="clang gcc cc cl.exe"
+    osx_lion=yes
+  fi
+  if [ test $version -ge 109 ]; then
+    osx_mavericks=yes
+  fi
+  if [ test $version -ge 1011 ]; then
+    osx_el_capitan=yes
   fi
 fi
+AC_MSG_CHECKING([for Mac OS X >= 10.7])
+if [test "x$osx_lion" = "xyes"]; then
+        AC_MSG_RESULT(yes)
+else
+        AC_MSG_RESULT(no)
+fi
+AC_MSG_CHECKING([for Mac OS X >= 10.9])
+if [test "x$osx_mavericks" = "xyes"]; then
+        AC_MSG_RESULT(yes)
+else
+        AC_MSG_RESULT(no)
+fi
+AC_MSG_CHECKING([for Mac OS X >= 10.11])
+if [test "x$osx_el_capitan" = "xyes"]; then
+        AC_MSG_RESULT(yes)
+else
+        AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(IS_ELCAPITAN, test "x$osx_el_capitan" = "xyes")
+
+# Our language is C++
+AC_LANG(C++)
+AC_PROG_CXX($cxx_list)
+AC_PROG_CC($cc_list)
+
+#############################################################################
+# Darwin option: Determine architecture of universal library to be built    #
+# ------------------------------------------------------------------------- #
+# --with-univeral-archs=VALUE, where VALUE is one of:                       #
+# 32-bit - ppc, i386                                                        #
+# 64-bit - ppc64, x86_64                                                    #
+# 3-way  - ppc, i386, x86_64 (default)                                      #
+# intel  - i386, x86_64                                                     #
+# all    - ppc, ppc64, i386, x86_64                                         #
+#############################################################################
+UNIVERSAL_ARCHS="3-way"
+AC_SUBST(LIPO_32BIT_FLAGS)
+AC_MSG_CHECKING(for --with-universal-archs)
+AC_ARG_WITH(universal-archs,
+    AS_HELP_STRING([--with-universal-archs=ARCH],
+                   [select architectures for universal build ("32-bit", "64-bit", "3-way", "intel", or "all")]),
+[
+	AC_MSG_RESULT($withval)
+	UNIVERSAL_ARCHS="$withval"
+],
+[
+ 	AC_MSG_RESULT(3-way)
+])
+
+
+#############################################################################
+# Darwin option: Determine if a universal library should be built           #
+# ------------------------------------------------------------------------- #
+# --enable-universalsdk=PATH takes an optional argument that specifies      #
+# which OSX SDK should be used to perform the build.                        #
+# This defaults to:                                                         #
+# "/Developer/SDKs/MacOSX.10.4u.sdk" for a '32-bit' build                   #
+# "/Developer/SDKs/MacOSX.10.5.sdk"  for any other build                    #
+#############################################################################
+AC_MSG_CHECKING([for --enable-universalsdk])
+AC_ARG_ENABLE(universalsdk,
+	AS_HELP_STRING([--enable-universalsdk@<:@=SDKDIR@:>@], [Build against Mac OS X 10.4 SDK (ppc/i386)]),
+[
+	case $enableval in
+	yes)
+        if [test "${UNIVERSAL_ARCHS}" = "32-bit";] then
+            enableval=/Developer/SDKs/MacOSX10.4u.sdk
+        else
+            enableval=/Developer/SDKs/MacOSX10.5.sdk
+        fi
+		if [test ! -d "${enableval}";] then
+			enableval=/
+        fi
+		;;
+	esac
+	case $enableval in
+	no)
+		UNIVERSALSDK=
+		enable_universalsdk=
+		;;
+	*)
+		UNIVERSALSDK=$enableval
+		if [test ! -d "${UNIVERSALSDK}"]; then
+			AC_MSG_ERROR([--enable-universalsdk specifies non-existing SDK: ${UNIVERSALSDK}])
+		fi
+		;;
+	esac
+	
+],[
+   	UNIVERSALSDK=
+	enable_universalsdk=
+])
+if [test -n "${UNIVERSALSDK}"]; then
+	AC_MSG_RESULT(${UNIVERSALSDK})
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(UNIVERSALSDK)
+
+
+#############################################################################
+# Darwin option: Check whether --with-universal-archs was specified without #
+#                --enable-universalsdk                                      #
+#############################################################################
+if [test "${withval}"]; then
+    if [test "${enable_universalsdk}"]; then
+		:
+	else
+		AC_MSG_ERROR([--with-universal-archs without --enable-universalsdk.])
+	fi
+fi
+
+
 
 #############################################################################
 # Set name for machine-dependent library files                              #
@@ -103,17 +224,56 @@ ac_sys_machine=`uname -m`
 AC_MSG_RESULT($ac_sys_machine)
 
 
-
-# Our language is C++
-AC_LANG(C++)
-AC_PROG_CXX($cxx_list)
-AC_PROG_CC($cc_list)
-
-# Checks for programs.
-#AC_PROG_CXX
-#AC_PROG_CC
-#AC_CANONICAL_HOST
-#AC_LIBOBJ
+#############################################################################
+# Set system-dependent library definitions                                  #
+#############################################################################
+AC_MSG_CHECKING([for the shared library paths environment variable])
+case $ac_sys_system in
+    BeOS*)
+        SHAREDSUFFIX='.so'
+        ;;
+    CYGWIN*)
+        SHAREDSUFFIX='.dll.a'
+        ;;
+    SunOS*)
+        SHAREDSUFFIX='.so'
+        RUNSHARED='LD_LIBRARY_PATH'
+        ;;
+    Linux*|GNU*|NetBSD*|FreeBSD*|DragonFly*)
+        SHAREDSUFFIX='.so'
+        RUNSHARED='LD_LIBRARY_PATH'
+        ;;
+    hp*|HP*)
+        case `uname -m` in
+            ia64)
+                SHAREDSUFFIX='.so'
+                ;;
+            *)
+                SHAREDSUFFIX='.sl'
+                ;;
+        esac
+        RUNSHARED='SHLIB_PATH'
+        ;;
+    OSF*)
+        SHAREDSUFFIX='.so'
+        RUNSHARED='LD_LIBRARY_PATH'
+        ;;
+    atheos*)
+        SHAREDSUFFIX='.so'
+        RUNSHARED='DLL_PATH'
+	    ;;
+    Darwin*)
+        SHAREDSUFFIX='.dylib'
+        RUNSHARED='DYLD_LIBRARY_PATH'
+        ;;
+    AIX*)
+        SHAREDSUFFIX='.so'
+        RUNSHARED='LIBPATH'
+        ;;
+esac
+AC_MSG_RESULT($RUNSHARED)
+AC_SUBST(SHAREDSUFFIX)
+AC_SUBST(RUNSHARED)
 
 
 # Checks for libraries.
