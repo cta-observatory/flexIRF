@@ -79,7 +79,7 @@ AC_C_INLINE
 #############################################################################
 # Check for cfitsio library                                                 #
 # ------------------------------------------------------------------------- #
-# We check first in the gammalib directory, then in the standard paths and  #
+# We check first in the flexIRF directory, then in the standard paths and  #
 # finally we perform system dependent checks. These are:                    #
 # - Darwin: /opt/local (MacPorts)                                           #
 # - Linux:  headers in /usr/include/libcfitsio0 (OpenSUSE)                  #
@@ -113,15 +113,83 @@ if [test "x$with_cfitsio" = "xyes"]; then
     esac
 
     # First check if cfitsio exists in $gammalib_prefix
+    if [test -f $gammalib_prefix/lib/libcfitsio$SHAREDSUFFIX -a \
+             -f $gammalib_prefix/include/fitsio.h]; then
+        add_gammalib_prefix="yes"
+        has_cfitsio="yes"
+        LIBDIR_CFITSIO="$gammalib_prefix/lib"
+        INCDIR_CFITSIO="$gammalib_prefix/include"
+    else
+
+        # Next search for cfitsio in standard path
+        AC_CHECK_LIB([cfitsio], [ffpss],
+                     [AC_MSG_NOTICE([cfitsio found])
+                      AC_CHECK_HEADER([fitsio.h],
+                                      [has_cfitsio="yes"
+                                       AC_MSG_NOTICE([cfitsio headers found])],
+                                      [], [])],
+                     [], [${cfitsio_deps}])
+
+        # If not found then make additional checks
+        if [test "x$has_cfitsio" != "xyes";] then
+            case $ac_sys_system in
+	            Darwin*) 
+                    if [test -f /opt/local/lib/libcfitsio$SHAREDSUFFIX -a \
+                             -f /opt/local/include/fitsio.h]; then
+                        add_opt_local="yes"
+                        has_cfitsio="yes"
+                        LIBDIR_CFITSIO="/opt/local/lib"
+                        INCDIR_CFITSIO="/opt/local/include"
+                    fi
+                    ;;
+                *)
+                    # OpenSUSE kluge
+                    if [test -f /usr/lib/libcfitsio$SHAREDSUFFIX -a \
+                             -f /usr/include/libcfitsio0/fitsio.h]; then
+                        has_cfitsio="yes"
+                        LIBDIR_CFITSIO="/usr/lib"
+                        INCDIR_CFITSIO="/usr/include/libcfitsio0"
+                    fi
+                    if [test -f /usr/lib64/libcfitsio$SHAREDSUFFIX -a \
+                             -f /usr/include/libcfitsio0/fitsio.h]; then
+                        has_cfitsio="yes"
+                        LIBDIR_CFITSIO="/usr/lib64"
+                        INCDIR_CFITSIO="/usr/include/libcfitsio0"
+                    fi
+                    # Scientific Linux, CentOS kluge
+                    if [test -f /usr/lib/libcfitsio$SHAREDSUFFIX -a \
+                             -f /usr/include/cfitsio/fitsio.h]; then
+                        has_cfitsio="yes"
+                        LIBDIR_CFITSIO="/usr/lib"
+                        INCDIR_CFITSIO="/usr/include/cfitsio"
+                    fi
+                    if [test -f /usr/lib64/libcfitsio$SHAREDSUFFIX -a \
+                             -f /usr/include/cfitsio/fitsio.h]; then
+                        has_cfitsio="yes"
+                        LIBDIR_CFITSIO="/usr/lib64"
+                        INCDIR_CFITSIO="/usr/include/cfitsio"
+                    fi
+                    # FreeBSD kluge
+                    if [test -f /usr/local/lib/libcfitsio$SHAREDSUFFIX -a \
+                             -f /usr/local/include/fitsio.h]; then
+                        has_cfitsio="yes"
+                        add_usr_local="yes"
+                        LIBDIR_CFITSIO="/usr/local/lib"
+                        INCDIR_CFITSIO="/usr/local/include"
+                    fi
+                    if [test -f /usr/local/lib64/libcfitsio$SHAREDSUFFIX -a \
+                             -f /usr/local/include/fitsio.h]; then
+                        has_cfitsio="yes"
+                        add_usr_local64="yes"
+                        LIBDIR_CFITSIO="/usr/local/lib64"
+                        INCDIR_CFITSIO="/usr/local/include"
+                    fi
+                    ;;
+            esac
+        fi
     
-    # Next search for cfitsio in standard path
-    AC_CHECK_LIB([cfitsio], [ffpss],
-                 [AC_MSG_NOTICE([cfitsio found])
-                  AC_CHECK_HEADER([fitsio.h],
-                                  [has_cfitsio="yes"
-                                   AC_MSG_NOTICE([cfitsio headers found])],
-                                  [], [])],
-                 [], [${cfitsio_deps}])
+    fi
+
 fi
 
 # If we have ncurses and readline then add readline support to GammaLib
