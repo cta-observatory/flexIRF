@@ -1,7 +1,10 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
+#############################################################################
+# Configuration file for flexIRF.                                           #
+# The whole file is composed of copy-pasted parts of the configuration      # 
+# file from GammaLib, by Juergen Knoedlseder, so all credits go to him      #
+#############################################################################
 AC_PREREQ([2.69])
-AC_INIT(irm, 0.6, thassan@ifae.es)
+AC_INIT(flexIRF, 0.6, thassan@ifae.es)
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([gnu no-dependencies -Wno-portability subdir-objects])
 
@@ -12,11 +15,26 @@ LT_INIT
 ACLOCAL_AMFLAGS="-I m4"
 
 
+#############################################################################
+# Set prefix                                                                #
+# ------------------------------------------------------------------------- #
+# By default, flexIRF gets installed into "/usr/local/flexIRF".  The default #
+# can be overwritten using the --prefix option.                             #
+#############################################################################
+AC_PREFIX_DEFAULT([/usr/local/flexIRF])
+if test "x$prefix" = xNONE; then
+  flexIRF_prefix="/usr/local/flexIRF"
+else
+  flexIRF_prefix=${prefix}
+fi
+AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], "${flexIRF_prefix}", [Location where library is installed])
+
 
 #############################################################################
 # Determine source directory for unit testing                               #
 #############################################################################
 PACKAGE_SOURCE=`pwd`
+flexIRF_prefix=${PACKAGE_SOURCE}
 AC_DEFINE_UNQUOTED([PACKAGE_SOURCE], "${PACKAGE_SOURCE}", [Location where source is installed])
 AC_SUBST(PACKAGE_SOURCE)
 
@@ -112,13 +130,13 @@ if [test "x$with_cfitsio" = "xyes"]; then
         *)            cfitsio_deps="-lm" ;;
     esac
 
-    # First check if cfitsio exists in $gammalib_prefix
-    if [test -f $gammalib_prefix/lib/libcfitsio$SHAREDSUFFIX -a \
-             -f $gammalib_prefix/include/fitsio.h]; then
-        add_gammalib_prefix="yes"
+    # First check if cfitsio exists in $flexIRF_prefix
+    if [test -f $flexIRF_prefix/lib/libcfitsio$SHAREDSUFFIX -a \
+             -f $flexIRF_prefix/include/fitsio.h]; then
+        add_flexIRF_prefix="yes"
         has_cfitsio="yes"
-        LIBDIR_CFITSIO="$gammalib_prefix/lib"
-        INCDIR_CFITSIO="$gammalib_prefix/include"
+        LIBDIR_CFITSIO="$flexIRF_prefix/lib"
+        INCDIR_CFITSIO="$flexIRF_prefix/include"
     else
 
         # Next search for cfitsio in standard path
@@ -192,7 +210,7 @@ if [test "x$with_cfitsio" = "xyes"]; then
 
 fi
 
-# If we have ncurses and readline then add readline support to GammaLib
+# If we have ncurses and readline then add readline support to flexIRF
 if [test "x$has_cfitsio" = "xyes"]; then
     AC_DEFINE([HAVE_LIBCFITSIO], [1], [Define if cfitsio library is available])
     LIBS="${LIBS} -lcfitsio ${cfitsio_deps}"
@@ -204,8 +222,27 @@ AM_CONDITIONAL(WITH_CFITSIO, test "x$has_cfitsio" = "xyes")
 #############################################################################
 # Add compiler flags                                                        #
 #############################################################################
+if [test "x$INCDIR_READLINE" != x]; then
+    CPPFLAGS="$CPPFLAGS -I$INCDIR_READLINE"
+fi
 if [test "x$INCDIR_CFITSIO" != x]; then
     CPPFLAGS="$CPPFLAGS -I$INCDIR_CFITSIO"
+fi
+if [test "x$add_flexIRF_prefix" = "xyes"]; then
+    LDFLAGS="$LDFLAGS -L$flexIRF_prefix/lib"
+    TEST_ENV_DIR="$TEST_ENV_DIR:$flexIRF_prefix/lib"
+fi
+if [test "x$add_opt_local" = "xyes"]; then
+    LDFLAGS="$LDFLAGS -L/opt/local/lib"
+    #TEST_ENV_DIR="$TEST_ENV_DIR:/opt/local/lib"
+fi
+if [test "x$add_usr_local" = "xyes"]; then
+    LDFLAGS="$LDFLAGS -L/usr/local/lib"
+    TEST_ENV_DIR="$TEST_ENV_DIR:/usr/local/lib"
+fi
+if [test "x$add_usr_local64" = "xyes"]; then
+    LDFLAGS="$LDFLAGS -L/usr/local/lib64"
+    TEST_ENV_DIR="$TEST_ENV_DIR:/usr/local/lib64"
 fi
 
 
@@ -239,8 +276,8 @@ fi
 #############################################################################
 # Checks if Python bindings are to be build                                 #
 # ------------------------------------------------------------------------- #
-# Python binding requires Python and either the files gammalib_wrap.cpp and #
-# gammalib.py or swig to create these files.  The following conditionals    #
+# Python binding requires Python and either the files flexIRF_wrap.cpp and #
+# flexIRF.py or swig to create these files.  The following conditionals    #
 # are set:                                                                  #
 # WITH_PYTHON - Python bindings will be built                               #
 # HAVE_SWIG   - swig is available                                           #
