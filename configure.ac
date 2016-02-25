@@ -70,6 +70,40 @@ if test `uname -s` = "Darwin"; then
   fi
 fi
 
+#############################################################################
+# Set name for machine-dependent library files                              #
+#############################################################################
+AC_SUBST(MACHDEP)
+AC_MSG_CHECKING(MACHDEP)
+if test -z "$MACHDEP"; then
+    ac_sys_system=`uname -s`
+	if test "$ac_sys_system" = "AIX" \
+	-o "$ac_sys_system" = "UnixWare" -o "$ac_sys_system" = "OpenUNIX"; then
+		ac_sys_release=`uname -v`
+	else
+		ac_sys_release=`uname -r`
+	fi
+	ac_md_system=`echo $ac_sys_system |
+			   tr -d '[/ ]' | tr '[[A-Z]]' '[[a-z]]'`
+	ac_md_release=`echo $ac_sys_release |
+			   tr -d '[/ ]' | sed 's/^[[A-Z]]\.//' | sed 's/\..*//'`
+
+    # Set MACHDEP
+    MACHDEP="$ac_md_system$ac_md_release"
+    case $MACHDEP in
+    cygwin*) MACHDEP="cygwin";;
+    darwin*) MACHDEP="darwin";;
+    atheos*) MACHDEP="atheos";;
+    irix646) MACHDEP="irix6";;
+    '')	MACHDEP="unknown";;
+    esac
+fi
+AC_MSG_CHECKING(machine type as reported by uname -m)
+ac_sys_machine=`uname -m`
+AC_MSG_RESULT($ac_sys_machine)
+
+
+
 # Our language is C++
 AC_LANG(C++)
 AC_PROG_CXX($cxx_list)
