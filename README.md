@@ -6,6 +6,19 @@ FlexIRF, developed as a test bench for the future Cherenkov Telescope Array Data
 
 The code is written in C++, making use of the CFITSIO library. Few dependencies, to be removed in the future, make use of ROOT libraries (current standard in gamma-ray astronomy).
 
+
+Dependencies
+--------------
+
+Currently, the software uses the following dependencies:
+
+git dpkg-dev make g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev cmake autoconf 
+
+It also uses CFITSIO library ("libcfitsio3" "libcfitsio3-dev" packages on ubuntu machines) and swig, although with no python working wrapper yet.
+
+ROOT is currently also used for some executables, but will be removed in the close future.
+
+
 Installation
 --------------
 
