@@ -1,7 +1,7 @@
 #############################################################################
 # Configuration file for flexIRF.                                           #
-# The whole file is composed of copy-pasted parts of the configuration      # 
-# file from GammaLib, by Juergen Knoedlseder, so all credits go to him      #
+# The whole file is copy-pasted from the configuration file from GammaLib,  #
+# by Juergen Knoedlseder, so all credits go to him, and GammaLib developers #
 #############################################################################
 AC_PREREQ([2.69])
 AC_INIT(flexIRF, 0.6, thassan@ifae.es)
@@ -34,7 +34,6 @@ AC_DEFINE_UNQUOTED([PACKAGE_PREFIX], "${flexIRF_prefix}", [Location where librar
 # Determine source directory for unit testing                               #
 #############################################################################
 PACKAGE_SOURCE=`pwd`
-flexIRF_prefix=${PACKAGE_SOURCE}
 AC_DEFINE_UNQUOTED([PACKAGE_SOURCE], "${PACKAGE_SOURCE}", [Location where source is installed])
 AC_SUBST(PACKAGE_SOURCE)
 
@@ -57,7 +56,15 @@ AC_CANONICAL_HOST
 #                                                                           #
 # A special kluge was added for Mac OS X >=10.7. As Apple switched to clang #
 # we search from this version on for the clang compiler.                    #
+#                                                                           #
+# We also signal whether Mac OS X >=10.9 (Mavericks) and Mac OS X >=10.11   #
+# (El Capitan).                                                             #
 #############################################################################
+# Set default Mac OS X version flags
+osx_lion=no
+osx_mavericks=no
+osx_el_capitan=no
+
 # Set default compiler lists
 cxx_list="g++ c++ gpp aCC CC cxx cc++ cl.exe FCC KCC RCC xlC_r xlC clang++"
 cc_list="gcc cc cl.exe clang"
@@ -101,6 +108,7 @@ AM_CONDITIONAL(IS_ELCAPITAN, test "x$osx_el_capitan" = "xyes")
 AC_LANG(C++)
 AC_PROG_CXX($cxx_list)
 AC_PROG_CC($cc_list)
+
 
 #############################################################################
 # Darwin option: Determine architecture of universal library to be built    #
@@ -190,7 +198,6 @@ if [test "${withval}"]; then
 fi
 
 
-
 #############################################################################
 # Set name for machine-dependent library files                              #
 #############################################################################
@@ -274,6 +281,225 @@ esac
 AC_MSG_RESULT($RUNSHARED)
 AC_SUBST(SHAREDSUFFIX)
 AC_SUBST(RUNSHARED)
+
+
+#############################################################################
+# Set -arch flags for universal builds on OSX and tweak BASECFLAGS based on #
+# compiler and platform (note that BASECFLAGS are not yet used).            #
+#############################################################################
+# Initialise the -arch flags for universal builds on OSX
+UNIVERSAL_ARCH_FLAGS=
+AC_SUBST(UNIVERSAL_ARCH_FLAGS)
+
+# Tweak BASECFLAGS based on compiler and platform
+case $GCC in
+yes)
+
+    # if using gcc on alpha, use -mieee to get (near) full IEEE 754
+    # support.  Without this, treatment of subnormals doesn't follow
+    # the standard.
+    case $ac_sys_machine in
+        alpha*)
+            BASECFLAGS="$BASECFLAGS -mieee"
+            ;;
+    esac
+
+    case $ac_sys_system in
+	SCO_SV*)
+	    BASECFLAGS="$BASECFLAGS -m486 -DSCO5"
+	    ;;
+	# is there any other compiler on Darwin besides gcc?
+	Darwin*)
+	    # -Wno-long-double, -no-cpp-precomp, and -mno-fused-madd
+	    # used to be here, but non-Apple gcc doesn't accept them.
+	    if test "${CC}" = gcc; then
+            AC_MSG_CHECKING(which compiler should be used)
+		    case "${UNIVERSALSDK}" in
+		    */MacOSX10.4u.sdk)
+			    # Build using 10.4 SDK, force usage of gcc when the 
+			    # compiler is gcc, otherwise the user will get very
+			    # confusing error messages when building on OSX 10.6
+			    CC=gcc-4.0
+			    CXX=g++-4.0
+			    CPP=cpp-4.0
+                ac_ct_CC="$CC"
+                ac_ct_CXX="$CXX"
+                ac_cv_prog_ac_ct_CC="$ac_ct_CC"
+                ac_cv_prog_ac_ct_CXX="$ac_ct_CXX"
+			    ;;
+		    esac
+		    AC_MSG_RESULT($CXX)
+        fi
+
+	    # Calculate the right deployment target for this build. x86_64
+        # support is only available in SDK 10.5, hence any build including
+        # a x86_64 target needs 10.5. i386 came in in SDK 10.4, hence we
+        # need 10.4 for a 32-bit build.
+	    cur_target=`sw_vers -productVersion | sed 's/\(10\.[[0-9]]*\).*/\1/'`
+	    if test ${cur_target} '>' 10.2; then
+		    cur_target=10.3
+		    if test ${enable_universalsdk}; then
+			    if test "${UNIVERSAL_ARCHS}" = "all"; then
+				    # Ensure that the default platform for a 
+				    # 4-way universal build is OSX 10.5, 
+				    # that's the first OS release where 
+				    # 4-way builds make sense.
+				    cur_target='10.5'
+			    elif test "${UNIVERSAL_ARCHS}" = "3-way"; then
+				    cur_target='10.5'
+			    elif test "${UNIVERSAL_ARCHS}" = "intel"; then
+				    cur_target='10.5'
+			    elif test "${UNIVERSAL_ARCHS}" = "64-bit"; then
+				    cur_target='10.5'
+			    elif test "${UNIVERSAL_ARCHS}" = "32-bit"; then
+				    cur_target='10.4'
+			    fi
+		    else
+			    if test `/usr/bin/arch` = "i386"; then
+				    # On Intel macs default to a deployment
+				    # target of 10.4, that's the first OSX
+				    # release with Intel support.
+				    cur_target="10.4"
+			    fi
+		    fi
+	    fi
+	    CONFIGURE_MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET-${cur_target}}
+        
+        # Make sure that deployment target is >= SDK
+        case "${UNIVERSALSDK}" in
+        */MacOSX10.4u.sdk)
+            if [test ${cur_target} '>' 10.4;] then
+	            AC_MSG_ERROR([Invalid MACOSX_DEPLOYMENT_TARGET=$CONFIGURE_MACOSX_DEPLOYMENT_TARGET for SDK 10.4. Specify --enable-universalsdk=/Developer/SDKs/MacOSX${cur_target}.sdk])
+            fi
+            ;;
+        */MacOSX10.5.sdk)
+            if [test ${cur_target} '>' 10.5;] then
+	            AC_MSG_ERROR([Invalid MACOSX_DEPLOYMENT_TARGET=$CONFIGURE_MACOSX_DEPLOYMENT_TARGET for SDK 10.5. Specify --enable-universalsdk=/Developer/SDKs/MacOSX${cur_target}.sdk])
+            fi
+            ;;
+        */MacOSX10.6.sdk)
+            if [test ${cur_target} '>' 10.6;] then
+	            AC_MSG_ERROR([Invalid MACOSX_DEPLOYMENT_TARGET=$CONFIGURE_MACOSX_DEPLOYMENT_TARGET for SDK 10.6. Specify --enable-universalsdk=/Developer/SDKs/MacOSX${cur_target}.sdk])
+            fi
+            ;;
+        esac
+	    
+        # Set compile, link and pre-processor flags dependent on architecture
+	    if test "${enable_universalsdk}"; then
+
+	        # Make sure that MACOSX_DEPLOYMENT_TARGET is set in the 
+	        # environment with a value that is the same as what we'll use
+	        # in the Makefile to ensure that we'll get the same compiler
+	        # environment during configure and build time.
+	        MACOSX_DEPLOYMENT_TARGET="$CONFIGURE_MACOSX_DEPLOYMENT_TARGET"
+	        export MACOSX_DEPLOYMENT_TARGET
+	        EXPORT_MACOSX_DEPLOYMENT_TARGET=''
+
+		    UNIVERSAL_ARCH_FLAGS=""
+	        if test "$UNIVERSAL_ARCHS" = "32-bit" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch ppc -arch i386"
+		        ARCH_RUN_32BIT=""
+		        LIPO_32BIT_FLAGS=""
+            elif test "$UNIVERSAL_ARCHS" = "64-bit" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch ppc64 -arch x86_64"
+		        LIPO_32BIT_FLAGS=""
+		        ARCH_RUN_32BIT="true"
+            elif test "$UNIVERSAL_ARCHS" = "all" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch i386 -arch ppc -arch ppc64 -arch x86_64"
+		        LIPO_32BIT_FLAGS="-extract ppc7400 -extract i386"
+		        ARCH_RUN_32BIT="/usr/bin/arch -i386 -ppc"
+            elif test "$UNIVERSAL_ARCHS" = "intel" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch i386 -arch x86_64"
+		        LIPO_32BIT_FLAGS="-extract i386"
+		        ARCH_RUN_32BIT="/usr/bin/arch -i386"
+            elif test "$UNIVERSAL_ARCHS" = "3-way" ; then
+		        UNIVERSAL_ARCH_FLAGS="-arch i386 -arch ppc -arch x86_64"
+		        LIPO_32BIT_FLAGS="-extract ppc7400 -extract i386"
+		        ARCH_RUN_32BIT="/usr/bin/arch -i386 -ppc"
+		    else
+	            AC_MSG_ERROR([proper usage is --with-universal-arch=ppc|i386|ppc64|x86_64|32-bit|64-bit|all|intel|3-way])
+		    fi
+		    CXXFLAGS="${UNIVERSAL_ARCH_FLAGS} ${CXXFLAGS}"
+		    if test "${UNIVERSALSDK}" != "/"; then
+			    CPPFLAGS="-isysroot ${UNIVERSALSDK} ${CPPFLAGS}"
+			    LDFLAGS="-isysroot ${UNIVERSALSDK} ${LDFLAGS}"
+			    CXXFLAGS="-isysroot ${UNIVERSALSDK} ${CXXFLAGS}"
+		    fi
+	    fi
+	    ;;
+	OSF*)
+	    BASECFLAGS="$BASECFLAGS -mieee"
+	    ;;
+    esac
+    ;;
+*)
+    case $ac_sys_system in
+    OpenUNIX*|UnixWare*)
+	BASECFLAGS="$BASECFLAGS -K pentium,host,inline,loop_unroll,alloca "
+	;;
+    OSF*)
+	BASECFLAGS="$BASECFLAGS -ieee -std"
+    	;;
+    SCO_SV*)
+	BASECFLAGS="$BASECFLAGS -belf -Ki486 -DSCO5"
+	;;
+    esac
+    ;;
+esac
+
+#############################################################################
+# Checks for debugging and profiling options                                #
+#############################################################################
+# Check for debugging option
+AC_MSG_CHECKING(whether to enable debugging)
+AC_ARG_ENABLE([debug],
+              AS_HELP_STRING([--enable-debug],
+                             [turn on debugging [default=no]]),
+              [enable_debug="$enableval"],
+              [enable_debug="no"])
+if test "x$enable_debug" = "xyes"; then
+  CFLAGS="$CFLAGS -g"
+  CXXFLAGS="$CXXFLAGS -g"
+  FFLAGS="$FFLAGS -g"
+  AC_DEFINE([G_DEBUG], [1], [Define if debugging is turned on])
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
+# Check for profiling option
+AC_MSG_CHECKING(whether to enable profiling)
+AC_ARG_ENABLE([profiling],
+              AS_HELP_STRING([--enable-profiling],
+                             [turn on profiling [default=no]]),
+              [enable_profiling="$enableval"],
+              [enable_profiling="no"])
+if test "x$enable_profiling" = "xyes"; then
+  CFLAGS="$CFLAGS -pg"
+  CXXFLAGS="$CXXFLAGS -pg"
+  FFLAGS="$FFLAGS -pg"
+  AC_DEFINE([G_PROFILE], [1], [Define if profiling is turned on])
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
+
+#############################################################################
+# Set linker options                                                        #
+#############################################################################
+case $ac_sys_system/$ac_sys_release in
+Darwin/*)
+    # Use -undefined dynamic_lookup whenever possible (10.3 and later).
+    # This allows an extension to be used in any Python
+    #if test ${MACOSX_DEPLOYMENT_TARGET} '>' 10.2; then
+        if test "${enable_universalsdk}"; then
+            LDFLAGS="${UNIVERSAL_ARCH_FLAGS} -isysroot ${UNIVERSALSDK} ${LDFLAGS}"
+        fi
+    #fi
+    ;;
+esac
+
 
 
 # Checks for libraries.
