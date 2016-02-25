@@ -426,10 +426,25 @@ AC_CONFIG_FILES([Makefile
 
 
 
-
-
-
 # Checks for library functions.
 AC_FUNC_MALLOC
 
 AC_OUTPUT
+
+
+#############################################################################
+# Print configuration summary to console                                    #
+#############################################################################
+echo
+echo "  flexIRF configuration summary"
+echo "  =============================="
+if test "x$has_cfitsio" = "xyes"; then
+  echo "  * FITS I/O support             (yes)   $LIBDIR_CFITSIO $INCDIR_CFITSIO"
+else
+  echo "  - FITS I/O support             (no)    no cfitsio library found"
+fi
+
+# Dump next step information
+echo
+echo "Now type 'make'"
+echo
