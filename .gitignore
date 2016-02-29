@@ -98,10 +98,8 @@ BGRate.fits
 DiffSens.fits
 EffectiveAreaEtrue.fits
 MigMatrix.fits
-alltest.fits
-testEffArea.fits
 plot.png
-testParamEffArea.fits
+
 
 
 #  From compilation  #

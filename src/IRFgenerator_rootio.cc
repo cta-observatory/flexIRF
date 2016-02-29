@@ -303,7 +303,7 @@ void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
   irf->AddPdf(mypdf);
 
   // Write the IRF to file                                                                                            
-  string fitsout="!"+histname+".fits";
+  string fitsout="!examples/"+histname+".fits";
   irf->Write(fitsout);
 
 }//ends makeFITS

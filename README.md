@@ -41,7 +41,7 @@ Although this project still lacks propper documentation, several very simple mac
 
 IRFsimpleWriteIrf.cc:
 
-This simple macro generates a fits file "testEffArea.fits" containing a mock effective area into a FITS file. To run it, simply execute:
+This simple macro generates a fits file "examples/testEffArea.fits" containing a mock effective area into a FITS file. To run it, simply execute:
 
 ```shell
 bin/IRFsimpleWriteIrf
@@ -52,12 +52,22 @@ It shows how "AxisType", "VarType" and other variables are used in the definitio
 
 IRFsimpleReadIrf.cc:
 
-Similarly as the previous example, this macro reads a the previously generated "testEffArea.fits", loading it into a GIRF object, extracting the effective area as a "GIRFPdf" and printing (& drawing, if you have ROOT properly installed, generating the "plot.png" file). To run it, execute:
+This script reads a the previously generated "examples/testEffArea.fits", loading it into a GIRF object, extracting the effective area as a "GIRFPdf" and printing (& drawing, if you have ROOT properly installed, generating the "plot.png" file). To run it, execute:
 
 ```shell
 bin/IRFsimpleReadIrf
 ```
 Note the use of the "GIRFConfig" class, used to extract the IRF with a specific configuration and valid range. 
+
+
+IRFsimpleWriteParamIrf.cc: 
+
+Similarly as in the "IRFsimpleWriteIrf", this script writes a parameterized effective area (1D gaussian) into a FITS file, stored in "examples/testParamEffArea.fits":
+
+```shell
+bin/IRFsimpleWriteParamIrf
+```
+
 
 **More examples will soon be added.**
 

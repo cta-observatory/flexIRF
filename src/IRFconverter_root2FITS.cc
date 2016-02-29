@@ -403,7 +403,7 @@ void IRFconverter_root2FITS_irfGenND(TFile *paramfile, GIRF* irf,
   irf->AddPdf(mypdf);
 
   // Write the IRF to file                                                                                            
-  string fullfile="alltest";
+  string fullfile="examples/testRoot2FITS_converter";
   string fitsout="!"+fullfile+".fits";
 
   cout<<endl;
