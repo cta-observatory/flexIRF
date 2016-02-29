@@ -51,7 +51,7 @@ int main()
 	config.Print();
 
 //	Set filename storing the IRF information, previously generated with bin/IRFsimpleWriteIrf executable.
-	string filename = "testEffArea.fits";
+	string filename = "examples/testEffArea.fits";
 
 //	Build GIRF object
 	GIRF irf(filename);

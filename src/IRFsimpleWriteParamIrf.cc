@@ -26,43 +26,38 @@ using namespace std;
 int main()
 {
 
-	int const numBins=9;
-
-//	Create arbitrary energy bin "low edges" values (numBins+1):
-	vector<float> axisEdges;
-	for (int i=0;i<(numBins+1);i++) axisEdges.push_back(-2+(i*0.5));
-
-//	Create arbitrary effective area values (numBins):
-	vector<float> pdfData;
-	pdfData.push_back(600);
-	pdfData.push_back(2200);
-	pdfData.push_back(10000);
-	pdfData.push_back(40000);
-	pdfData.push_back(90000);
-	pdfData.push_back(200000);
-	pdfData.push_back(300000);
-	pdfData.push_back(300000);
-	pdfData.push_back(300000);
-
-//	Define required information to build a GIRFAxis object.
-    AxisType axis_type = kBins;							// Not necessary, as it is already fixed by using the "GIRFAxisBins"
-    VarType  var_type  = kEnergy;
+//	Axis parameterization will be done in log scale
     bool               islog    = 1;
-    int                size     = axisEdges.size();
-    float*             axisData  = axisEdges.data();
 
-//  Build GIRFAxis object.
-    GIRFAxis* axis = new GIRFAxisBins(var_type,size,axisData,islog);
+//  Instanciate AxisParameterization class, to define a parameterization.
+	AxisParameterization param;
+//	Define parameterization formula, valid range and number of parameters. All will be stored into the FITS file with dedicated keywords.
+//	Note ROOT's "TF1" sintax is currently used.
+	param.formula = "gaus";
+	param.validRangeLow= -2;
+	param.validRangeHigh= 2;
+	param.numParameters= 3;
+
+//	Create the axis (in this case, of GIRFAxisParam type) and specify its type, and scale (log).
+	GIRFAxisParam* axis1 = new GIRFAxisParam(kEnergy, islog);
+	axis1->SetAxisParam(param);
+	axis1->Print();
+
+//	Create arbitrary parameters of an effective area gaussian fit:
+	vector<float> pdfData;
+	pdfData.push_back(2.68E06);
+	pdfData.push_back(1.83);
+	pdfData.push_back(1.03);
 
 //  Build GIRFPdf object, using both pdfData and the generated axis.
 	GIRFPdf*   myIrfToStore   = new GIRFPdf(kAeff,kNumber);
 	myIrfToStore->SetData(pdfData.data());
-	myIrfToStore->AddAxis(axis);
+	myIrfToStore->AddAxis(axis1);
 
 //  Build GIRF object, introduce the generated GIRFPdf object and write it into a fits file.
 	GIRF irf;
 	irf.AddPdf(myIrfToStore);
-	irf.Write("!examples/testEffArea.fits");
+	irf.Write("!examples/testParamEffArea.fits");
 
 	return 0;
 }//Ends main

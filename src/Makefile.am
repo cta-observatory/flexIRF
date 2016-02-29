@@ -10,7 +10,13 @@ AM_LDFLAGS = -L@ROOTLIBDIR@ @ROOTGLIBS@ @ROOTLIBS@ @LIBS@ -L$(top_builddir)/flex
 # Program name
 #bin_PROGRAMS = IRFsimpleTests
 #bin_PROGRAMS = IRFconverter_root2FITS IRFsimpleTests
-bin_PROGRAMS = $(top_builddir)/bin/IRFconverter_root2FITS $(top_builddir)/bin/IRFgenerator_rootio $(top_builddir)/bin/IRFsimpleReadIrf $(top_builddir)/bin/IRFsimpleWriteIrf 
+bin_PROGRAMS = \
+		$(top_builddir)/bin/IRFconverter_root2FITS \
+		$(top_builddir)/bin/IRFgenerator_rootio \
+		$(top_builddir)/bin/IRFsimpleReadIrf \
+		$(top_builddir)/bin/IRFsimpleWriteIrf \
+		$(top_builddir)/bin/IRFsimpleWriteParamIrf 
+		 
 
 # $(top_builddir)/bin/IRFsimpleTests
 # $(top_builddir)/bin/IRFmerger_fitsio
@@ -33,13 +39,18 @@ __top_builddir__bin_IRFgenerator_rootio_LDFLAGS = ${AM_LDFLAGS}
 # __top_builddir__bin_IRFmerger_fitsio_CXXFLAGS = ${AM_CPPFLAGS}
 # __top_builddir__bin_IRFmerger_fitsio_LDFLAGS = ${AM_LDFLAGS}  
 
+__top_builddir__bin_IRFsimpleReadIrf_SOURCES = IRFsimpleReadIrf.cc
+__top_builddir__bin_IRFsimpleReadIrf_CXXFLAGS = ${AM_CPPFLAGS}
+__top_builddir__bin_IRFsimpleReadIrf_LDFLAGS = ${AM_LDFLAGS} 
+
 __top_builddir__bin_IRFsimpleWriteIrf_SOURCES = IRFsimpleWriteIrf.cc
 __top_builddir__bin_IRFsimpleWriteIrf_CXXFLAGS = ${AM_CPPFLAGS}
 __top_builddir__bin_IRFsimpleWriteIrf_LDFLAGS = ${AM_LDFLAGS} 
 
-__top_builddir__bin_IRFsimpleReadIrf_SOURCES = IRFsimpleReadIrf.cc
-__top_builddir__bin_IRFsimpleReadIrf_CXXFLAGS = ${AM_CPPFLAGS}
-__top_builddir__bin_IRFsimpleReadIrf_LDFLAGS = ${AM_LDFLAGS} 
+__top_builddir__bin_IRFsimpleWriteParamIrf_SOURCES = IRFsimpleWriteParamIrf.cc
+__top_builddir__bin_IRFsimpleWriteParamIrf_CXXFLAGS = ${AM_CPPFLAGS}
+__top_builddir__bin_IRFsimpleWriteParamIrf_LDFLAGS = ${AM_LDFLAGS} 
+
 
 # __top_builddir__bin_IRFsimpleTests_SOURCES = IRFsimpleTests.cc
 # __top_builddir__bin_IRFsimpleTests_CXXFLAGS = ${AM_CPPFLAGS}
