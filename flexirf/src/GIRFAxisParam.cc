@@ -118,8 +118,8 @@ bool GIRFAxisParam::ContainsRange(AxisRange axisRange) {
 	if (axisRange.varType != GetVarType())
 		return 0;							//Sanity check
 	else {
-		if (axisRange.lowRange > GetRangeMin()
-				&& axisRange.highRange < GetRangeMax()){
+		if (axisRange.lowRange >= GetRangeMin()
+				&& axisRange.highRange <= GetRangeMax()){
 			return 1;
 		}
 

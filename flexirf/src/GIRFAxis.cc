@@ -201,6 +201,8 @@ void GIRFAxis::SetVarType(string axisVarName) {
 //
 std::string GIRFAxis::GetVarUnit() const {
 
+	//TODO: Build a separate GIRFAxis units enum, which is read/written from the FITS file.
+
 	string axisVarType;
 
 	switch (fVarType) {

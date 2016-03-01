@@ -449,7 +449,11 @@ GIRFPdf* GIRF::ReadPdf(PdfVar pdfVar, GIRFConfig config) {
 	// 		- return Pdf
 
 
-	return extractedPdf;
+	if (extractedPdf->IsEmpty()) {
+		cout << "Extracted pdf is empty!" << endl;
+		return NULL;
+	}
+	else return extractedPdf;
 
 }
 
