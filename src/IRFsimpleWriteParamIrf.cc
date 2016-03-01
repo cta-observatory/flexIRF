@@ -2,7 +2,7 @@
 !                                                                                                                            
 !   Author(s): Tarek Hassan, John E Ward, Javier Rico     12/2014 <mailto:thassan@ifae.es>
 !                                                                                                                               
-!   Copyright: CTA Software Development, 2014                                                                           
+!   Copyright: CTA Software Development, 2016
 !                                                                                                                                          
 \* ======================================================================== */
 

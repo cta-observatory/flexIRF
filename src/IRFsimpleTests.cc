@@ -1,34 +1,15 @@
 /* ======================================================================== *\                                      
 !                                                                                                                            
-!   Author(s): John E Ward, Javier Rico     12/2014 <mailto:jward@ifae.es>                                                           
+!   Author(s): Tarek Hassan, John E Ward, Javier Rico     12/2014 <mailto:thassan@ifae.es>
 !                                                                                                                               
-!   Copyright: CTA Software Development, 2014                                                                           
+!   Copyright: CTA Software Development, 2016
 !                                                                                                                                          
 \* ======================================================================== */
-
-//#include <iostream>
-//#include <sstream>
-//#include <fstream>
-//#include <string>
-//#include <iterator>
-//#include <iomanip>
-//#include <math.h>
 
 //GIRF includes
 #include "GIRF.h"
 
-//FITS includes
-//#include "fitsio.h"
-
-//#include "rootincludes.h"
-
 using namespace std;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-// Declare functions here
-//
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
