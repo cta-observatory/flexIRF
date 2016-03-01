@@ -60,10 +60,16 @@ void GIRFPdf::Draw(string filename, string drawOption) const {
 		GIRFAxisParam* axisParam = dynamic_cast<GIRFAxisParam*>(fAxis[0]);
 		GIRFAxisBins* axisBins = dynamic_cast<GIRFAxisBins*>(fAxis[0]);
 		if (axisParam){
+
 			cout << "Formula: " << axisParam->GetFormula().data() << endl;
 			TF1* pdf = new TF1(GetExtName().data(), axisParam->GetFormula().data(), (float) axisParam->GetRangeMin(), (float) axisParam->GetRangeMax());
 			for (int i=0;i<axisParam->GetNumPars();i++) pdf->SetParameter(i,fData[i]);
 			TCanvas c1;
+			TString xTitle = (TString)axisParam->GetVarName() + " [" + (TString)axisParam->GetVarUnit() + "]";;
+			TString yTitle = (TString)GetVarName() + " [" + (TString)GetVarUnit() + "]";;
+			pdf->SetTitle((TString)GetExtName());
+			pdf->GetXaxis()->SetTitle(xTitle);
+			pdf->GetYaxis()->SetTitle(yTitle);
 			if (drawOption.find("logy")) c1.SetLogy();
 			pdf->Draw();
 			if (filename == "") c1.SaveAs("plot.png");
@@ -76,6 +82,11 @@ void GIRFPdf::Draw(string filename, string drawOption) const {
 				pdf->SetBinContent(i,fData[i-1]);
 			}
 			TCanvas c1;
+			TString xTitle = (TString)axisBins->GetVarName() + " [" + (TString)axisBins->GetVarUnit() + "]";;
+			TString yTitle = (TString)GetVarName() + " [" + (TString)GetVarUnit() + "]";;
+			pdf->GetXaxis()->SetTitle(xTitle);
+			pdf->GetYaxis()->SetTitle(yTitle);
+			pdf->SetStats(0);
 			std::size_t logY = drawOption.find("logY");
 			if (logY!=std::string::npos) c1.SetLogy();
 			pdf->Draw();
@@ -98,7 +109,7 @@ void GIRFPdf::Draw(string filename, string drawOption) const {
 			cout << "2D Parametrized axis are not yet supported... (yet!) :)" << endl;
 			return;
 		}
-		if (axisBins1 && axisBins2){
+		else if (axisBins1 && axisBins2){
 			TH2F *pdf = new TH2F("pdf", GetExtName().data(), axisBins1->GetSize()-1, axisBins1->GetAxisBins().data(), axisBins2->GetSize()-1, axisBins2->GetAxisBins().data());
 
 			for (int i=0;i<axisBins1->GetSize();i++){
@@ -196,39 +207,41 @@ std::string GIRFPdf::GetVarName() const {
 //
 std::string GIRFPdf::GetVarUnit() const {
 
-	string axisVarType;
+	//TODO: Build a separate GIRFPdf units enum, which is read/written from the FITS file.
+
+	string pdfVarType;
 
 	switch (fPdfVar) {
 	case kEfficiency:
-		axisVarType = "";
+		pdfVarType = "";
 		break;
 	case kEDispersion:
-		axisVarType = "log10(TeV)";
+		pdfVarType = "log10(TeV)";
 		break;
 	case kPsf:
-		axisVarType = "deg";
+		pdfVarType = "deg";
 		break;
 	case kBkgRate:
-		axisVarType = "events*s^-1";
+		pdfVarType = "events*s^-1";
 		break;
 	case kBkgRateSqDeg:
-		axisVarType = "events*s^-1*deg^-2";
+		pdfVarType = "events*s^-1*deg^-2";
 		break;
 	case kDiffSens:
-		axisVarType = "erg*cm^-2*s^-1";
+		pdfVarType = "erg*cm^-2*s^-1";
 		break;
 	case kAeff:
-		axisVarType = "m^2";
+		pdfVarType = "m^2";
 		break;
 	case kAeffNoTheta2Cut:
-		axisVarType = "m^2";
+		pdfVarType = "m^2";
 		break;
 	default:
 		cout << "Incorrect variable type.\n";
-		return axisVarType;
+		return pdfVarType;
 	}
 
-	return axisVarType;
+	return pdfVarType;
 }
 
 
