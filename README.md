@@ -37,9 +37,9 @@ Although we DON'T recommend it, if you want to link generated libraries into you
 Documentation
 --------------
 
-Although this project still lacks propper documentation, several very simple macros were created to show simple use cases of the different classes:
+Although this project still lacks proper documentation, several very simple macros were created to show the typical use cases of the different classes:
 
-IRFsimpleWriteIrf.cc:
+**IRFsimpleWriteIrf.cc**:
 
 This simple macro generates a fits file "examples/testEffArea.fits" containing a mock effective area into a FITS file. To run it, simply execute:
 
@@ -50,26 +50,29 @@ bin/IRFsimpleWriteIrf
 It shows how "AxisType", "VarType" and other variables are used in the definition of a "GIRFAxis" object, and then how the IRF element is created using a "GIRFPdf" and introduced into the generic "GIRF".
 
 
-IRFsimpleReadIrf.cc:
+**IRFsimpleWriteParamIrf.cc**: 
 
-This script reads a the previously generated "examples/testEffArea.fits", loading it into a GIRF object, extracting the effective area as a "GIRFPdf" and printing (& drawing, if you have ROOT properly installed, generating the "plot.png" file). To run it, execute:
-
-```shell
-bin/IRFsimpleReadIrf
-```
-Note the use of the "GIRFConfig" class, used to extract the IRF with a specific configuration and valid range. 
-
-
-IRFsimpleWriteParamIrf.cc: 
-
-Similarly as in the "IRFsimpleWriteIrf", this script writes a parameterized effective area (1D gaussian) into a FITS file, stored in "examples/testParamEffArea.fits":
+Similarly as "IRFsimpleWriteIrf", this script writes a parameterized effective area (1D gaussian) into a FITS file, stored in "examples/testParamEffArea.fits":
 
 ```shell
 bin/IRFsimpleWriteParamIrf
 ```
 
+**IRFsimpleReadIrf.cc**:
 
-**More examples will soon be added.**
+This script reads a previously generated GIRF FITS file (such as "examples/testEffArea.fits" or "examples/testParamEffArea.fits"), loading it into a GIRF object, extracting an effective area as a "GIRFPdf" and printing it (& drawing it, if you have ROOT properly installed, generating the "plot.png" file). To run it, execute:
+
+```shell
+bin/IRFsimpleReadIrf examples/testEffArea.fits
+```
+
+or 
+
+```shell
+bin/IRFsimpleReadIrf examples/testParamEffArea.fits
+```
+
+Note the use of the "GIRFConfig" class, used to extract the IRF with a specific configuration and valid range. Also note the process to read an IRF element is identical in the case of a binned or parameterized axis.
 
 
 The following are older and more complicated (working, but nearly deprecated) examples. 

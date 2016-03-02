@@ -65,7 +65,8 @@ void GIRFPdf::Draw(string filename, string drawOption) const {
 			TF1* pdf = new TF1(GetExtName().data(), axisParam->GetFormula().data(), (float) axisParam->GetRangeMin(), (float) axisParam->GetRangeMax());
 			for (int i=0;i<axisParam->GetNumPars();i++) pdf->SetParameter(i,fData[i]);
 			TCanvas c1;
-			TString xTitle = (TString)axisParam->GetVarName() + " [" + (TString)axisParam->GetVarUnit() + "]";;
+			TString xTitle = (TString)axisParam->GetVarName() + " [" + (TString)axisParam->GetVarUnit() + "]";
+			if (axisParam->IsLog()) xTitle = "log " + (TString)axisParam->GetVarName() + " [" + (TString)axisParam->GetVarUnit() + "]";
 			TString yTitle = (TString)GetVarName() + " [" + (TString)GetVarUnit() + "]";;
 			pdf->SetTitle((TString)GetExtName());
 			pdf->GetXaxis()->SetTitle(xTitle);
@@ -82,8 +83,9 @@ void GIRFPdf::Draw(string filename, string drawOption) const {
 				pdf->SetBinContent(i,fData[i-1]);
 			}
 			TCanvas c1;
-			TString xTitle = (TString)axisBins->GetVarName() + " [" + (TString)axisBins->GetVarUnit() + "]";;
-			TString yTitle = (TString)GetVarName() + " [" + (TString)GetVarUnit() + "]";;
+			TString xTitle = (TString)axisBins->GetVarName() + " [" + (TString)axisBins->GetVarUnit() + "]";
+			TString yTitle = (TString)GetVarName() + " [" + (TString)GetVarUnit() + "]";
+			if (axisBins->IsLog()) xTitle = "log " + (TString)axisBins->GetVarName() + " [" + (TString)axisBins->GetVarUnit() + "]";
 			pdf->GetXaxis()->SetTitle(xTitle);
 			pdf->GetYaxis()->SetTitle(yTitle);
 			pdf->SetStats(0);
