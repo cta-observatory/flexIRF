@@ -11,12 +11,15 @@ set( EXTRA_LIBS ${EXTRA_LIBS} ${CFITSIO_LIBRARIES} )
 
 ## ROOT 
 
-## Include ROOT libraries                                                                                                                                             
-find_package(ROOT REQUIRED)
-include_directories(${ROOT_INCLUDE_DIR})
-set( ROOT_LIBS ${ROOT_LIBS} ${ROOT_LIBRARIES} )
-set( rootinc ${PROJECT_SOURCE_DIR}/include )
-include_directories(${rootinc})
+## Include ROOT libraries   
+find_package(ROOT)
+IF(ROOT_FOUND)
+	include_directories(${ROOT_INCLUDE_DIR})
+	set( ROOT_LIBS ${ROOT_LIBS} ${ROOT_LIBRARIES} )
+	set( rootinc ${PROJECT_SOURCE_DIR}/include )
+	include_directories(${rootinc})
+ENDIF()                                                                                                                                          
+
 
 ## Add flexIRF code
 set( srcForfIRF ${PROJECT_SOURCE_DIR}/flexirf/src )
