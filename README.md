@@ -22,17 +22,14 @@ ROOT is currently also used for some executables, but will be removed in the clo
 Installation
 --------------
 
-It is currently only compiling properly in linux machines. 
+Note this repository is currently only tested properly in linux machines. 
 
 Build git version using:
 
 ```shell
-./autogen.sh
-./configure
+./setup.sh
 make
 ```
-
-Although we DON'T recommend it, if you want to link generated libraries into your "/usr/local/share" do (sudo) make install.
 
 Documentation
 --------------
