@@ -222,6 +222,7 @@ int main(int argc, char **argv)
 
   //Clean up
   delete irf;
+  delete [] histname;
 
   cout<<"Finished conversion. "<<endl;
   cout<<endl;
