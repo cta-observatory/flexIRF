@@ -7,13 +7,6 @@ notifications:
 before_install:
     - sudo apt-get install git dpkg-dev make g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev
     - sudo apt-get install cmake
-
-    # Update autoconf to 1.69
-    - sudo add-apt-repository ppa:dns/gnu -y
-    - sudo apt-get update -q
-    - sudo apt-get install --only-upgrade autoconf
-    - autoconf -V
-
     - sudo apt-get install libcfitsio3
     - sudo apt-get install libcfitsio3-dev
 
@@ -39,15 +32,18 @@ before_install:
     - make -j 4;
     - source bin/thisroot.sh;
     - cd ..;
-    - ./autogen.sh;
-    - ./configure;
+    - ./setup.sh;
+    - cd build;
     - make;
+    - cd ..
 #    - ./setup.sh;
 #    - cd build/;
 #    - make;
 script:
-    - ./bin/IRFconverter_root2FITS dummy/dummyconfig.txt prodfiles/Performance_2Q_Aar_50h_20150505.root;
-    - ./bin/IRFgenerator_rootio dummy/dummyconfig.txt prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root;
-    - ./bin/IRFsimpleTests;
-
+    - ./bin/IRFsimpleWriteIrf
+    - ./bin/IRFsimpleWriteParamIrf
+    - ./bin/IRFsimpleReadIrf examples/testEffArea.fits
+    - ./bin/IRFsimpleReadIrf examples/testParamEffArea.fits
+    - ./bin/IRFconverter_root2FITS dummy/dummyconfig.txt prodfiles/Performance_2Q_Aar_50h_20150505.root
+    - ./bin/IRFgenerator_rootio dummy/dummyconfig.txt prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root
 #    - ./bin/IRFmerger_fitsio dummy/dummyconfig.txt dummy/dummypdf-2D.txt;
