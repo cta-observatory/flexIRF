@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 
   const int numest=num_hists;
   int naxes[num_hists];
-  string histname[numest];
+  string *histname = new string[num_hists];
   int num_objects=0;
 
   while (key = (TKey*)nextkey()) {
