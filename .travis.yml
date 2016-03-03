@@ -1,44 +1,22 @@
 
-language: python # a lie because shippable "doesn't support" cpp
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
 os:
-    - linux
-notifications:
-    email: false
+  - linux
+  - osx
+
 before_install:
-    - sudo apt-get install git dpkg-dev make g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev
-    - sudo apt-get install cmake
-    - sudo apt-get install libcfitsio3
-    - sudo apt-get install libcfitsio3-dev
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update && sudo apt-get install -y git dpkg-dev make g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev cmake libcfitsio3-dev swig; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update; brew install swig doxygen; brew install python-pip; sudo pip install sphinx breathe numpy matplotlib; fi
 
-    # Install swig
-    - sudo apt-get install swig
-
-
-    # - wget ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3370.tar.gz;
-    # - tar -xzvf cfitsio3370.tar.gz;
-    # - cd cfitsio
-    # - ./configure --prefix=$PWD;
-    # - make;
-    # - make install; 
-    # - export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH;
-    # - export PATH=$PWD/include:$PATH;
-    - echo $LD_LIBRARY_PATH;
-    - echo $PATH;
-    # - cd ..;
-    - wget https://root.cern.ch/download/root_v5.34.32.source.tar.gz;
-    - tar -xzf root_v5.34.32.source.tar.gz;
-    - cd root;
-    - ./configure;
-    - make -j 4;
-    - source bin/thisroot.sh;
-    - cd ..;
+install:
     - ./setup.sh;
-    - cd build;
-    - make;
-    - cd ..
-#    - ./setup.sh;
-#    - cd build/;
-#    - make;
+    - cd build && make && cd ..
+
 script:
     - ./bin/IRFsimpleWriteIrf
     - ./bin/IRFsimpleWriteParamIrf
