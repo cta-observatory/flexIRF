@@ -28,7 +28,7 @@ Build git version using:
 
 ```shell
 ./setup.sh
-make
+cd build && make all && cd ..
 ```
 
 Documentation
