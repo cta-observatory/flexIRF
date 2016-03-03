@@ -1,0 +1,27 @@
+
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+os:
+  - linux
+  - osx
+
+before_install:
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update && sudo apt-get install -y git dpkg-dev make g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev cmake libcfitsio3-dev swig; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update; brew install swig cfitsio cmake; fi
+
+install:
+    - ./setup.sh;
+    - cd build && make && cd ..
+
+script:
+    - ./bin/IRFsimpleWriteIrf
+    - ./bin/IRFsimpleWriteParamIrf
+    - ./bin/IRFsimpleReadIrf examples/testEffArea.fits
+    - ./bin/IRFsimpleReadIrf examples/testParamEffArea.fits
+    - ./bin/IRFconverter_root2FITS dummy/dummyconfig.txt prodfiles/Performance_2Q_Aar_50h_20150505.root
+    - ./bin/IRFgenerator_rootio dummy/dummyconfig.txt prodfiles/DESY.d20140105.Erec1.V3.ID0NIM2.prod2-Tenerife-NS.N.2NN-MST.180000s.root
+#    - ./bin/IRFmerger_fitsio dummy/dummyconfig.txt dummy/dummypdf-2D.txt;
