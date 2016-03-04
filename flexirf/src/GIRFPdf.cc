@@ -22,7 +22,11 @@
 #include <iostream>
 #include <string.h>
 
-#include "rootincludes.h"
+
+//ROOT includes
+#ifdef WITH_ROOT  // ROOT found in the installation
+	#include "rootincludes.h"
+#endif
 
 using namespace std;
 
@@ -42,6 +46,9 @@ GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc, unsigned long naxes) : fPdfFun
 // 		Draw Pdf content
 //	TODO: Just 1 and 2 dimensional IRFs can be currently drawn.
 void GIRFPdf::Draw(string filename, string drawOption) const {
+
+
+#ifdef WITH_ROOT  // ROOT found in the installation
 
 	if (fIsEmpty) {
 		cout << "Pdf is empty" << endl;
@@ -127,8 +134,10 @@ void GIRFPdf::Draw(string filename, string drawOption) const {
 	}
 
 
-
-
+#endif
+#ifndef WITH_ROOT  // ROOT found in the installation
+	cout << "WARNING: GIRFPdf::Draw is implemented using ROOT libraries (not found in your system during compilation)." << endl;
+#endif
 
 }
 

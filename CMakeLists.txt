@@ -30,16 +30,9 @@ set( incForfIRF ${PROJECT_SOURCE_DIR}/flexirf/include )
 include_directories(${incForfIRF})
 
 ## Specify source code
-set( srcsIRFm ${PROJECT_SOURCE_DIR}/src/IRFmerger_fitsio.cc )
-
-## Building library                                                                                                                  
 add_subdirectory (flexirf) 
-add_executable( IRFmerger_fitsio ${srcsIRFm} )
 
-## Link everything
-target_link_libraries( IRFmerger_fitsio ${EXTRA_LIBS} flexirf ${ROOT_LIBS} )
-
-##Other tools
+##All tools
 set( srcsIRFconv ${PROJECT_SOURCE_DIR}/src/IRFconverter_root2FITS.cc )
 add_executable( IRFconverter_root2FITS ${srcsIRFconv} )
 target_link_libraries( IRFconverter_root2FITS flexirf ${EXTRA_LIBS} ${ROOT_LIBS} )

@@ -43,8 +43,6 @@ void IRFconverter_root2FITS_irfGenND(TFile *f, GIRF* irf, vector<float>& pdfdata
 //
 
 
-#ifndef WITH_ROOT  // ROOT found in the installation
-
 int main(int argc, char **argv)
 {
 

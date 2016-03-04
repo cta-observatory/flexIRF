@@ -15,6 +15,3 @@ fi
 
 echo "You may now run 'make' in the build/ directory"
 echo "  make                        - build the full software suite"
-echo "  make IRFgenerator_rootio    - build the ROOT analysis IRF generator "
-echo "  make IRFmerger_fitsio       - build the IRF 'datacube' generator "
-echo "  make IRFconverter_root2FITS - build the IRF root to IRF converter "
