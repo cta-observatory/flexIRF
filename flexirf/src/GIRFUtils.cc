@@ -29,7 +29,7 @@ using namespace std;
 //
 // Set CHDU to last Axis HDU present within the fits file
 //
-void GIRFUtils::GoToLastAxisHDU(fitsfile* fptr) {
+void flexIRF::GIRFUtils::GoToLastAxisHDU(fitsfile* fptr) {
 
 	int status = 0;   		// must be initialized (0 means ok)
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
@@ -66,7 +66,7 @@ void GIRFUtils::GoToLastAxisHDU(fitsfile* fptr) {
 //
 // Set CHDU to the Data HDU with ID equal to pdfID
 //
-void GIRFUtils::GoToPdfHDU(fitsfile* fptr, int pdfID) {
+void flexIRF::GIRFUtils::GoToPdfHDU(fitsfile* fptr, int pdfID) {
 
 	int status = 0;   		// must be initialized (0 means ok)
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
@@ -104,7 +104,7 @@ void GIRFUtils::GoToPdfHDU(fitsfile* fptr, int pdfID) {
 //
 // Check the last Axis ID present within the fits file
 //
-int GIRFUtils::GetLastAxisID(string filename) {
+int flexIRF::GIRFUtils::GetLastAxisID(string filename) {
 
 	fitsfile *fptr; /* FITS file pointer, defined in fitsio.h */
 	int status = 0;   		// must be initialized (0 means ok)
@@ -129,7 +129,7 @@ int GIRFUtils::GetLastAxisID(string filename) {
 }
 
 
-int GIRFUtils::GetLastAxisID(fitsfile* fptr) {
+int flexIRF::GIRFUtils::GetLastAxisID(fitsfile* fptr) {
 
 	int currenthdu = fptr->HDUposition;
 
@@ -168,7 +168,7 @@ int GIRFUtils::GetLastAxisID(fitsfile* fptr) {
 //
 // Check the last Pdf ID present within the fits file
 //
-int GIRFUtils::GetLastPdfID(string filename) {
+int flexIRF::GIRFUtils::GetLastPdfID(string filename) {
 
 	fitsfile *fptr; /* FITS file pointer, defined in fitsio.h */
 	int status = 0;   		// must be initialized (0 means ok)
@@ -186,7 +186,7 @@ int GIRFUtils::GetLastPdfID(string filename) {
 	return lastID;
 }
 
-int GIRFUtils::GetLastPdfID(fitsfile* fptr) {
+int flexIRF::GIRFUtils::GetLastPdfID(fitsfile* fptr) {
 
 	int currenthdu = fptr->HDUposition;
 
@@ -220,7 +220,7 @@ int GIRFUtils::GetLastPdfID(fitsfile* fptr) {
 	return lastID;
 }
 
-vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<AxisRange> axisRanges){
+vector<int> flexIRF::GIRFUtils::FindAxisRanges(string filename, std::vector<AxisRange> axisRanges){
 
 	vector<int> axisIDs, foundIDs;
 
@@ -249,7 +249,7 @@ vector<int> GIRFUtils::FindAxisRanges(string filename, std::vector<AxisRange> ax
 // 		Return all axis IDs matching AxisRange.
 //
 //
-vector<int> GIRFUtils::FindAxisRange(fitsfile *fptr, AxisRange axisRange){
+vector<int> flexIRF::GIRFUtils::FindAxisRange(fitsfile *fptr, AxisRange axisRange){
 	vector<int> foundAxisID;
 
 	int currenthdu = fptr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...

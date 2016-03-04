@@ -45,22 +45,22 @@ int main()
 	pdfData.push_back(300000);
 
 //	Define required information to build a GIRFAxis object.
-    AxisType axis_type = kBins;							// Not necessary, as it is already fixed by using the "GIRFAxisBins"
-    VarType  var_type  = kEnergy;
+	flexIRF::AxisType axis_type = flexIRF::kBins;							// Not necessary, as it is already fixed by using the "GIRFAxisBins"
+	flexIRF::VarType  var_type  = flexIRF::kEnergy;
     bool               islog    = 1;
     int                size     = axisEdges.size();
     float*             axisData  = axisEdges.data();
 
 //  Build GIRFAxis object.
-    GIRFAxis* axis = new GIRFAxisBins(var_type,size,axisData,islog);
+    flexIRF::GIRFAxis* axis = new flexIRF::GIRFAxisBins(var_type,size,axisData,islog);
 
 //  Build GIRFPdf object, using both pdfData and the generated axis.
-	GIRFPdf*   myIrfToStore   = new GIRFPdf(kAeff,kNumber);
+    flexIRF::GIRFPdf*   myIrfToStore   = new flexIRF::GIRFPdf(flexIRF::kAeff,flexIRF::kNumber);
 	myIrfToStore->SetData(pdfData.data());
 	myIrfToStore->AddAxis(axis);
 
 //  Build GIRF object, introduce the generated GIRFPdf object and write it into a fits file.
-	GIRF irf;
+	flexIRF::GIRF irf;
 	irf.AddPdf(myIrfToStore);
 	irf.Write("!examples/testEffArea.fits");
 

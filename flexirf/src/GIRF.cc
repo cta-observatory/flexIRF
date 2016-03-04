@@ -28,7 +28,7 @@ using namespace std;
 // 
 // Create GIRF object: either for read/write FITS files
 //
-GIRF::GIRF() : fStatus(0), fFitsPtr(NULL), fFITSopened(0) {
+flexIRF::GIRF::GIRF() : fStatus(0), fFitsPtr(NULL), fFITSopened(0) {
 
 }
 
@@ -36,7 +36,7 @@ GIRF::GIRF() : fStatus(0), fFitsPtr(NULL), fFITSopened(0) {
 //
 // Create GIRF object: either for read/write FITS files
 //
-GIRF::GIRF(string filename) : fStatus(0) {
+flexIRF::GIRF::GIRF(string filename) : fStatus(0) {
 	fFilename=filename;
 
 	//First try to open existing fits file.
@@ -55,7 +55,7 @@ GIRF::GIRF(string filename) : fStatus(0) {
 //
 //  	TODO: Handle errors, check status, show warnings...
 //
-int GIRF::OpenFITS(){
+int flexIRF::GIRF::OpenFITS(){
 	if (!fits_open_file(&fFitsPtr, fFilename.data(), READWRITE, &fStatus)) return 1;
 	else return 0;
 }
@@ -66,7 +66,7 @@ int GIRF::OpenFITS(){
 //
 //  	TODO: Handle errors, check status, show warnings...
 //
-int GIRF::CreateFITS(){
+int flexIRF::GIRF::CreateFITS(){
 	if (!fits_create_file(&fFitsPtr, fFilename.data(), &fStatus)) return 1;
 	else return 0;
 }
@@ -79,7 +79,7 @@ int GIRF::CreateFITS(){
 //
 //  TODO: Handle errors, check status, show warnings...
 //
-int GIRF::CheckStatus(){
+int flexIRF::GIRF::CheckStatus(){
 	if (fStatus) fits_report_error(stderr, fStatus);
 	return fStatus;
 }
@@ -89,7 +89,7 @@ int GIRF::CheckStatus(){
 //
 // Get axis type with specific ID
 //
-AxisType GIRF::CheckAxisType(int axisID) {
+flexIRF::AxisType flexIRF::GIRF::CheckAxisType(int axisID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -133,7 +133,7 @@ AxisType GIRF::CheckAxisType(int axisID) {
 //
 // Get axis variable with specific ID
 //
-VarType GIRF::CheckAxisVarType(int axisID) {
+flexIRF::VarType flexIRF::GIRF::CheckAxisVarType(int axisID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -179,7 +179,7 @@ VarType GIRF::CheckAxisVarType(int axisID) {
 // (use filename="-" for stdout, or
 // start it with "!" to force overwriting)
 //
-int GIRF::Write() {
+int flexIRF::GIRF::Write() {
 
 	if (fFilename.empty()){
 		cout << "ERROR: No filename specified." << endl;
@@ -243,7 +243,7 @@ int GIRF::Write() {
 //
 // Get axis type from fitsfile
 //
-int GIRF::CheckAxisHDUpos(int axisID) {
+int flexIRF::GIRF::CheckAxisHDUpos(int axisID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -291,7 +291,7 @@ int GIRF::CheckAxisHDUpos(int axisID) {
 //
 // Get axis object from fitsfile
 //
-GIRFAxis* GIRF::ReadAxis(int axisID) {
+flexIRF::GIRFAxis* flexIRF::GIRF::ReadAxis(int axisID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -337,7 +337,7 @@ GIRFAxis* GIRF::ReadAxis(int axisID) {
 // Get axis object from fitsfile with the range defined
 // within AxisRanges
 //
-GIRFAxis* GIRF::ReadAxis(int axisID, vector<AxisRange> axisRanges) {
+flexIRF::GIRFAxis* flexIRF::GIRF::ReadAxis(int axisID, vector<AxisRange> axisRanges) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -389,7 +389,7 @@ GIRFAxis* GIRF::ReadAxis(int axisID, vector<AxisRange> axisRanges) {
 // 		Search and extract GIRFPdf object from fitsfile
 //		with specific  PdfVar and GIRFConfig.
 //
-GIRFPdf* GIRF::ReadPdf(PdfVar pdfVar, GIRFConfig config) {
+flexIRF::GIRFPdf* flexIRF::GIRF::ReadPdf(PdfVar pdfVar, GIRFConfig config) {
 
 	GIRFPdf* extractedPdf = new GIRFPdf();
 
@@ -462,7 +462,7 @@ GIRFPdf* GIRF::ReadPdf(PdfVar pdfVar, GIRFConfig config) {
 // 		Read GIRFPdf object from fitsfile with a specific
 //		pdfID
 //
-GIRFPdf* GIRF::ReadPdf(int pdfID, GIRFConfig config) {
+flexIRF::GIRFPdf* flexIRF::GIRF::ReadPdf(int pdfID, GIRFConfig config) {
 
 	std::vector<AxisRange> axisRanges = config.GetAxisRanges();
 
@@ -490,7 +490,7 @@ GIRFPdf* GIRF::ReadPdf(int pdfID, GIRFConfig config) {
 // 		Read GIRFPdf::PdfVar object from fitsfile with a
 //		specific pdfID
 //
-PdfVar GIRF::ReadPdfVar(int pdfID) {
+flexIRF::PdfVar flexIRF::GIRF::ReadPdfVar(int pdfID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -534,7 +534,7 @@ PdfVar GIRF::ReadPdfVar(int pdfID) {
 // 		Read GIRFPdf::PdfFunc object from fitsfile with a
 //		specific pdfID
 //
-PdfFunc GIRF::ReadPdfFunc(int pdfID) {
+flexIRF::PdfFunc flexIRF::GIRF::ReadPdfFunc(int pdfID) {
 
 	int currenthdu = fFitsPtr->HDUposition;
 
@@ -578,7 +578,7 @@ PdfFunc GIRF::ReadPdfFunc(int pdfID) {
 // 		Read data from fitsfile from a Data HDU with a
 //		specific pdfID
 //
-float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axisRanges){
+float*  flexIRF::GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axisRanges){
 
 	vector<long> lBins, hBins, inc;
 	int lBin, hBin, anynull, axisSize;
@@ -664,7 +664,7 @@ float*  GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axis
 //
 // 		Return all axis IDs matching AxisRange.
 //
-vector<int> GIRF::FindAxisRange(AxisRange axisRange){
+vector<int> flexIRF::GIRF::FindAxisRange(AxisRange axisRange){
 	vector<int> foundAxisID;
 
 	int currenthdu = fFitsPtr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...
@@ -730,7 +730,7 @@ vector<int> GIRF::FindAxisRange(AxisRange axisRange){
 //
 //		TODO: For now, just takes all AxisRanges present in the
 //		FITS file, and ignores the rest.
-vector< vector<int> > GIRF::FindAxisRanges(std::vector<AxisRange> axisRanges){
+vector< vector<int> > flexIRF::GIRF::FindAxisRanges(std::vector<AxisRange> axisRanges){
 
 	vector< vector<int> > axisIDs, emptyVector;
 	vector<int> foundIDs;
@@ -756,7 +756,7 @@ vector< vector<int> > GIRF::FindAxisRanges(std::vector<AxisRange> axisRanges){
 //
 // 		Return Pdfs IDs pointing at all axisIDs.
 //
-vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, PdfVar pdfVar){
+vector<int> flexIRF::GIRF::FindPdfs(vector< vector<int> > axisIDs, PdfVar pdfVar){
 
 	vector<int> pdfAxes;
 
@@ -801,7 +801,7 @@ vector<int> GIRF::FindPdfs(vector< vector<int> > axisIDs, PdfVar pdfVar){
 //
 // 		Return all pdf IDs matching the Pdf type pdfVar.
 //
-vector<int> GIRF::FindPdfsOfType(PdfVar pdfVar){
+vector<int> flexIRF::GIRF::FindPdfsOfType(PdfVar pdfVar){
 
 	vector<int> foundPdfIDs;
 
@@ -842,7 +842,7 @@ vector<int> GIRF::FindPdfsOfType(PdfVar pdfVar){
 //
 // 		Return the axis IDs which the Pdf points at.
 //
-vector<int> GIRF::GetPdfAxisIDs(int pdfID){
+vector<int> flexIRF::GIRF::GetPdfAxisIDs(int pdfID){
 
 	vector<int> foundAxisIDs;
 
@@ -892,7 +892,7 @@ vector<int> GIRF::GetPdfAxisIDs(int pdfID){
 //
 // 		Return the axis IDs which the Pdfs points at.
 //
-vector< vector<int> > GIRF::GetPdfAxisIDs(vector<int> pdfIDs){
+vector< vector<int> > flexIRF::GIRF::GetPdfAxisIDs(vector<int> pdfIDs){
 
 	vector< vector<int> > foundPdfsAxisIDs;
 
@@ -908,7 +908,7 @@ vector< vector<int> > GIRF::GetPdfAxisIDs(vector<int> pdfIDs){
 //
 // 		Return the pdf IDs pointing at the correct axis.
 //
-vector<int> GIRF::FindPdfsPointingToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfsIDs, vector< vector<int> > allPdfsAxisIDs){
+vector<int> flexIRF::GIRF::FindPdfsPointingToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfsIDs, vector< vector<int> > allPdfsAxisIDs){
 
 	vector<int> foundPdfIDs;
 
@@ -924,7 +924,7 @@ vector<int> GIRF::FindPdfsPointingToAxisIDs(vector< vector<int> > axisIDs, vecto
 //
 // 		Check if one pdf points to the required axes
 //
-bool GIRF::CheckPdfPointsToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfAxisIDs){
+bool flexIRF::GIRF::CheckPdfPointsToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfAxisIDs){
 
 
 	bool axisRangePresent=0;
@@ -943,7 +943,7 @@ bool GIRF::CheckPdfPointsToAxisIDs(vector< vector<int> > axisIDs, vector<int> pd
 //
 // 		Check if one pdf points to the required axes
 //
-int GIRF::PickPreferredPdf(vector<int> foundPdfs, GIRFConfig config){
+int flexIRF::GIRF::PickPreferredPdf(vector<int> foundPdfs, GIRFConfig config){
 
 //	cout << "foundPdfs.size() = " << foundPdfs.size() << endl;
 	if (foundPdfs.size() == 0) return 0;

@@ -32,12 +32,12 @@ using namespace std;
 //
 
 void IRFgenerator_rootio_irfGenND(TFile *f, string histname,
-	      const AxisType axistype[],
-	      const VarType vartype[],
+	      const flexIRF::AxisType axistype[],
+	      const flexIRF::VarType vartype[],
 	      const int naxes);
 void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string fitsname,
-	      const AxisType axistype[],
-	      const VarType vartype[],
+	      const flexIRF::AxisType axistype[],
+	      const flexIRF::VarType vartype[],
 	      const int axissize[], const bool  axisislog[], 
 	      float *axis[], const int naxes);
 
@@ -102,35 +102,35 @@ int main(int argc, char **argv)
       exit(EXIT_FAILURE);
     }
     
-    AxisType axistype[naxes[i]];
-    VarType vartype[naxes[i]];
+    flexIRF::AxisType axistype[naxes[i]];
+    flexIRF::VarType vartype[naxes[i]];
     
     switch(i)
       {
       case 0: //Energy Resolution for E (kEnergy) v. Offset (kTheta)
-	axistype[0]   = kBins;
-	vartype[0]    = kEnergy;
+	axistype[0]   = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy;
 	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       case 1: //Energy Bias for E (kEnergy) v. Offset (kTheta)
-	axistype[0]   = kBins;
+	axistype[0]   = flexIRF::kBins;
 	//	vartype[0]    = kEnergy, vartype[1] = kTheta;
-	vartype[0]    = kEnergy;
+	vartype[0]    = flexIRF::kEnergy;
 	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       case 2: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
-	axistype[0]   = kBins;
-	vartype[0]    = kEnergy;
+	axistype[0]   = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy;
 	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       case 3: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
-	axistype[0]   = kBins;
-	vartype[0]    = kEnergy;
+	axistype[0]   = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy;
 	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       case 4: //Angular Resolution for E (kEnergy) v. Offset (kTheta) v. Azimuth (kPhi)
-	axistype[0]   = kBins, axistype[1] = kBins;
-	vartype[0]    = kEnergy, vartype[1] = kTheta;
+	axistype[0]   = flexIRF::kBins, axistype[1] = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy, vartype[1] = flexIRF::kTheta;
 	IRFgenerator_rootio_irfGenND(f, histname[i], axistype, vartype, naxes[i]);
 	break;
       }
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
   
 }//ends main
 
-void IRFgenerator_rootio_irfGenND(TFile *paramfile, string histname, const AxisType axistype[], const VarType vartype[], const int naxesArr)
+void IRFgenerator_rootio_irfGenND(TFile *paramfile, string histname, const flexIRF::AxisType axistype[], const flexIRF::VarType vartype[], const int naxesArr)
 {
 
   //Estimator histogram from analysis file
@@ -267,24 +267,24 @@ void IRFgenerator_rootio_irfGenND(TFile *paramfile, string histname, const AxisT
 }//end irfGenND
 
 void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
-	      const AxisType axistype[], const VarType vartype[],
+	      const flexIRF::AxisType axistype[], const flexIRF::VarType vartype[],
 	      const int axissize[], const bool  axisislog[], 
 	      float *axis[], int naxes)
 {
   
   // declare and fill pdf                                                                                                           
-  GIRFPdf*   mypdf   = new GIRFPdf(kEfficiency,kNumber);
+  flexIRF::GIRFPdf*   mypdf   = new flexIRF::GIRFPdf(flexIRF::kEfficiency,flexIRF::kNumber);
   mypdf->SetData(&pdfdata[0]);
 
-  GIRFAxis** IRFAxis = new GIRFAxis*[naxes];
+  flexIRF::GIRFAxis** IRFAxis = new flexIRF::GIRFAxis*[naxes];
 
   // fill the axes                                                                                                                      
   for(int iaxis=0;iaxis<naxes;iaxis++)
     {
       
       // simpler notation                                                                         
-      AxisType axis_type = axistype[iaxis];
-      VarType  var_type  = vartype[iaxis];
+	  flexIRF::AxisType axis_type = axistype[iaxis];
+	  flexIRF::VarType  var_type  = vartype[iaxis];
       bool               islog    = axisislog[iaxis];
       int                size     = axissize[iaxis];
       float*             theaxis  = axis[iaxis];
@@ -292,8 +292,8 @@ void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
       // fill the GIRF axis objects                                                                      
       switch(axis_type)
         {
-        case kBins:
-          IRFAxis[iaxis] = new GIRFAxisBins(var_type,size,theaxis,islog);
+        case flexIRF::kBins:
+          IRFAxis[iaxis] = new flexIRF::GIRFAxisBins(var_type,size,theaxis,islog);
           break;
         default:
         	//TODO: Currently not supporting parameterized axes.
@@ -305,7 +305,7 @@ void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
     }
 
   // Fill pdf (which includes axes already) in the GIRF object                                                              
-  GIRF* irf = new GIRF;
+  flexIRF::GIRF* irf = new flexIRF::GIRF;
   irf->AddPdf(mypdf);
 
   // Write the IRF to file                                                                                            

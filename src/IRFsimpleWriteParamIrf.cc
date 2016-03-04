@@ -30,7 +30,7 @@ int main()
     bool               islog    = 1;
 
 //  Instanciate AxisParameterization class, to define a parameterization.
-	AxisParameterization param;
+    flexIRF::AxisParameterization param;
 //	Define parameterization formula, valid range and number of parameters. All will be stored into the FITS file with dedicated keywords.
 //	Note ROOT's "TF1" sintax is currently used.
 	param.formula = "gaus";
@@ -39,7 +39,7 @@ int main()
 	param.numParameters= 3;
 
 //	Create the axis (in this case, of GIRFAxisParam type) and specify its type, and scale (log).
-	GIRFAxisParam* axis1 = new GIRFAxisParam(kEnergy, islog);
+	flexIRF::GIRFAxisParam* axis1 = new flexIRF::GIRFAxisParam(flexIRF::kEnergy, islog);
 	axis1->SetAxisParam(param);
 	axis1->Print();
 
@@ -50,12 +50,12 @@ int main()
 	pdfData.push_back(1.03);
 
 //  Build GIRFPdf object, using both pdfData and the generated axis.
-	GIRFPdf*   myIrfToStore   = new GIRFPdf(kAeff,kNumber);
+	flexIRF::GIRFPdf*   myIrfToStore   = new flexIRF::GIRFPdf(flexIRF::kAeff,flexIRF::kNumber);
 	myIrfToStore->SetData(pdfData.data());
 	myIrfToStore->AddAxis(axis1);
 
 //  Build GIRF object, introduce the generated GIRFPdf object and write it into a fits file.
-	GIRF irf;
+	flexIRF::GIRF irf;
 	irf.AddPdf(myIrfToStore);
 	irf.Write("!examples/testParamEffArea.fits");
 

@@ -34,7 +34,7 @@ using namespace std;
 // 
 // Construct pdf table with type
 //
-GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc, unsigned long naxes) : fPdfFunc(pdffunc), fData(0), fIsEmpty(1) {
+flexIRF::GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc, unsigned long naxes) : fPdfFunc(pdffunc), fData(0), fIsEmpty(1) {
 	fPdfVar = pdftype;
 	fAxis.reserve(naxes);
 }
@@ -45,7 +45,7 @@ GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc, unsigned long naxes) : fPdfFun
 //
 // 		Draw Pdf content
 //	TODO: Just 1 and 2 dimensional IRFs can be currently drawn.
-void GIRFPdf::Draw(string filename, string drawOption) const {
+void flexIRF::GIRFPdf::Draw(string filename, string drawOption) const {
 
 
 #ifdef WITH_ROOT  // ROOT found in the installation
@@ -149,7 +149,7 @@ void GIRFPdf::Draw(string filename, string drawOption) const {
 //
 // Return the axis name for EXTNAME
 //
-std::string GIRFPdf::GetFuncName() const {
+std::string flexIRF::GIRFPdf::GetFuncName() const {
 
 	string axisType;
 
@@ -175,7 +175,7 @@ std::string GIRFPdf::GetFuncName() const {
 //
 // Return the axis name for EXTNAME
 //
-std::string GIRFPdf::GetVarName() const {
+std::string flexIRF::GIRFPdf::GetVarName() const {
 
 	string axisVarType;
 
@@ -216,7 +216,7 @@ std::string GIRFPdf::GetVarName() const {
 //
 // Return the axis name for EXTNAME
 //
-std::string GIRFPdf::GetVarUnit() const {
+std::string flexIRF::GIRFPdf::GetVarUnit() const {
 
 	//TODO: Build a separate GIRFPdf units enum, which is read/written from the FITS file.
 
@@ -262,7 +262,7 @@ std::string GIRFPdf::GetVarUnit() const {
 // Write the pdf and the associated axes to the specified
 // file pointer
 //
-int GIRFPdf::Write(fitsfile* fptr, int* status) {
+int flexIRF::GIRFPdf::Write(fitsfile* fptr, int* status) {
 
 	// create arrays with size and first entry of every dimension to be saved (1 is first, not 0)
 	int naxis = int(fAxis.size());
@@ -422,7 +422,7 @@ int GIRFPdf::Write(fitsfile* fptr, int* status) {
 // Write the pdf and the associated axes to the specified
 // file pointer
 //
-void GIRFPdf::Print(int sanity) const {
+void flexIRF::GIRFPdf::Print(int sanity) const {
 
 	int iAxis=0;
 	int totalSize=1;
@@ -460,7 +460,7 @@ void GIRFPdf::Print(int sanity) const {
 
 }
 
-void   GIRFPdf::SetData(float* data){
+void   flexIRF::GIRFPdf::SetData(float* data){
 	if (data==0) return;
 	fData = data;
 	fIsEmpty=0;

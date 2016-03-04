@@ -26,7 +26,7 @@ using namespace std;
 // 
 // Construct empty axis object
 //
-GIRFAxisParam::GIRFAxisParam() :
+flexIRF::GIRFAxisParam::GIRFAxisParam() :
 		GIRFAxis(), fAxisParameterizationFilled(0){
 
 	SetAxisType(kParam);
@@ -36,7 +36,7 @@ GIRFAxisParam::GIRFAxisParam() :
 // 
 // Construct axis object with predefined data
 //
-GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
+flexIRF::GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
 		GIRFAxis(vartype), fAxisParameterizationFilled(0){
 	SetAxisType(kParam);
 	SetLog(islog);
@@ -47,7 +47,7 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
 // 
 // Construct axis object with predefined vectors (using arrays)
 //
-GIRFAxisParam::GIRFAxisParam(VarType vartype, AxisParameterization axisParam,
+flexIRF::GIRFAxisParam::GIRFAxisParam(VarType vartype, AxisParameterization axisParam,
 		bool islog) : GIRFAxis(vartype) {
 	SetAxisType(kParam);
 	fAxisParam = axisParam;
@@ -62,7 +62,7 @@ GIRFAxisParam::GIRFAxisParam(VarType vartype, AxisParameterization axisParam,
 //
 // Construct axis object directly reading from HDU
 //
-GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
+flexIRF::GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 
 	SetAxisType(kParam);
 
@@ -110,7 +110,7 @@ GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 //
 // Check if axis contains AxisRange
 //
-bool GIRFAxisParam::ContainsRange(AxisRange axisRange) {
+bool flexIRF::GIRFAxisParam::ContainsRange(AxisRange axisRange) {
 
 	//TODO: Modify as soon as I add the range of validity!!!
 	if (!fAxisParameterizationFilled) return 0;
@@ -130,7 +130,7 @@ bool GIRFAxisParam::ContainsRange(AxisRange axisRange) {
 
 
 
-void GIRFAxisParam::SetAxisParam(AxisParameterization axisParam){
+void flexIRF::GIRFAxisParam::SetAxisParam(AxisParameterization axisParam){
 
 	fAxisParam = axisParam;
 	// Check if the axis is properly parameterized
@@ -143,7 +143,7 @@ void GIRFAxisParam::SetAxisParam(AxisParameterization axisParam){
 //
 // 		Set the parametrized formula of the axis.
 //
-void GIRFAxisParam::SetFormula(string formula,
+void flexIRF::GIRFAxisParam::SetFormula(string formula,
 		std::vector<float>::size_type numParameters) {
 
 
@@ -159,7 +159,7 @@ void GIRFAxisParam::SetFormula(string formula,
 //
 // 		Set the valid range of the parameterization.
 //
-void GIRFAxisParam::SetValidRange(float validRangeLow, float validRangeHigh) {
+void flexIRF::GIRFAxisParam::SetValidRange(float validRangeLow, float validRangeHigh) {
 
 
 	fAxisParam.validRangeLow = validRangeLow;
@@ -173,7 +173,7 @@ void GIRFAxisParam::SetValidRange(float validRangeLow, float validRangeHigh) {
 // 
 // Write the axis to the specified file pointer
 //
-int const GIRFAxisParam::Write(fitsfile* fptr, int& axisID, int* status) {
+int const flexIRF::GIRFAxisParam::Write(fitsfile* fptr, int& axisID, int* status) {
 	// fill the data array
 	float* axisdata;
 
@@ -189,7 +189,7 @@ int const GIRFAxisParam::Write(fitsfile* fptr, int& axisID, int* status) {
 //
 // Check if the Axis already exists within the fits file
 //
-bool const GIRFAxisParam::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
+bool const flexIRF::GIRFAxisParam::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 
 
 	int currenthdu = fptr->HDUposition;
@@ -242,7 +242,7 @@ bool const GIRFAxisParam::CheckAxisExists(fitsfile* fptr, int& axisID, int* stat
 //
 // Check that the vector describe consistently the axis
 //
-int GIRFAxisParam::CheckAxisConsistency() {
+int flexIRF::GIRFAxisParam::CheckAxisConsistency() {
 	int status = GIRFAxis::CheckAxisConsistency();
 
 	if (!fAxisParameterizationFilled) status++;
@@ -254,7 +254,7 @@ int GIRFAxisParam::CheckAxisConsistency() {
 //
 // 	Print the content of the parameterized axis.
 //
-void const GIRFAxisParam::Print() {
+void const flexIRF::GIRFAxisParam::Print() {
 	cout << "GIRFAxisParam:" << endl;
 	cout << "formula = " << fAxisParam.formula << endl;
 	cout << "numParameters = " << fAxisParam.numParameters << endl;
@@ -266,7 +266,7 @@ void const GIRFAxisParam::Print() {
 //
 // Check if the parameterized axis is filled propperly
 //
-bool GIRFAxisParam::CheckAxisParameterizationFilled(){
+bool flexIRF::GIRFAxisParam::CheckAxisParameterizationFilled(){
 
 
 	if (fAxisParam.validRangeLow < fAxisParam.validRangeHigh && fAxisParam.validRangeLow != fAxisParam.validRangeHigh){

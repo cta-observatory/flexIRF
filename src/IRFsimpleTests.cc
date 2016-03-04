@@ -19,8 +19,8 @@ using namespace std;
 
 int main()
 {
-	GIRFAxisBins axis1;
-	GIRFAxisBins axis2;
+	flexIRF::GIRFAxisBins axis1;
+	flexIRF::GIRFAxisBins axis2;
 
 	vector<float> vect1, vect2;
 	for (int i=0;i<10;i++){
@@ -29,7 +29,7 @@ int main()
 	}
 	axis1.SetAxisBins(vect1);
 	axis2.SetAxisBins(vect2);
-	axis1.SetVarType(kEnergy);
+	axis1.SetVarType(flexIRF::kEnergy);
 //	cout << "axis1.GetRangeMin() = " << axis1.GetRangeMin() << endl;
 //	cout << "axis2.GetRangeMin() = " << axis2.GetRangeMin() << endl;
 //
@@ -39,13 +39,13 @@ int main()
 //	cout << "(axis1==axis2) = " << (axis1==axis2) << endl;
 //
 //	cout << "axis1.GetExtName() = " << axis1.GetExtName().data() << endl;
-	int lastID = GIRFUtils::GetLastAxisID("alltest.fits");
+	int lastID = flexIRF::GIRFUtils::GetLastAxisID("alltest.fits");
 //	cout << "lastID = " << lastID << endl;
 
-	GIRFAxisBins* axis3;
-	GIRFAxisBins* axis4;
-	axis3 = new GIRFAxisBins();
-	axis4 = new GIRFAxisBins();
+	flexIRF::GIRFAxisBins* axis3;
+	flexIRF::GIRFAxisBins* axis4;
+	axis3 = new flexIRF::GIRFAxisBins();
+	axis4 = new flexIRF::GIRFAxisBins();
 	axis3->SetAxisBins(vect1);
 	axis4->SetAxisBins(vect2);
 	cout << "axis3==axis4 = " << ((*axis3)==(*axis4)) << endl;
@@ -127,14 +127,14 @@ int main()
 //	irf2->Write("!paramTest.fits");
 //
 //
-	GIRFConfig config;
+	flexIRF::GIRFConfig config;
 //	config.SetDefault();
-	config.AddAxisRange(kEnergy,-1.7,-0.9, 1);
-	config.AddAxisRange(kPhi, -1,1, 0);
+	config.AddAxisRange(flexIRF::kEnergy,-1.7,-0.9, 1);
+	config.AddAxisRange(flexIRF::kPhi, -1,1, 0);
 //	config.Print();
 	string filename = "paramTest.fits";
-	GIRF irf(filename);
-	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(kAeff, config));
+	flexIRF::GIRF irf(filename);
+	flexIRF::GIRFPdf* effArea = dynamic_cast<flexIRF::GIRFPdf*>(irf.ReadPdf(flexIRF::kAeff, config));
 	if (!effArea || effArea->IsEmpty()) return 2;
 	effArea->Print();
 //	effArea->Draw();

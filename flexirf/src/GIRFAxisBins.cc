@@ -27,7 +27,7 @@ using namespace std;
 // 
 // Construct empty axis object
 //
-GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fAxisBinsFilled(0){
+flexIRF::GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fAxisBinsFilled(0){
 	SetAxisType(kBins);
 
 }
@@ -36,7 +36,7 @@ GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fAxisBinsFilled(0){
 // 
 // Construct axis object with predefined size
 //
-GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, bool islog) :
+flexIRF::GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, bool islog) :
 	fAxisBinsFilled(0) {
 	SetAxisType(kBins);
 	fAxisBins.reserve(size);
@@ -47,7 +47,7 @@ GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, bool islog) :
 // 
 // Construct axis object with predefined data
 //
-GIRFAxisBins::GIRFAxisBins(VarType vartype, bool islog) :
+flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, bool islog) :
 		GIRFAxis(vartype), fAxisBinsFilled(0) {
 	SetAxisType(kBins);
 	SetLog(islog);
@@ -57,7 +57,7 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, bool islog) :
 // 
 // Construct axis object with predefined size
 //
-GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
+flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 		bool islog) :
 		GIRFAxis(vartype), fAxisBinsFilled(0) {
 	SetAxisType(kBins);
@@ -68,7 +68,7 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 // 
 // Construct axis object with predefined vectors
 //
-GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float> bins, bool islog) :
+flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float> bins, bool islog) :
 		GIRFAxis(vartype) {
 	SetLog(islog);
 	SetAxisType(kBins);
@@ -84,7 +84,7 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float> bins, bool islog)
 // 
 // Construct axis object with predefined vectors (using arrays)
 //
-GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
+flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 		float* bins, bool islog) :
 		GIRFAxis(vartype) {
 	SetAxisType(kBins);
@@ -97,7 +97,7 @@ GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
 //
 // Construct axis object directly reading from current HDU
 //
-GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
+flexIRF::GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 {
 	SetAxisType(kBins);
 
@@ -130,7 +130,7 @@ GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 // 
 // Check that the vector describe consistently the axis
 //
-int GIRFAxisBins::CheckAxisConsistency() {
+int flexIRF::GIRFAxisBins::CheckAxisConsistency() {
 	int status = GIRFAxis::CheckAxisConsistency();
 
 	if (fAxisBins.size() == 0) {
@@ -152,7 +152,7 @@ int GIRFAxisBins::CheckAxisConsistency() {
 //
 // Check if both axis are identical. For now, only ranges and bins
 //	TODO: check values inside
-bool GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
+bool flexIRF::GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
 	if (otherAxis.GetAxisType() == this->GetAxisType() && otherAxis.GetVarType() == this->GetVarType()){
 		if (otherAxis.GetRangeMax() == this->GetRangeMax() && otherAxis.GetRangeMin() == this->GetRangeMin() && otherAxis.GetSize() == this->GetSize()){
 			vector<float> otherAxisBins = otherAxis.GetAxisBins();
@@ -167,7 +167,7 @@ bool GIRFAxisBins::operator==(const GIRFAxisBins& otherAxis) {
 //
 // Check if axis contains AxisRange
 //
-bool GIRFAxisBins::ContainsRange(AxisRange axisRange){
+bool flexIRF::GIRFAxisBins::ContainsRange(AxisRange axisRange){
 	if (axisRange.varType != this->GetVarType()) return 0;							//Sanity check
 	else{
 //		cout << "axisRange.lowRange = " << axisRange.lowRange << " & " << " axisRange.highRange = " << axisRange.highRange << endl;
@@ -181,7 +181,7 @@ bool GIRFAxisBins::ContainsRange(AxisRange axisRange){
 // 
 // Check that the vector describe consistently the axis
 //
-void GIRFAxisBins::SetAxis(std::vector<float>::size_type size, float* bins) {
+void flexIRF::GIRFAxisBins::SetAxis(std::vector<float>::size_type size, float* bins) {
 	// Clear vector
 	fAxisBins.clear();
 
@@ -198,7 +198,7 @@ void GIRFAxisBins::SetAxis(std::vector<float>::size_type size, float* bins) {
 // 
 // Write the axis to the specified file pointer
 //
-int const GIRFAxisBins::Write(fitsfile* fptr, int& axisID, int* status) {
+int const flexIRF::GIRFAxisBins::Write(fitsfile* fptr, int& axisID, int* status) {
 	// fill the data array
 	std::vector<float>::size_type axisSize = fAxisBins.size();
 	float* axisdata = new float[axisSize];
@@ -218,7 +218,7 @@ int const GIRFAxisBins::Write(fitsfile* fptr, int& axisID, int* status) {
 //
 // Print Axis content
 //
-void const GIRFAxisBins::Print()
+void const flexIRF::GIRFAxisBins::Print()
 {
 	//TODO: Improve print output.
 	std::vector<float>::size_type axisSize = fAxisBins.size();
@@ -231,7 +231,7 @@ void const GIRFAxisBins::Print()
 //
 // 		Check if the Axis already exists within the fits file
 //
-bool const GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
+bool const flexIRF::GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* status) {
 
 	int currenthdu = fptr->HDUposition;
 
@@ -275,7 +275,7 @@ bool const GIRFAxisBins::CheckAxisExists(fitsfile* fptr, int& axisID, int* statu
 //
 // 		Resize Axis, checking internal axis limit values
 //
-void GIRFAxisBins::Resize(float lValue, float hValue){
+void flexIRF::GIRFAxisBins::Resize(float lValue, float hValue){
 	int lbin, hbin;
 	bool lBinFilled=0,hBinFilled=0;
 	for (std::vector<float>::size_type ibin = 0; ibin < fAxisBins.size(); ibin++) {
@@ -290,7 +290,7 @@ void GIRFAxisBins::Resize(float lValue, float hValue){
 // 		Resize Axis, checking internal axis limit values,
 // 		returning lbin and hbin.
 //
-void GIRFAxisBins::Resize(float lValue, float hValue, int *lbin, int *hbin){
+void flexIRF::GIRFAxisBins::Resize(float lValue, float hValue, int *lbin, int *hbin){
 
 	bool lBinFilled=0,hBinFilled=0;
 	for (std::vector<float>::size_type ibin = 0; ibin < fAxisBins.size(); ibin++) {

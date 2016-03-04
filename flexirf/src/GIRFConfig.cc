@@ -28,7 +28,7 @@ using namespace std;
 // Construct object: read config file if available. If not,
 // set default values.
 //
-GIRFConfig::GIRFConfig() :
+flexIRF::GIRFConfig::GIRFConfig() :
 		fNSBLevel(kNoNSBLevel), fObsMode(kNoObsMode), fSubArray(kNoSubArray) {
 
 	SetDefault();
@@ -41,7 +41,7 @@ GIRFConfig::GIRFConfig() :
 
 }
 
-GIRFConfig::GIRFConfig(string filename) :
+flexIRF::GIRFConfig::GIRFConfig(string filename) :
 		fNSBLevel(kNoNSBLevel), fObsMode(kNoObsMode), fSubArray(kNoSubArray) {
 
 	SetDefault();
@@ -56,7 +56,7 @@ GIRFConfig::GIRFConfig(string filename) :
 	LoadConfigFile(filename);
 }
 
-int GIRFConfig::LoadConfigFile(string filename) {
+int flexIRF::GIRFConfig::LoadConfigFile(string filename) {
 
 	// TODO
 	// Read input card and set values
@@ -64,7 +64,7 @@ int GIRFConfig::LoadConfigFile(string filename) {
 	return 0;
 }
 
-void GIRFConfig::SetDefault() {
+void flexIRF::GIRFConfig::SetDefault() {
 
 	fNSBLevel = kExtragalactic;
 	fObsMode = kPoint;
@@ -76,7 +76,7 @@ void GIRFConfig::SetDefault() {
 
 }
 
-void GIRFConfig::Print() {
+void flexIRF::GIRFConfig::Print() {
 
 	cout << "*******************************************" << endl;
 	cout << "***       Printing CTAconfig          ***" << endl;

@@ -26,7 +26,7 @@ using namespace std;
 //
 // Construct object
 //
-GIRFRange::GIRFRange() {
+flexIRF::GIRFRange::GIRFRange() {
 
 	//TODO: Is there anything needed in the constructor?
 
@@ -37,7 +37,7 @@ GIRFRange::GIRFRange() {
 // Construct object: read config file if available. If not,
 // set default values.
 //
-void GIRFRange::AddAxisRange(VarType varType, float valueMin, float valueMax){
+void flexIRF::GIRFRange::AddAxisRange(VarType varType, float valueMin, float valueMax){
 
 	AxisRange axisRange;
 
@@ -49,7 +49,7 @@ void GIRFRange::AddAxisRange(VarType varType, float valueMin, float valueMax){
 	fAxisRanges.push_back(axisRange);
 }
 
-void GIRFRange::AddAxisRange(VarType varType, float valueMin, float valueMax, bool required){
+void flexIRF::GIRFRange::AddAxisRange(VarType varType, float valueMin, float valueMax, bool required){
 
 	AxisRange axisRange;
 

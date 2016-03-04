@@ -12,20 +12,21 @@
 #include "GIRFRange.h"
 #include "GIRFUtils.h"
 
-class GIRF {
+namespace flexIRF{
+	class GIRF {
 
-#ifdef SWIG
-public:
-#else
-private:
-#endif
+	#ifdef SWIG
+	public:
+	#else
+	private:
+	#endif
 	std::vector<GIRFPdf*> fPdfList;
 	std::string fFilename;
 	fitsfile* fFitsPtr;
 	int fStatus;
 	bool fFITSopened;
 
-public:
+	public:
 	GIRF();
 	GIRF(std::string filename);
 	virtual ~GIRF() {};
@@ -39,18 +40,18 @@ public:
 	inline GIRFPdf 			GetPdf(int pdfPos){GIRFPdf pdf = *fPdfList[pdfPos]; return pdf;};
 	GIRFPdf* 				ReadPdf(PdfVar pdfVar, GIRFConfig config);
 	GIRFPdf* 				ReadPdf(int pdfID, GIRFConfig config);
-//	GIRFPdf* 				ReadPdf(int pdfID);
+	//	GIRFPdf* 				ReadPdf(int pdfID);
 
 	int 					Write();
 	inline int 				Write(std::string filename){fFilename=filename; return Write();};
 	int 					OpenFITS();
 	int 					CreateFITS();
 
-#ifdef SWIG
-public:
-#else
-protected:
-#endif
+	#ifdef SWIG
+	public:
+	#else
+	protected:
+	#endif
 
 	int 					CheckAxisHDUpos(int axisID);
 	AxisType 		CheckAxisType(int axisID);
@@ -67,7 +68,9 @@ protected:
 	PdfVar 					ReadPdfVar(int pdfID);
 	PdfFunc 				ReadPdfFunc(int pdfID);
 	float*  				ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axisRanges);
-};
+	};
+}
+
 
 #endif
 

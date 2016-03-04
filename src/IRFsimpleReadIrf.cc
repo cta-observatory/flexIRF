@@ -33,20 +33,20 @@ int main(int argc, char **argv)
 	}
 
 //	Build mock CTA configuration file "GIRFConfig", and fill the ranges which we are interested to retrieve from the IRF file.
-	GIRFConfig config;
+	flexIRF::GIRFConfig config;
 	config.SetDefault();
 
 //	Select energy range between -1.7 and 0.9. Set the axis range as mandatory (if range is not present, stop with an error).
-	config.AddAxisRange(kEnergy,-1.7,0.9, 1);
+	config.AddAxisRange(flexIRF::kEnergy,-1.7,0.9, 1);
 //	Select Phi angle between -1 and 1. Set the axis range as optional (if range is not present in the file, continue with a warning).
-	config.AddAxisRange(kPhi, -1,1, 0);
+	config.AddAxisRange(flexIRF::kPhi, -1,1, 0);
 //	Print current GIRFConfig values.
 	config.Print();
 
 //	Build GIRF object
-	GIRF irf(filename);
+	flexIRF::GIRF irf(filename);
 //	Extract desired IRF of type "kAeff" (effective area) using the GCTAConfig object we just generated
-	GIRFPdf* effArea = dynamic_cast<GIRFPdf*>(irf.ReadPdf(kAeff, config));
+	flexIRF::GIRFPdf* effArea = dynamic_cast<flexIRF::GIRFPdf*>(irf.ReadPdf(flexIRF::kAeff, config));
 	if (effArea && !effArea->IsEmpty()) {
 		effArea->Print();
 		effArea->Draw("", "logY");

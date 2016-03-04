@@ -30,7 +30,7 @@ using namespace std;
 // 
 // Construct empty axis object
 //
-GIRFAxis::GIRFAxis() :
+flexIRF::GIRFAxis::GIRFAxis() :
 		fAxisType(kNoAxisType), fVarType(kNoVarType), fIsLog(0) {
 }
 
@@ -38,7 +38,7 @@ GIRFAxis::GIRFAxis() :
 // 
 // Construct empty axis object
 //
-GIRFAxis::GIRFAxis(VarType vartype) :
+flexIRF::GIRFAxis::GIRFAxis(VarType vartype) :
 		fAxisType(kNoAxisType), fVarType(vartype), fIsLog(false) {
 }
 
@@ -47,7 +47,7 @@ GIRFAxis::GIRFAxis(VarType vartype) :
 // 
 // Check that the vector describe consistently the axis
 //
-int GIRFAxis::CheckAxisConsistency() {
+int flexIRF::GIRFAxis::CheckAxisConsistency() {
 	int status = 0;
 	if (fVarType <= kNoVarType || fVarType >= kVarMax){
 		cout << "ERROR: Axis has no VarType!" << endl;
@@ -61,7 +61,7 @@ int GIRFAxis::CheckAxisConsistency() {
 //
 // Return the axis name for EXTNAME
 //
-std::string GIRFAxis::GetTypeName() const {
+std::string flexIRF::GIRFAxis::GetTypeName() const {
 
 	string axisType;
 
@@ -84,7 +84,7 @@ std::string GIRFAxis::GetTypeName() const {
 //
 // Return the axis name for EXTNAME
 //
-std::string GIRFAxis::GetVarName() const {
+std::string flexIRF::GIRFAxis::GetVarName() const {
 
 	string axisVarType;
 
@@ -120,7 +120,7 @@ std::string GIRFAxis::GetVarName() const {
 //
 // Return the axis name for EXTNAME
 //
-std::string GIRFAxis::GetVarName(VarType varType) {
+std::string flexIRF::GIRFAxis::GetVarName(VarType varType) {
 
 	string axisVarType;
 
@@ -158,7 +158,7 @@ std::string GIRFAxis::GetVarName(VarType varType) {
 //
 // Set the axis type using FITS format keywords
 //
-void GIRFAxis::SetAxisType(string axisTypeName) {
+void flexIRF::GIRFAxis::SetAxisType(string axisTypeName) {
 
 	if (axisTypeName == "BINS") {
 		fAxisType = kBins;
@@ -174,7 +174,7 @@ void GIRFAxis::SetAxisType(string axisTypeName) {
 //
 // Set the axis variable type using FITS format keywords
 //
-void GIRFAxis::SetVarType(string axisVarName) {
+void flexIRF::GIRFAxis::SetVarType(string axisVarName) {
 
 	if (axisVarName == "ENERGY") {
 		fVarType = kEnergy;
@@ -199,7 +199,7 @@ void GIRFAxis::SetVarType(string axisVarName) {
 //
 // Return the axis name for EXTNAME
 //
-std::string GIRFAxis::GetVarUnit() const {
+std::string flexIRF::GIRFAxis::GetVarUnit() const {
 
 	//TODO: Build a separate GIRFAxis units enum, which is read/written from the FITS file.
 
@@ -236,7 +236,7 @@ std::string GIRFAxis::GetVarUnit() const {
 // 
 // Write the header of the axis HDU
 //
-int const GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
+int const flexIRF::GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
 		int* status) {
 
 

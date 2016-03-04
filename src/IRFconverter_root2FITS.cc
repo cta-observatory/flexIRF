@@ -30,11 +30,11 @@ using namespace std;
 //
 // Declare functions here
 //
-void IRFconverter_root2FITS_irfGenND(TFile *f, GIRF* irf, vector<float>& pdfdata, string histname,
-	      const AxisType axistype[],
-	      const VarType vartype[],
-	      const PdfVar pdfvar_type,
-	      const PdfFunc pdffunc_type,
+void IRFconverter_root2FITS_irfGenND(TFile *f, flexIRF::GIRF* irf, vector<float>& pdfdata, string histname,
+	      const flexIRF::AxisType axistype[],
+	      const flexIRF::VarType vartype[],
+	      const flexIRF::PdfVar pdfvar_type,
+	      const flexIRF::PdfFunc pdffunc_type,
 	      const int naxes);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,19 +133,19 @@ int main(int argc, char **argv)
   
   vector< vector<float> > pdfgroup(numest);
 
-  GIRF* irf = new GIRF;  
+  flexIRF::GIRF* irf = new flexIRF::GIRF;
   
   //Need to use the config file to read the following:
   //PDF type: kNoPdfVar=0,kEfficiency,kEDispersion,kPsf,kBkgRate,kPdfVarMax
   //PDF Para: kNoPdfFunc=0,kNumber,kGaussian,k2DGaussian,kPdfFuncMax
 
-  PdfVar pdfvar_type;
-  PdfFunc pdffunc_type;
+  flexIRF::PdfVar pdfvar_type;
+  flexIRF::PdfFunc pdffunc_type;
 
   for(int i=0; i<numest; i++){
     
-    AxisType axistype[naxes[i]];
-    VarType vartype[naxes[i]];
+	flexIRF::AxisType axistype[naxes[i]];
+	flexIRF::VarType vartype[naxes[i]];
   
     //These switch statements are matched to the histogram objects 
     //located in the performance file Performance_2Q_Aar_50h_20150217.root
@@ -154,64 +154,64 @@ int main(int argc, char **argv)
     switch(i)
       {
       case 0: //DiffSens
-	axistype[0]   = kBins;
-	vartype[0]    = kEnergy_rec;
-	pdfvar_type   = kDiffSens;
-	pdffunc_type  = kNumber;
+	axistype[0]   = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy_rec;
+	pdfvar_type   = flexIRF::kDiffSens;
+	pdffunc_type  = flexIRF::kNumber;
 
 	IRFconverter_root2FITS_irfGenND(fin, irf, pdfgroup[i], histname[i], axistype,
 		 vartype, pdfvar_type, pdffunc_type, naxes[i]);
 	break;
       case 1: //BGRate
-	axistype[0]   = kBins;
-	vartype[0]    = kEnergy;
-	pdfvar_type   = kBkgRate;
-	pdffunc_type  = kNumber;
+	axistype[0]   = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy;
+	pdfvar_type   = flexIRF::kBkgRate;
+	pdffunc_type  = flexIRF::kNumber;
 
 	IRFconverter_root2FITS_irfGenND(fin, irf, pdfgroup[i], histname[i], axistype,
 		 vartype, pdfvar_type, pdffunc_type, naxes[i]);
 	break;
       case 2: //BGRatePerSqDeg
-	axistype[0]   = kBins;
-	vartype[0]    = kEnergy;
-	pdfvar_type   = kBkgRateSqDeg;
-	pdffunc_type  = kNumber;
+	axistype[0]   = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy;
+	pdfvar_type   = flexIRF::kBkgRateSqDeg;
+	pdffunc_type  = flexIRF::kNumber;
 
 	IRFconverter_root2FITS_irfGenND(fin, irf, pdfgroup[i], histname[i], axistype,
 		 vartype, pdfvar_type, pdffunc_type, naxes[i]);
 	break;
       case 3: //AngRes
-	axistype[0]   = kBins, axistype[1] = kBins;
-	vartype[0]    = kEnergy, vartype[1] = kEnergy;
-	pdfvar_type   = kPsf;
-	pdffunc_type  = kNumber;
+	axistype[0]   = flexIRF::kBins, axistype[1] = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy, vartype[1] = flexIRF::kEnergy;
+	pdfvar_type   = flexIRF::kPsf;
+	pdffunc_type  = flexIRF::kNumber;
 
 	IRFconverter_root2FITS_irfGenND(fin, irf, pdfgroup[i], histname[i], axistype,
 		 vartype, pdfvar_type, pdffunc_type, naxes[i]);
 	break;
       case 4: //EffectiveAreaETrue
-	axistype[0]   = kBins;
-	vartype[0]    = kEnergy;
-	pdfvar_type   = kAeff;
-	pdffunc_type  = kNumber;
+	axistype[0]   = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy;
+	pdfvar_type   = flexIRF::kAeff;
+	pdffunc_type  = flexIRF::kNumber;
 
 	IRFconverter_root2FITS_irfGenND(fin, irf, pdfgroup[i], histname[i], axistype,
 		 vartype, pdfvar_type, pdffunc_type, naxes[i]);
 	break;
       case 5: //EffectiveAreaEtrueNoTheta2cut
-	axistype[0]   = kBins;
-	vartype[0]    = kEnergy;
-	pdfvar_type   = kAeffNoTheta2Cut;
-	pdffunc_type  = kNumber;
+	axistype[0]   = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy;
+	pdfvar_type   = flexIRF::kAeffNoTheta2Cut;
+	pdffunc_type  = flexIRF::kNumber;
 
 	IRFconverter_root2FITS_irfGenND(fin, irf, pdfgroup[i], histname[i], axistype,
 		 vartype, pdfvar_type, pdffunc_type, naxes[i]);
 	break;
       case 6: //MigMatrix
-	axistype[0]   = kBins; axistype[1] = kBins;
-	vartype[0]    = kEnergy_rec; vartype[1] = kEnergy_true;
-	pdfvar_type   = kEDispersion;
-	pdffunc_type  = kNumber;
+	axistype[0]   = flexIRF::kBins; axistype[1] = flexIRF::kBins;
+	vartype[0]    = flexIRF::kEnergy_rec; vartype[1] = flexIRF::kEnergy_true;
+	pdfvar_type   = flexIRF::kEDispersion;
+	pdffunc_type  = flexIRF::kNumber;
 
 	IRFconverter_root2FITS_irfGenND(fin, irf, pdfgroup[i], histname[i], axistype,
 		 vartype, pdfvar_type, pdffunc_type, naxes[i]);
@@ -233,10 +233,10 @@ int main(int argc, char **argv)
 
 }//ends main
 
-void IRFconverter_root2FITS_irfGenND(TFile *paramfile, GIRF* irf,
+void IRFconverter_root2FITS_irfGenND(TFile *paramfile, flexIRF::GIRF* irf,
 	      vector<float>& pdfdata, string histname, 
-	      const AxisType axistype[], const VarType vartype[],
-	      const PdfVar pdfvar_type, const PdfFunc pdffunc_type,
+	      const flexIRF::AxisType axistype[], const flexIRF::VarType vartype[],
+	      const flexIRF::PdfVar pdfvar_type, const flexIRF::PdfFunc pdffunc_type,
 	      const int naxes_array)
 {
 
@@ -371,18 +371,18 @@ void IRFconverter_root2FITS_irfGenND(TFile *paramfile, GIRF* irf,
   }
   
   //Declare and fill pdf                                                                                                           
-  GIRFPdf*   mypdf   = new GIRFPdf(pdfvar_type, pdffunc_type);
+  flexIRF::GIRFPdf*   mypdf   = new flexIRF::GIRFPdf(pdfvar_type, pdffunc_type);
   mypdf->SetData(pdfdata.data());
   
-  GIRFAxis** IRFAxis = new GIRFAxis*[naxes];
+  flexIRF::GIRFAxis** IRFAxis = new flexIRF::GIRFAxis*[naxes];
 
   //Fill the axes                                                                                                                      
   for(int iaxis=0;iaxis<naxes;iaxis++)
     {
       
       //Simpler notation                                                                         
-      AxisType axis_type = axistype[iaxis];
-      VarType  var_type  = vartype[iaxis];
+	  flexIRF::AxisType axis_type = axistype[iaxis];
+	  flexIRF::VarType  var_type  = vartype[iaxis];
       bool               islog    = axisislog[iaxis];
       int                size     = axissize[iaxis];
       float*             theaxis  = axis[iaxis];
@@ -390,8 +390,8 @@ void IRFconverter_root2FITS_irfGenND(TFile *paramfile, GIRF* irf,
       //Fill the GIRF axis objects                                                                      
       switch(axis_type)
         {
-        case kBins:
-          IRFAxis[iaxis] = new GIRFAxisBins(var_type,size,theaxis,islog);
+        case flexIRF::kBins:
+          IRFAxis[iaxis] = new flexIRF::GIRFAxisBins(var_type,size,theaxis,islog);
           break;
         default:
         	//TODO: Currently not supporting parameterized axes.
