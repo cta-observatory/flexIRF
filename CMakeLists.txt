@@ -14,6 +14,7 @@ set( EXTRA_LIBS ${EXTRA_LIBS} ${CFITSIO_LIBRARIES} )
 ## Include ROOT libraries   
 find_package(ROOT)
 IF(ROOT_FOUND)
+    add_definitions(-DWITH_ROOT)
 	include_directories(${ROOT_INCLUDE_DIR})
 	set( ROOT_LIBS ${ROOT_LIBS} ${ROOT_LIBRARIES} )
 	set( rootinc ${PROJECT_SOURCE_DIR}/include )

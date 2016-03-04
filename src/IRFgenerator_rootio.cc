@@ -16,9 +16,15 @@
 #include "GIRF.h"
 
 //ROOT includes
-#include <rootincludes.h>
+#ifdef WITH_ROOT  // ROOT found in the installation
+	#include "rootincludes.h"
+#endif
 
 using namespace std;
+
+
+#ifdef WITH_ROOT  // ROOT found in the installation
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -307,3 +313,17 @@ void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
   irf->Write(fitsout);
 
 }//ends makeFITS
+
+#endif
+
+
+#ifndef WITH_ROOT  // ROOT found in the installation
+
+int main(int argc, char **argv)
+{
+	cout << "This macro makes use of ROOT libraries (not found in your system during compilation)." << endl;
+	cout << "Exitting..." << endl;
+	return 0;
+}
+
+#endif

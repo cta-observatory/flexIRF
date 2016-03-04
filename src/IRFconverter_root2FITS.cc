@@ -7,9 +7,6 @@
 \* ======================================================================== */
 
 
-#ifndef IRFCONVERTER_ROOT2FITS
-#define IRFCONVERTER_ROOT2FITS
-
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -20,15 +17,19 @@
 #include "GIRF.h"
 
 //ROOT includes
-#include "rootincludes.h"
+#ifdef WITH_ROOT  // ROOT found in the installation
+	#include "rootincludes.h"
+#endif
 
 using namespace std;
+
+
+#ifdef WITH_ROOT  // ROOT found in the installation
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Declare functions here
 //
-
 void IRFconverter_root2FITS_irfGenND(TFile *f, GIRF* irf, vector<float>& pdfdata, string histname,
 	      const AxisType axistype[],
 	      const VarType vartype[],
@@ -40,6 +41,9 @@ void IRFconverter_root2FITS_irfGenND(TFile *f, GIRF* irf, vector<float>& pdfdata
 //
 // Main code starts here
 //
+
+
+#ifndef WITH_ROOT  // ROOT found in the installation
 
 int main(int argc, char **argv)
 {
@@ -412,5 +416,18 @@ void IRFconverter_root2FITS_irfGenND(TFile *paramfile, GIRF* irf,
   irf->Write(fitsout);
   
 }//ends irfGenND
+#endif
 
-#endif /* GAPPLICATION_HPP */
+
+#ifndef WITH_ROOT  // ROOT found in the installation
+
+int main(int argc, char **argv)
+{
+	cout << "This macro makes use of ROOT libraries (not found in your system during compilation)." << endl;
+	cout << "Exitting..." << endl;
+	return 0;
+}
+
+#endif
+
+
