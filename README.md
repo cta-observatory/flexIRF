@@ -16,13 +16,11 @@ git dpkg-dev make g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev 
 
 It also uses CFITSIO library ("libcfitsio3" "libcfitsio3-dev" packages on ubuntu machines) and swig, although with no python working wrapper yet.
 
-ROOT is currently also used for some executables, but will be removed in the close future.
+ROOT is currently an optional library used by some executables, but will be removed in the future.
 
 
 Installation
 --------------
-
-Note this repository is currently only tested properly in linux machines. 
 
 Build git version using:
 
