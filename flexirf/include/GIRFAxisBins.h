@@ -13,11 +13,11 @@ namespace flexIRF{
 
 	 public:
 	  GIRFAxisBins();           // create new empty bin axis
-	  GIRFAxisBins(std::vector<float>::size_type size,bool islog=false);   // create new bin axis with size
-	  GIRFAxisBins(flexIRF::VarType vartype,bool islog=false); // create new axis
-	  GIRFAxisBins(flexIRF::VarType vartype,std::vector<float>::size_type size,bool islog=false); // create new axis
-	  GIRFAxisBins(flexIRF::VarType vartype,std::vector<float> bins,bool islog=false); // create new axis
-	  GIRFAxisBins(flexIRF::VarType vartype,std::vector<float>::size_type size,float* bins,bool islog=false); // create new axis
+	  GIRFAxisBins(std::vector<float>::size_type size, ScaleType scaleType);   // create new bin axis with size
+	  GIRFAxisBins(flexIRF::VarType vartype, ScaleType scaleType); // create new axis
+	  GIRFAxisBins(flexIRF::VarType vartype,std::vector<float>::size_type size, ScaleType scaleType); // create new axis
+	  GIRFAxisBins(flexIRF::VarType vartype,std::vector<float> bins, ScaleType scaleType); // create new axis
+	  GIRFAxisBins(flexIRF::VarType vartype,std::vector<float>::size_type size,float* bins, ScaleType scaleType); // create new axis
 	  GIRFAxisBins(fitsfile* fptr,int* status);
 	  virtual ~GIRFAxisBins(){};
 

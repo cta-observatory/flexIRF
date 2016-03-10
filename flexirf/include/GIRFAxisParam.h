@@ -22,8 +22,8 @@ namespace flexIRF{
 
 	public:
 		GIRFAxisParam();           // create new empty bin axis
-		GIRFAxisParam(VarType vartype, bool islog = false); // create new axis
-		GIRFAxisParam(VarType vartype, AxisParameterization axisParam, bool islog = false); // create new axis
+		GIRFAxisParam(VarType varType, ScaleType scaleType); // create new axis
+		GIRFAxisParam(VarType varType, AxisParameterization axisParam, ScaleType scaleType); // create new axis
 		GIRFAxisParam(fitsfile* fptr, int* status);
 
 

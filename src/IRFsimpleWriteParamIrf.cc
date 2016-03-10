@@ -26,9 +26,6 @@ using namespace std;
 int main()
 {
 
-//	Axis parameterization will be done in log scale
-    bool               islog    = 1;
-
 //  Instanciate AxisParameterization class, to define a parameterization.
     flexIRF::AxisParameterization param;
 //	Define parameterization formula, valid range and number of parameters. All will be stored into the FITS file with dedicated keywords.
@@ -38,8 +35,11 @@ int main()
 	param.validRangeHigh= 2;
 	param.numParameters= 3;
 
+//	Axis parameterization is done in log scale (log10(E_TeV))
+	flexIRF::ScaleType scale = flexIRF::kLog10;
+
 //	Create the axis (in this case, of GIRFAxisParam type) and specify its type, and scale (log).
-	flexIRF::GIRFAxisParam* axis1 = new flexIRF::GIRFAxisParam(flexIRF::kEnergy, islog);
+	flexIRF::GIRFAxisParam* axis1 = new flexIRF::GIRFAxisParam(flexIRF::kEnergy, scale);
 	axis1->SetAxisParam(param);
 	axis1->Print();
 

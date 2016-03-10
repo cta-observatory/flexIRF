@@ -85,7 +85,7 @@ bin/IRFconverter_root2FITS dummy/dummyconfig.txt prodfiles/Performance_2Q_Aar_50
 
 Output will be
 
-alltest.fits
+testRoot2FITS_converter.fits
 
 IRFgenerator_rootio:
 

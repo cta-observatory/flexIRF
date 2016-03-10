@@ -36,21 +36,21 @@ flexIRF::GIRFAxisBins::GIRFAxisBins() : GIRFAxis(), fAxisBinsFilled(0){
 // 
 // Construct axis object with predefined size
 //
-flexIRF::GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, bool islog) :
+flexIRF::GIRFAxisBins::GIRFAxisBins(std::vector<float>::size_type size, ScaleType scaleType) :
 	fAxisBinsFilled(0) {
 	SetAxisType(kBins);
 	fAxisBins.reserve(size);
-	SetLog(islog);
+	SetScale(scaleType);
 }
 
 ////////////////////////////////////////////////////////////////
 // 
 // Construct axis object with predefined data
 //
-flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, bool islog) :
+flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, ScaleType scaleType) :
 		GIRFAxis(vartype), fAxisBinsFilled(0) {
 	SetAxisType(kBins);
-	SetLog(islog);
+	SetScale(scaleType);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -58,19 +58,19 @@ flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, bool islog) :
 // Construct axis object with predefined size
 //
 flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
-		bool islog) :
+		ScaleType scaleType) :
 		GIRFAxis(vartype), fAxisBinsFilled(0) {
 	SetAxisType(kBins);
-	SetLog(islog);
+	SetScale(scaleType);
 	fAxisBins.reserve(size);
 }
 ////////////////////////////////////////////////////////////////
 // 
 // Construct axis object with predefined vectors
 //
-flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float> bins, bool islog) :
+flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float> bins, ScaleType scaleType) :
 		GIRFAxis(vartype) {
-	SetLog(islog);
+	SetScale(scaleType);
 	SetAxisType(kBins);
 	fAxisBins = bins;
 
@@ -85,11 +85,11 @@ flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float> bins, bo
 // Construct axis object with predefined vectors (using arrays)
 //
 flexIRF::GIRFAxisBins::GIRFAxisBins(VarType vartype, std::vector<float>::size_type size,
-		float* bins, bool islog) :
+		float* bins, ScaleType scaleType) :
 		GIRFAxis(vartype) {
 	SetAxisType(kBins);
 	SetAxis(size, bins);
-	SetLog(islog);
+	SetScale(scaleType);
 }
 
 
@@ -117,8 +117,8 @@ flexIRF::GIRFAxisBins::GIRFAxisBins(fitsfile* fptr,int* status)
 	fits_read_key_str(fptr, "VARTYPE", card, NULL, status);
 	SetVarType((VarType)atoi(card));
 
-	fits_read_key_str(fptr, "ISLOG", card, NULL, status);
-	SetLog((bool)atoi(card));
+	fits_read_key_str(fptr, "SCALE", card, NULL, status);
+	SetScale((string) card);
 }
 
 

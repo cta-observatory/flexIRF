@@ -54,6 +54,4 @@ int main(int argc, char **argv)
 	}
 	cout << "ERROR: IRF element was not properly extracted from the FITS file." << endl;
 	return 1;
-
-	return 0;
 }//Ends main

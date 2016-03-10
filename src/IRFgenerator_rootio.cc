@@ -285,7 +285,10 @@ void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
       // simpler notation                                                                         
 	  flexIRF::AxisType axis_type = axistype[iaxis];
 	  flexIRF::VarType  var_type  = vartype[iaxis];
-      bool               islog    = axisislog[iaxis];
+	  flexIRF::ScaleType  scale_type;
+	  if (axisislog[iaxis]) scale_type=flexIRF::kLog10;
+	  else scale_type=flexIRF::kLinear;
+
       int                size     = axissize[iaxis];
       float*             theaxis  = axis[iaxis];
       
@@ -293,7 +296,7 @@ void IRFgenerator_rootio_makeFITS(vector <float> pdfdata, string histname,
       switch(axis_type)
         {
         case flexIRF::kBins:
-          IRFAxis[iaxis] = new flexIRF::GIRFAxisBins(var_type,size,theaxis,islog);
+          IRFAxis[iaxis] = new flexIRF::GIRFAxisBins(var_type,size,theaxis,scale_type);
           break;
         default:
         	//TODO: Currently not supporting parameterized axes.

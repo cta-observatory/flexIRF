@@ -36,10 +36,10 @@ flexIRF::GIRFAxisParam::GIRFAxisParam() :
 // 
 // Construct axis object with predefined data
 //
-flexIRF::GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
-		GIRFAxis(vartype), fAxisParameterizationFilled(0){
+flexIRF::GIRFAxisParam::GIRFAxisParam(VarType varType, ScaleType scaleType) :
+		GIRFAxis(varType), fAxisParameterizationFilled(0){
 	SetAxisType(kParam);
-	SetLog(islog);
+	SetScale(scaleType);
 }
 
 
@@ -47,11 +47,11 @@ flexIRF::GIRFAxisParam::GIRFAxisParam(VarType vartype, bool islog) :
 // 
 // Construct axis object with predefined vectors (using arrays)
 //
-flexIRF::GIRFAxisParam::GIRFAxisParam(VarType vartype, AxisParameterization axisParam,
-		bool islog) : GIRFAxis(vartype) {
+flexIRF::GIRFAxisParam::GIRFAxisParam(VarType varType, AxisParameterization axisParam,
+		ScaleType scaleType) : GIRFAxis(varType) {
 	SetAxisType(kParam);
 	fAxisParam = axisParam;
-	SetLog(islog);
+	SetScale(scaleType);
 
 	// Check if the axis is properly parameterized
 	CheckAxisParameterizationFilled();
@@ -98,8 +98,8 @@ flexIRF::GIRFAxisParam::GIRFAxisParam(fitsfile* fptr, int* status) {
 
 //	SetValidRange();
 
-	fits_read_key_str(fptr, "ISLOG", card, NULL, status);
-	SetLog((bool)atoi(card));
+	fits_read_key_str(fptr, "SCALE", card, NULL, status);
+	SetScale((string) card);
 
 	//TODO: Read everything from fits file.
 	CheckAxisParameterizationFilled();

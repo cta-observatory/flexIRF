@@ -27,6 +27,15 @@ namespace flexIRF{
 		kVarMax
 	}; // allowed variables
 
+	enum ScaleType {
+		kNoScaleType = 0,
+		kLinear,
+		kLog10,
+		kSqrt,
+		kScaleMax
+	}; // allowed variables
+
+
 	struct AxisRange {
 		VarType varType;
 		float lowRange;
@@ -46,9 +55,10 @@ namespace flexIRF{
 		// ID:     PDG particle ID numbering scheme
 
 	private:
-		AxisType fAxisType;  		// kind of axis (bins or parameterization)
-		VarType fVarType;   		// variable described by axis
-		bool fIsLog;        		// if true, the interpolation/parameterization will be done on the log of the variable
+		AxisType fAxisType;  		// Type of the axis (bins or parameterization)
+		VarType fVarType;   		// Variable contained in axis (energy, theta, phi...)
+		ScaleType fScaleType;		// Scale in which the variable is stored (linear, log...)
+//		bool fIsLog;        		// if true, the interpolation/parameterization will be done on the log of the variable TODO: deprecated!
 
 	public:
 		GIRFAxis();                	// create new empty axis
@@ -56,11 +66,18 @@ namespace flexIRF{
 
 		virtual ~GIRFAxis(){};
 
-		virtual inline void SetVarType(VarType vartype) {fVarType = vartype;}
+		virtual inline void SetVarType(VarType varType) {fVarType = varType;}
 		virtual void SetVarType(std::string axisVarName);
 
 		virtual inline AxisType GetAxisType() const {return fAxisType;}
 		virtual inline VarType GetVarType() const {return fVarType;}
+
+		virtual inline void SetScale(ScaleType scaleType) {fScaleType = scaleType;}
+		virtual void SetScale(std::string scaleVarName);
+
+		virtual inline ScaleType GetScale() const {return fScaleType;}
+		virtual std::string 	GetScaleName() const {return GetScaleName(fScaleType);}
+		static std::string 	GetScaleName(ScaleType scaleType);
 
 	//  virtual GIRFAxis* GetAxis(fitsfile* fptr, int axisID, int* status);
 
@@ -68,12 +85,12 @@ namespace flexIRF{
 		virtual float 	GetRangeMax() const {return 0;}
 		virtual int 	GetSize() const {return 0;}
 
-		virtual bool 		IsLog() const {return fIsLog;}
-		virtual inline void	SetLog(bool isLog=1) {fIsLog=isLog;}
+//		virtual bool 		IsLog() const {return fIsLog;}
+//		virtual inline void	SetLog(bool isLog=1) {fIsLog=isLog;}
 
 		virtual inline std::string 	GetExtName() const {return GetVarName() + "_" + GetTypeName();}
 		virtual std::string 		GetTypeName() const;
-		virtual std::string 		GetVarName() const;
+		virtual std::string 		GetVarName() const {return GetVarName(fVarType);}
 		static std::string 			GetVarName(VarType varType);
 		virtual std::string 		GetVarUnit() const;
 

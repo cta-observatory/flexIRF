@@ -47,12 +47,12 @@ int main()
 //	Define required information to build a GIRFAxis object.
 	flexIRF::AxisType axis_type = flexIRF::kBins;							// Not necessary, as it is already fixed by using the "GIRFAxisBins"
 	flexIRF::VarType  var_type  = flexIRF::kEnergy;
-    bool               islog    = 1;
+	flexIRF::ScaleType  scale_type  = flexIRF::kLog10;
     int                size     = axisEdges.size();
     float*             axisData  = axisEdges.data();
 
 //  Build GIRFAxis object.
-    flexIRF::GIRFAxis* axis = new flexIRF::GIRFAxisBins(var_type,size,axisData,islog);
+    flexIRF::GIRFAxis* axis = new flexIRF::GIRFAxisBins(var_type,size,axisData,scale_type);
 
 //  Build GIRFPdf object, using both pdfData and the generated axis.
     flexIRF::GIRFPdf*   myIrfToStore   = new flexIRF::GIRFPdf(flexIRF::kAeff,flexIRF::kNumber);
@@ -62,6 +62,7 @@ int main()
 //  Build GIRF object, introduce the generated GIRFPdf object and write it into a fits file.
 	flexIRF::GIRF irf;
 	irf.AddPdf(myIrfToStore);
+	cout << "Writing IRF element example into examples/testEffArea.fits" << endl;
 	irf.Write("!examples/testEffArea.fits");
 
 	return 0;

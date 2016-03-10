@@ -19,6 +19,7 @@
 #include "GIRFAxis.h"
 #include "GIRFAxisBins.h"
 #include "GIRFAxisParam.h"
+#include "GIRFUtils.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -31,7 +32,7 @@ using namespace std;
 // Construct empty axis object
 //
 flexIRF::GIRFAxis::GIRFAxis() :
-		fAxisType(kNoAxisType), fVarType(kNoVarType), fIsLog(0) {
+		fAxisType(kNoAxisType), fVarType(kNoVarType), fScaleType(kLinear) {
 }
 
 ////////////////////////////////////////////////////////////////
@@ -39,7 +40,7 @@ flexIRF::GIRFAxis::GIRFAxis() :
 // Construct empty axis object
 //
 flexIRF::GIRFAxis::GIRFAxis(VarType vartype) :
-		fAxisType(kNoAxisType), fVarType(vartype), fIsLog(false) {
+		fAxisType(kNoAxisType), fVarType(vartype), fScaleType(kLinear) {
 }
 
 
@@ -78,41 +79,6 @@ std::string flexIRF::GIRFAxis::GetTypeName() const {
 	}
 
 	return axisType;
-}
-
-////////////////////////////////////////////////////////////////
-//
-// Return the axis name for EXTNAME
-//
-std::string flexIRF::GIRFAxis::GetVarName() const {
-
-	string axisVarType;
-
-	switch (fVarType) {
-	case kEnergy:
-		axisVarType = "ENERGY";
-		break;
-	case kEnergy_true:
-		axisVarType = "TENERGY";
-		break;
-	case kEnergy_rec:
-		axisVarType = "RENERGY";
-		break;
-	case kTheta:
-		axisVarType = "THETA";
-		break;
-	case kPhi:
-		axisVarType = "PHI";
-		break;
-	case kID:
-		axisVarType = "ID";
-		break;
-	default:
-		cout << "Incorrect variable type.\n";
-		return axisVarType;
-	}
-
-	return axisVarType;
 }
 
 
@@ -190,8 +156,57 @@ void flexIRF::GIRFAxis::SetVarType(string axisVarName) {
 		fVarType = kID;
 	} else {
 		cout << "Incorrect axis variable type.\n";
+		fVarType = kNoVarType;
 	}
 	return;
+
+}
+
+////////////////////////////////////////////////////////////////
+//
+// Set the scale type using FITS format keywords
+//
+void flexIRF::GIRFAxis::SetScale(string scaleVarName) {
+
+	if (scaleVarName == "LINEAR") {
+		fScaleType = kLinear;
+	} else if (scaleVarName == "LOG10") {
+		fScaleType = kLog10;
+	} else if (scaleVarName == "SQRT") {
+		fScaleType = kSqrt;
+	} else {
+		cout << "Incorrect scale type.\n";
+
+	}
+	return;
+
+}
+
+////////////////////////////////////////////////////////////////
+//
+// Set CHDU to last Axis HDU present within the fits file
+//
+std::string flexIRF::GIRFAxis::GetScaleName(ScaleType scaleType){
+
+	string scaleTypeName;
+
+	switch (scaleType) {
+	case kLinear:
+		scaleTypeName = "LINEAR";
+		break;
+	case kLog10:
+		scaleTypeName = "LOG10";
+		break;
+	case kSqrt:
+		scaleTypeName = "SQRT";
+		break;
+	default:
+		cout << "Incorrect scale type.\n";
+		scaleTypeName = "";
+		return scaleTypeName;
+	}
+
+	return scaleTypeName;
 
 }
 
@@ -280,11 +295,11 @@ int const flexIRF::GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, i
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 
-// write IsLog
-	sprintf(keyword, "ISLOG");
-	usval = ushort(fIsLog);
-	sprintf(comment, "If true, logarithm of the variable is stored");
-	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+// write scale type
+	sprintf(keyword, "SCALE");
+	sprintf(chval, "%s", GetScaleName().data());
+	sprintf(comment, "Scale type (see GIRFAxis.h for details)");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 

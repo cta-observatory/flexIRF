@@ -9,17 +9,17 @@ namespace flexIRF{
 	class GIRFRange {
 
 	private:
-		std::vector<AxisRange> fAxisRanges;
+		std::vector<flexIRF::AxisRange> fAxisRanges;
 	//	int LoadConfigFile(std::string filename);
 
 	public:
-		inline void AddAxisRange(AxisRange axisRange)  {fAxisRanges.push_back(axisRange);} 		// insert axis range in the list
+		inline void AddAxisRange(flexIRF::AxisRange axisRange)  {fAxisRanges.push_back(axisRange);} 		// insert axis range in the list
 		void AddAxisRange(VarType varType, float valueMin, float valueMax); 		// insert axis range in the list
 		void AddAxisRange(VarType varType, float valueMin, float valueMax, bool required);
 
 		GIRFRange();
 		virtual ~GIRFRange() {};
-		inline std::vector<AxisRange> GetAxisRanges() const {return fAxisRanges;}
+		inline std::vector<flexIRF::AxisRange> GetAxisRanges() const {return fAxisRanges;}
 		inline uint GetNumAxisRanges() const {return fAxisRanges.size();}
 
 	};

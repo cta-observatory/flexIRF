@@ -73,7 +73,7 @@ void flexIRF::GIRFPdf::Draw(string filename, string drawOption) const {
 			for (int i=0;i<axisParam->GetNumPars();i++) pdf->SetParameter(i,fData[i]);
 			TCanvas c1;
 			TString xTitle = (TString)axisParam->GetVarName() + " [" + (TString)axisParam->GetVarUnit() + "]";
-			if (axisParam->IsLog()) xTitle = "log " + (TString)axisParam->GetVarName() + " [" + (TString)axisParam->GetVarUnit() + "]";
+			if (axisParam->GetScale() == kLog10) xTitle = "log " + (TString)axisParam->GetVarName() + " [" + (TString)axisParam->GetVarUnit() + "]";
 			TString yTitle = (TString)GetVarName() + " [" + (TString)GetVarUnit() + "]";;
 			pdf->SetTitle((TString)GetExtName());
 			pdf->GetXaxis()->SetTitle(xTitle);
@@ -92,7 +92,7 @@ void flexIRF::GIRFPdf::Draw(string filename, string drawOption) const {
 			TCanvas c1;
 			TString xTitle = (TString)axisBins->GetVarName() + " [" + (TString)axisBins->GetVarUnit() + "]";
 			TString yTitle = (TString)GetVarName() + " [" + (TString)GetVarUnit() + "]";
-			if (axisBins->IsLog()) xTitle = "log " + (TString)axisBins->GetVarName() + " [" + (TString)axisBins->GetVarUnit() + "]";
+			if (axisBins->GetScale() == kLog10) xTitle = "log " + (TString)axisBins->GetVarName() + " [" + (TString)axisBins->GetVarUnit() + "]";
 			pdf->GetXaxis()->SetTitle(xTitle);
 			pdf->GetYaxis()->SetTitle(yTitle);
 			pdf->SetStats(0);
