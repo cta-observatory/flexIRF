@@ -264,6 +264,26 @@ std::string flexIRF::GIRFPdf::GetVarUnit() const {
 //
 int flexIRF::GIRFPdf::Write(fitsfile* fptr, int* status) {
 
+	if (fSerialization.empty()) {
+		cout << "WARNING: No serialization specified. Using default IMAGE serialization" << endl;
+		fSerialization="IMAGE";
+	}
+
+	if (fSerialization=="IMAGE") return Write_IMAGE(fptr, status);
+	else if (fSerialization=="BINTABLE") return Write_BINTABLE(fptr, status);
+	else {
+		cout << "ERROR: Incorrect serialization type. Exitting...\n";
+		return 1;
+	}
+}
+
+////////////////////////////////////////////////////////////////
+//
+// Write the pdf and the associated axes to the specified
+// file pointer. Only done if IMAGE serialization is used.
+//
+int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
+
 	// create arrays with size and first entry of every dimension to be saved (1 is first, not 0)
 	int naxis = int(fAxis.size());
 	long* naxes = new long[naxis];
@@ -415,6 +435,15 @@ int flexIRF::GIRFPdf::Write(fitsfile* fptr, int* status) {
 	return *status;
 }
 
+////////////////////////////////////////////////////////////////
+//
+// Write the pdf and the associated axes as a BINTABLE. Only
+// done if BINTABLE serialization is used.
+//
+int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
+
+
+}
 
 
 ////////////////////////////////////////////////////////////////

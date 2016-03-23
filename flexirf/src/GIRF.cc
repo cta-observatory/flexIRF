@@ -184,11 +184,42 @@ int flexIRF::GIRF::Write() {
 	if (fFilename.empty()){
 		cout << "ERROR: No filename specified." << endl;
 		return 1;
+	} else if (fSerialization.empty()) {
+		cout << "WARNING: No serialization specified. Using default IMAGE serialization" << endl;
+		fSerialization="IMAGE";
 	}
+
 
 	if (!fFITSopened) if (!CreateFITS()) cout << "ERROR: Could not create FITS file." << endl;
 
 	// write primary HDU
+	if (Write_PHDU()) {
+		cout << "ERROR: Impossible to write primary HDU." << endl;
+		return 1;
+	}
+
+	// write pdf blocks and associated axes
+	for (vector<GIRFPdf*>::iterator pdf = fPdfList.begin();
+			pdf != fPdfList.end(); ++pdf)
+		if ((*pdf)->Write(fFitsPtr, &fStatus))
+			cout << "GIRF::Write Error: cannot write pdf (error code: "
+					<< fStatus << ")" << endl;
+
+	// close output file
+	if (fits_close_file(fFitsPtr, &fStatus))
+		cout << "GIRF::Write Error: cannot close file (error code: " << fStatus
+				<< ")" << endl;
+	return fStatus;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// 			Write primary HDU
+//
+int flexIRF::GIRF::Write_PHDU() {
+
+
 	if (fits_create_img(fFitsPtr, BYTE_IMG, 0, NULL, &fStatus))
 		cout << "GIRF::Write Error: cannot write primary header (error code: "
 				<< fStatus << ")" << endl;
@@ -219,25 +250,42 @@ int flexIRF::GIRF::Write() {
 				<< fStatus << ")" << endl;
 
 	sprintf(keyword, "HDUCLAS2");
+	if (fSerialization=="IMAGE") sprintf(keyval, "IMAGE");
+	else if (fSerialization=="BINTABLE") sprintf(keyval, "BINTABLE");
+	sprintf(comment, "Serialization used to store IRF");
+	if (fits_write_key(fFitsPtr, TSTRING, keyword, &keyval, comment, &fStatus))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< fStatus << ")" << endl;
+
+	sprintf(keyword, "HDUCLAS3");
 	sprintf(keyval, "PRIMARY");
 	sprintf(comment, "PRIMARY HDU.");
 	if (fits_write_key(fFitsPtr, TSTRING, keyword, &keyval, comment, &fStatus))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< fStatus << ")" << endl;
 
-	// write pdf blocks and associated axes
+	return 0;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// 			Write PDF.
+//
+int flexIRF::GIRF::Write_PDF() {
+
 	for (vector<GIRFPdf*>::iterator pdf = fPdfList.begin();
-			pdf != fPdfList.end(); ++pdf)
-		if ((*pdf)->Write(fFitsPtr, &fStatus))
+			pdf != fPdfList.end(); ++pdf){
+		if ((*pdf)->Write(fFitsPtr, fSerialization,  &fStatus)){
 			cout << "GIRF::Write Error: cannot write pdf (error code: "
 					<< fStatus << ")" << endl;
-
-	// close output file
-	if (fits_close_file(fFitsPtr, &fStatus))
-		cout << "GIRF::Write Error: cannot close file (error code: " << fStatus
-				<< ")" << endl;
-	return fStatus;
+			return fStatus;
+		}
+	}
+	return 0;
 }
+
+
 
 ////////////////////////////////////////////////////////////////
 //

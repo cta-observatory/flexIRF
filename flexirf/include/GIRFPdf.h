@@ -31,8 +31,12 @@ namespace flexIRF{
 	  PdfVar  fPdfVar;
 	  PdfFunc fPdfFunc;
 	  std::vector<GIRFAxis*> fAxis;
+	  std::string fSerialization;
 	  bool fIsEmpty;
 	  float*  fData;
+
+	  virtual int Write_IMAGE(fitsfile* fptr, int* status);
+	  virtual int Write_BINTABLE(fitsfile* fptr, int* status);
 
 	 public:
 	  GIRFPdf(PdfVar pdftype=kNoPdfVar,PdfFunc pdffunc=kNoPdfFunc,unsigned long naxes=0); // create new pdf table for a given PdfVar
@@ -65,7 +69,9 @@ namespace flexIRF{
 		  }
 	  }
 
-	  virtual int Write(fitsfile* fptr,int* status);
+	  virtual int Write(fitsfile* fptr, int* status);
+	  virtual inline int Write(fitsfile* fptr, std::string serialization, int* status)
+	  	  {fSerialization=serialization; return Write(fptr, status);};
 	  virtual void Print(int sanity=30) const;
 	};
 }
