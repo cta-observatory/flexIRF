@@ -184,7 +184,8 @@ int flexIRF::GIRF::Write() {
 	if (fFilename.empty()){
 		cout << "ERROR: No filename specified." << endl;
 		return 1;
-	} else if (fSerialization.empty()) {
+	}
+    if (fSerialization.empty()) {
 		cout << "WARNING: No serialization specified. Using default IMAGE serialization" << endl;
 		fSerialization="IMAGE";
 	}
@@ -201,7 +202,7 @@ int flexIRF::GIRF::Write() {
 	// write pdf blocks and associated axes
 	for (vector<GIRFPdf*>::iterator pdf = fPdfList.begin();
 			pdf != fPdfList.end(); ++pdf)
-		if ((*pdf)->Write(fFitsPtr, &fStatus))
+		if ((*pdf)->Write(fFitsPtr,fSerialization, &fStatus))
 			cout << "GIRF::Write Error: cannot write pdf (error code: "
 					<< fStatus << ")" << endl;
 

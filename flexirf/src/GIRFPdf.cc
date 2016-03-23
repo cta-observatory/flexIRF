@@ -442,6 +442,150 @@ int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
 //
 int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 
+	// create arrays with the total number of columns and the size of each of them
+	const int naxis = int(fAxis.size());
+	int* naxes = new int[(2*naxis)+1];
+//	long* fpixel = new long[naxis];
+
+	char *ttype[(2*naxis)+1];
+	char *tform[(2*naxis)+1];
+	char *tunit[(2*naxis)+1];
+
+//	Loop over axes, filling both low and high edges. TODO: Must be improved for other kind of axes.
+	for (std::vector<GIRFAxis*>::size_type jaxis = 0; jaxis < naxis; jaxis++) {
+		naxes[2*jaxis] = int(fAxis[jaxis]->GetSize()-1);
+		naxes[(2*jaxis)+1] = int(fAxis[jaxis]->GetSize()-1);
+
+//		TODO: Only if stored column is a float!!!
+		sprintf(ttype[2*jaxis], "%s_LOW", (char*)fAxis[jaxis]->GetVarName().data());
+		sprintf(ttype[(2*jaxis)+1], "%s_HIGH", (char*)fAxis[jaxis]->GetVarName().data());
+
+		sprintf(tform[2*jaxis], "%dE", naxes[2*jaxis]);  //TODO: add type to axis, so float require _LOW _HIGH while "integers" or "chars" not.
+		sprintf(tform[(2*jaxis)+1], "%dE", naxes[(2*jaxis)+1]);  //TODO: add type to axis, so float require _LOW _HIGH while "integers" or "chars" not.
+
+		tunit[2*jaxis] = (char*)fAxis[jaxis]->GetVarUnit().data();
+		tunit[(2*jaxis)+1] = (char*)fAxis[jaxis]->GetVarUnit().data();
+//		fpixel[jaxis] = 1;
+	}
+
+	int pdfEntries = GetSize();
+	ttype[(2*naxis)]=(char*)GetVarName().data();
+	sprintf(tform[(2*naxis)], "%dE", pdfEntries);
+	tunit[(2*naxis)]=(char*)GetVarUnit().data();
+
+	// write the pdf BINTABLE HDU.
+	if (fits_create_tbl(fptr, BINARY_TBL, 0, (2*naxis)+1,ttype, tform, tunit,GetExtName().data(), status))
+		cout << "GIRFPdf::Write Error: problem writing axis header (error code: "
+				<< *status << ")" << endl;
+
+	// write keywords to the header
+	char keyword[9];
+	char chval[20];
+	char comment[70];
+	ushort usval;
+//	// NOT NEEDED ANYMORE!!! TODO: REMOVE!!!! AS SOON AS IT WORKS!!!
+//	sprintf(keyword, "EXTNAME");
+//	sprintf(chval, "%s", GetExtName().data());
+//	sprintf(comment, "Pdf Data HDU");
+//	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+//		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+//				<< *status << ")" << endl;
+
+
+
+	//TODO: LOOP THROUGH AXES AND WRITE AXIS COLUMNS (2 per AXIS). THEN WRITE PDF.
+	//	Loop over axes, filling both low and high edges. TODO: Must be improved for other kind of axes.
+	for (std::vector<GIRFAxis*>::size_type jaxis = 0; jaxis < naxis; jaxis++) {
+//		TODO: allow other variable types.
+		GIRFAxisBins* axisPtr= dynamic_cast<GIRFAxisBins*>(fAxis[jaxis]);
+		if (axisPtr){
+			vector<float> axisBinsLow= axisPtr->GetAxisBins();
+			vector<float> axisBinsHigh= axisPtr->GetAxisBins();
+			axisBinsLow.pop_back();
+			axisBinsHigh.erase(axisBinsHigh.begin());
+			fits_write_col(fptr, TFLOAT, (2*jaxis)+1, 1, 1, naxes[2*jaxis], axisBinsLow.data(), status);
+			fits_write_col(fptr, TFLOAT, (2*jaxis)+2, 1, 1, naxes[(2*jaxis)+1], axisBinsHigh.data(), status);
+		}
+
+	}
+
+	fits_write_col(fptr, TFLOAT, (2*naxis)+1, 1, 1, pdfEntries, fData, status);
+
+	// write pdf var
+	sprintf(keyword, "PDFVAR");
+	usval = ushort(fPdfVar);
+	sprintf(comment,
+			"Variable whose pdf is parameterized (see GIRFPdf.h for details)");
+	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
+	// write pdf function
+	sprintf(keyword, "PDFFunc");
+	usval = ushort(fPdfFunc);
+	sprintf(comment, "Function describing pdf (see GIRFPdf.h for details)");
+	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
+	// Add class keywords to the HDU.
+	sprintf(keyword, "HDUCLASS");
+	sprintf(chval, "CTA");
+	sprintf(comment, "FITS file following the CTA data format.");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	sprintf(keyword, "HDUCLAS1");
+	sprintf(chval, "IRM");
+	sprintf(comment, "Instrument Response Model HDU.");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	sprintf(keyword, "HDUCLAS2");
+	sprintf(chval, "DATA");
+	sprintf(comment, "Data HDU.");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	sprintf(keyword, "HDUCLAS3");
+	sprintf(chval, "%s", GetVarName().data());
+	sprintf(comment, "Variable whose pdf is parameterized (see GIRFPdf.h for details)");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	//Get the last Pdf ID of the same class
+	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
+
+	sprintf(keyword, "HDUCLAS4");
+	usval = ushort(pdfID);
+	sprintf(comment, "Pdf ID");
+	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
+	// write the pdf data
+//	long nentries = GetSize();
+
+//  For testing purposes:
+//	float *array;
+//	array = (float *) calloc(nentries+1, abs(FLOAT_IMG)/8);
+//	for (int i=0;i<=nentries;i++) array[i]=fData[i];
+
+//	if (fits_write_img(fptr, TFLOAT, 1, nentries, array, status))
+//			cout << "GIRFPdf::Write Error: problem writing axis data (error code: "
+//					<< *status << ")" << endl;
+
+	// NOT NEEDED ANYMORE!! in BINTABLE pdf is stored in one additional column.
+//	if (fits_write_pix(fptr, TFLOAT, fpixel, nentries, fData, status))
+//		cout << "GIRFPdf::Write Error: problem writing axis data (error code: "
+//				<< *status << ")" << endl;
+
+	return *status;
+
+
+
+
+
 
 }
 
