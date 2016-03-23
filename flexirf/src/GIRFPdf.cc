@@ -177,39 +177,39 @@ std::string flexIRF::GIRFPdf::GetFuncName() const {
 //
 std::string flexIRF::GIRFPdf::GetVarName() const {
 
-	string axisVarType;
+	string pdfVarType;
 
 	switch (fPdfVar) {
-	case kEfficiency:
-		axisVarType = "EFFIC";
-		break;
-	case kEDispersion:
-		axisVarType = "EDISP";
-		break;
-	case kPsf:
-		axisVarType = "PSF";
-		break;
-	case kBkgRate:
-		axisVarType = "BGRATE";
-		break;
-	case kBkgRateSqDeg:
-		axisVarType = "BGRATESQDEG";
-		break;
-	case kDiffSens:
-		axisVarType = "DIFFSENS";
-		break;
-	case kAeff:
-		axisVarType = "EFFAREA";
-		break;
-	case kAeffNoTheta2Cut:
-		axisVarType = "EFFANOT2CUT";
-		break;
-	default:
-		cout << "Incorrect variable type.\n";
-		return axisVarType;
+		case kEfficiency:
+			pdfVarType = "EFFIC";
+			break;
+		case kEDispersion:
+			pdfVarType = "EDISP";
+			break;
+		case kPsf:
+			pdfVarType = "PSF";
+			break;
+		case kBkgRate:
+			pdfVarType = "BGRATE";
+			break;
+		case kBkgRateSqDeg:
+			pdfVarType = "BGRATESQDEG";
+			break;
+		case kDiffSens:
+			pdfVarType = "DIFFSENS";
+			break;
+		case kAeff:
+			pdfVarType = "EFFAREA";
+			break;
+		case kAeffNoTheta2Cut:
+			pdfVarType = "EFFANOT2CUT";
+			break;
+		default:
+			cout << "Incorrect variable type.\n";
+			return pdfVarType;
 	}
 
-	return axisVarType;
+	return pdfVarType;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -444,37 +444,78 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 
 	// create arrays with the total number of columns and the size of each of them
 	const int naxis = int(fAxis.size());
-	int* naxes = new int[(2*naxis)+1];
-//	long* fpixel = new long[naxis];
+	const int nColumns = (2*naxis)+1;
+	int naxes[nColumns];
 
-	char *ttype[(2*naxis)+1];
-	char *tform[(2*naxis)+1];
-	char *tunit[(2*naxis)+1];
+//	char *ttype[(2*naxis)+1];
+//	char *tform[(2*naxis)+1];
+//	char *tunit[(2*naxis)+1];
 
+	vector<string> tType, tForm, tUnit;
 //	Loop over axes, filling both low and high edges. TODO: Must be improved for other kind of axes.
-	for (std::vector<GIRFAxis*>::size_type jaxis = 0; jaxis < naxis; jaxis++) {
-		naxes[2*jaxis] = int(fAxis[jaxis]->GetSize()-1);
-		naxes[(2*jaxis)+1] = int(fAxis[jaxis]->GetSize()-1);
-
+	for (int jaxis = 0; jaxis < naxis; jaxis++) {
+		naxes[2*jaxis] = int(fAxis[jaxis]->GetSize());
+		naxes[(2*jaxis)+1] = int(fAxis[jaxis]->GetSize());
 //		TODO: Only if stored column is a float!!!
-		sprintf(ttype[2*jaxis], "%s_LOW", (char*)fAxis[jaxis]->GetVarName().data());
-		sprintf(ttype[(2*jaxis)+1], "%s_HIGH", (char*)fAxis[jaxis]->GetVarName().data());
 
-		sprintf(tform[2*jaxis], "%dE", naxes[2*jaxis]);  //TODO: add type to axis, so float require _LOW _HIGH while "integers" or "chars" not.
-		sprintf(tform[(2*jaxis)+1], "%dE", naxes[(2*jaxis)+1]);  //TODO: add type to axis, so float require _LOW _HIGH while "integers" or "chars" not.
+		char temp1[30];
+		sprintf(temp1, "%s_LOW", (char*)fAxis[jaxis]->GetVarName().data());
+		tType.push_back(temp1);
 
-		tunit[2*jaxis] = (char*)fAxis[jaxis]->GetVarUnit().data();
-		tunit[(2*jaxis)+1] = (char*)fAxis[jaxis]->GetVarUnit().data();
-//		fpixel[jaxis] = 1;
+		char temp2[30];
+		sprintf(temp2, "%s_HIGH", (char*)fAxis[jaxis]->GetVarName().data());
+		tType.push_back(temp2);
+		char temp3[30];
+		sprintf(temp3, "%dE", naxes[2*jaxis]);  //TODO: add type to axis, so float require _LOW _HIGH while "integers" or "chars" not.
+		tForm.push_back(temp3);
+		char temp4[30];
+		sprintf(temp4, "%dE", naxes[(2*jaxis)+1]);  //TODO: add type to axis, so float require _LOW _HIGH while "integers" or "chars" not.
+		tForm.push_back(temp4);
+		tUnit.push_back(fAxis[jaxis]->GetVarUnit().data());
+		tUnit.push_back(fAxis[jaxis]->GetVarUnit().data());
+
 	}
+	int const pdfEntries = GetSize();
+	char temp6[30];
+	sprintf(temp6, "%s", GIRFPdf::GetVarName().data());
+	tType.push_back(temp6);
 
-	int pdfEntries = GetSize();
-	ttype[(2*naxis)]=(char*)GetVarName().data();
-	sprintf(tform[(2*naxis)], "%dE", pdfEntries);
-	tunit[(2*naxis)]=(char*)GetVarUnit().data();
+	char temp5[30];
+	sprintf(temp5, "%dE", pdfEntries);
+//	cout << "pdfEntries = " << pdfEntries << endl;
+	tForm.push_back(temp5);
+	tUnit.push_back(GIRFPdf::GetVarUnit());
+
+
+	// Filling of cfitsio bintable parameters (taken from gammalib::GFitsTable.cpp)
+    // Initialise number of fields
+    int tfields = 0;
+    // Setup cfitsio column definition arrays
+    char** ttype = NULL;
+    char** tform = NULL;
+    char** tunit = NULL;
+    if (nColumns > 0) {
+        ttype = new char*[nColumns];
+        tform = new char*[nColumns];
+        tunit = new char*[nColumns];
+        for (int i = 0; i < nColumns; ++i) {
+            ttype[i] = NULL;
+            tform[i] = NULL;
+            tunit[i] = NULL;
+        }
+        for (int i = 0; i < nColumns; ++i) {
+            ttype[tfields] = (char*)tType[i].data();
+            tform[tfields] = (char*)tForm[i].data();
+            tunit[tfields] = (char*)tUnit[i].data();
+            if (ttype[tfields] != NULL && tform[tfields] != NULL &&
+                tunit[tfields] != NULL)
+                tfields++;
+        }
+    }
+
 
 	// write the pdf BINTABLE HDU.
-	if (fits_create_tbl(fptr, BINARY_TBL, 0, (2*naxis)+1,ttype, tform, tunit,GetExtName().data(), status))
+	if (fits_create_tbl(fptr, BINARY_TBL, 0, nColumns,ttype, tform, tunit,GetExtName().data(), status))
 		cout << "GIRFPdf::Write Error: problem writing axis header (error code: "
 				<< *status << ")" << endl;
 
@@ -483,18 +524,8 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 	char chval[20];
 	char comment[70];
 	ushort usval;
-//	// NOT NEEDED ANYMORE!!! TODO: REMOVE!!!! AS SOON AS IT WORKS!!!
-//	sprintf(keyword, "EXTNAME");
-//	sprintf(chval, "%s", GetExtName().data());
-//	sprintf(comment, "Pdf Data HDU");
-//	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
-//		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
-//				<< *status << ")" << endl;
 
-
-
-	//TODO: LOOP THROUGH AXES AND WRITE AXIS COLUMNS (2 per AXIS). THEN WRITE PDF.
-	//	Loop over axes, filling both low and high edges. TODO: Must be improved for other kind of axes.
+	//	Loop over axes, writing both low and high edge columns. TODO: Must be improved for other kind of axes.
 	for (std::vector<GIRFAxis*>::size_type jaxis = 0; jaxis < naxis; jaxis++) {
 //		TODO: allow other variable types.
 		GIRFAxisBins* axisPtr= dynamic_cast<GIRFAxisBins*>(fAxis[jaxis]);
@@ -563,28 +594,7 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 
-	// write the pdf data
-//	long nentries = GetSize();
-
-//  For testing purposes:
-//	float *array;
-//	array = (float *) calloc(nentries+1, abs(FLOAT_IMG)/8);
-//	for (int i=0;i<=nentries;i++) array[i]=fData[i];
-
-//	if (fits_write_img(fptr, TFLOAT, 1, nentries, array, status))
-//			cout << "GIRFPdf::Write Error: problem writing axis data (error code: "
-//					<< *status << ")" << endl;
-
-	// NOT NEEDED ANYMORE!! in BINTABLE pdf is stored in one additional column.
-//	if (fits_write_pix(fptr, TFLOAT, fpixel, nentries, fData, status))
-//		cout << "GIRFPdf::Write Error: problem writing axis data (error code: "
-//				<< *status << ")" << endl;
-
 	return *status;
-
-
-
-
 
 
 }
