@@ -177,39 +177,39 @@ std::string flexIRF::GIRFPdf::GetFuncName() const {
 //
 std::string flexIRF::GIRFPdf::GetVarName() const {
 
-	string axisVarType;
+	string pdfVarType;
 
 	switch (fPdfVar) {
-	case kEfficiency:
-		axisVarType = "EFFIC";
-		break;
-	case kEDispersion:
-		axisVarType = "EDISP";
-		break;
-	case kPsf:
-		axisVarType = "PSF";
-		break;
-	case kBkgRate:
-		axisVarType = "BGRATE";
-		break;
-	case kBkgRateSqDeg:
-		axisVarType = "BGRATESQDEG";
-		break;
-	case kDiffSens:
-		axisVarType = "DIFFSENS";
-		break;
-	case kAeff:
-		axisVarType = "EFFAREA";
-		break;
-	case kAeffNoTheta2Cut:
-		axisVarType = "EFFANOT2CUT";
-		break;
-	default:
-		cout << "Incorrect variable type.\n";
-		return axisVarType;
+		case kEfficiency:
+			pdfVarType = "EFFIC";
+			break;
+		case kEDispersion:
+			pdfVarType = "EDISP";
+			break;
+		case kPsf:
+			pdfVarType = "PSF";
+			break;
+		case kBkgRate:
+			pdfVarType = "BGRATE";
+			break;
+		case kBkgRateSqDeg:
+			pdfVarType = "BGRATESQDEG";
+			break;
+		case kDiffSens:
+			pdfVarType = "DIFFSENS";
+			break;
+		case kAeff:
+			pdfVarType = "EFFAREA";
+			break;
+		case kAeffNoTheta2Cut:
+			pdfVarType = "EFFANOT2CUT";
+			break;
+		default:
+			cout << "Incorrect variable type.\n";
+			return pdfVarType;
 	}
 
-	return axisVarType;
+	return pdfVarType;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -263,6 +263,26 @@ std::string flexIRF::GIRFPdf::GetVarUnit() const {
 // file pointer
 //
 int flexIRF::GIRFPdf::Write(fitsfile* fptr, int* status) {
+
+	if (fSerialization.empty()) {
+		cout << "WARNING: No serialization specified. Using default IMAGE serialization" << endl;
+		fSerialization="IMAGE";
+	}
+
+	if (fSerialization=="IMAGE") return Write_IMAGE(fptr, status);
+	else if (fSerialization=="BINTABLE") return Write_BINTABLE(fptr, status);
+	else {
+		cout << "ERROR: Incorrect serialization type. Exitting...\n";
+		return 1;
+	}
+}
+
+////////////////////////////////////////////////////////////////
+//
+// Write the pdf and the associated axes to the specified
+// file pointer. Only done if IMAGE serialization is used.
+//
+int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
 
 	// create arrays with size and first entry of every dimension to be saved (1 is first, not 0)
 	int naxis = int(fAxis.size());
@@ -415,6 +435,169 @@ int flexIRF::GIRFPdf::Write(fitsfile* fptr, int* status) {
 	return *status;
 }
 
+////////////////////////////////////////////////////////////////
+//
+// Write the pdf and the associated axes as a BINTABLE. Only
+// done if BINTABLE serialization is used.
+//
+int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
+
+	// create arrays with the total number of columns and the size of each of them
+	const int naxis = int(fAxis.size());
+	const int nColumns = (2*naxis)+1;
+	int naxes[nColumns];
+
+//	char *ttype[(2*naxis)+1];
+//	char *tform[(2*naxis)+1];
+//	char *tunit[(2*naxis)+1];
+
+	vector<string> tType, tForm, tUnit;
+//	Loop over axes, filling both low and high edges. TODO: Must be improved for other kind of axes.
+	for (int jaxis = 0; jaxis < naxis; jaxis++) {
+		naxes[2*jaxis] = int(fAxis[jaxis]->GetSize());
+		naxes[(2*jaxis)+1] = int(fAxis[jaxis]->GetSize());
+//		TODO: Only if stored column is a float!!!
+
+		char temp1[30];
+		sprintf(temp1, "%s_LOW", (char*)fAxis[jaxis]->GetVarName().data());
+		tType.push_back(temp1);
+
+		char temp2[30];
+		sprintf(temp2, "%s_HIGH", (char*)fAxis[jaxis]->GetVarName().data());
+		tType.push_back(temp2);
+		char temp3[30];
+		sprintf(temp3, "%dE", naxes[2*jaxis]);  //TODO: add type to axis, so float require _LOW _HIGH while "integers" or "chars" not.
+		tForm.push_back(temp3);
+		char temp4[30];
+		sprintf(temp4, "%dE", naxes[(2*jaxis)+1]);  //TODO: add type to axis, so float require _LOW _HIGH while "integers" or "chars" not.
+		tForm.push_back(temp4);
+		tUnit.push_back(fAxis[jaxis]->GetVarUnit().data());
+		tUnit.push_back(fAxis[jaxis]->GetVarUnit().data());
+
+	}
+	int const pdfEntries = GetSize();
+	char temp6[30];
+	sprintf(temp6, "%s", GIRFPdf::GetVarName().data());
+	tType.push_back(temp6);
+
+	char temp5[30];
+	sprintf(temp5, "%dE", pdfEntries);
+//	cout << "pdfEntries = " << pdfEntries << endl;
+	tForm.push_back(temp5);
+	tUnit.push_back(GIRFPdf::GetVarUnit());
+
+
+	// Filling of cfitsio bintable parameters (taken from gammalib::GFitsTable.cpp)
+    // Initialise number of fields
+    int tfields = 0;
+    // Setup cfitsio column definition arrays
+    char** ttype = NULL;
+    char** tform = NULL;
+    char** tunit = NULL;
+    if (nColumns > 0) {
+        ttype = new char*[nColumns];
+        tform = new char*[nColumns];
+        tunit = new char*[nColumns];
+        for (int i = 0; i < nColumns; ++i) {
+            ttype[i] = NULL;
+            tform[i] = NULL;
+            tunit[i] = NULL;
+        }
+        for (int i = 0; i < nColumns; ++i) {
+            ttype[tfields] = (char*)tType[i].data();
+            tform[tfields] = (char*)tForm[i].data();
+            tunit[tfields] = (char*)tUnit[i].data();
+            if (ttype[tfields] != NULL && tform[tfields] != NULL &&
+                tunit[tfields] != NULL)
+                tfields++;
+        }
+    }
+
+
+	// write the pdf BINTABLE HDU.
+	if (fits_create_tbl(fptr, BINARY_TBL, 0, nColumns,ttype, tform, tunit,GetExtName().data(), status))
+		cout << "GIRFPdf::Write Error: problem writing axis header (error code: "
+				<< *status << ")" << endl;
+
+	// write keywords to the header
+	char keyword[9];
+	char chval[20];
+	char comment[70];
+	ushort usval;
+
+	//	Loop over axes, writing both low and high edge columns. TODO: Must be improved for other kind of axes.
+	for (std::vector<GIRFAxis*>::size_type jaxis = 0; jaxis < naxis; jaxis++) {
+//		TODO: allow other variable types.
+		GIRFAxisBins* axisPtr= dynamic_cast<GIRFAxisBins*>(fAxis[jaxis]);
+		if (axisPtr){
+			vector<float> axisBinsLow= axisPtr->GetAxisBins();
+			vector<float> axisBinsHigh= axisPtr->GetAxisBins();
+			axisBinsLow.pop_back();
+			axisBinsHigh.erase(axisBinsHigh.begin());
+			fits_write_col(fptr, TFLOAT, (2*jaxis)+1, 1, 1, naxes[2*jaxis], axisBinsLow.data(), status);
+			fits_write_col(fptr, TFLOAT, (2*jaxis)+2, 1, 1, naxes[(2*jaxis)+1], axisBinsHigh.data(), status);
+		}
+
+	}
+
+	fits_write_col(fptr, TFLOAT, (2*naxis)+1, 1, 1, pdfEntries, fData, status);
+
+	// write pdf var
+	sprintf(keyword, "PDFVAR");
+	usval = ushort(fPdfVar);
+	sprintf(comment,
+			"Variable whose pdf is parameterized (see GIRFPdf.h for details)");
+	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
+	// write pdf function
+	sprintf(keyword, "PDFFunc");
+	usval = ushort(fPdfFunc);
+	sprintf(comment, "Function describing pdf (see GIRFPdf.h for details)");
+	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
+	// Add class keywords to the HDU.
+	sprintf(keyword, "HDUCLASS");
+	sprintf(chval, "CTA");
+	sprintf(comment, "FITS file following the CTA data format.");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	sprintf(keyword, "HDUCLAS1");
+	sprintf(chval, "IRM");
+	sprintf(comment, "Instrument Response Model HDU.");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	sprintf(keyword, "HDUCLAS2");
+	sprintf(chval, "DATA");
+	sprintf(comment, "Data HDU.");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	sprintf(keyword, "HDUCLAS3");
+	sprintf(chval, "%s", GetVarName().data());
+	sprintf(comment, "Variable whose pdf is parameterized (see GIRFPdf.h for details)");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	//Get the last Pdf ID of the same class
+	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
+
+	sprintf(keyword, "HDUCLAS4");
+	usval = ushort(pdfID);
+	sprintf(comment, "Pdf ID");
+	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
+	return *status;
+
+
+}
 
 
 ////////////////////////////////////////////////////////////////

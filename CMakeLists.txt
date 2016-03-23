@@ -48,6 +48,11 @@ set( srcsIRFsimpleWriteIrf ${PROJECT_SOURCE_DIR}/src/IRFsimpleWriteIrf.cc )
 add_executable( IRFsimpleWriteIrf ${srcsIRFsimpleWriteIrf} )
 target_link_libraries( IRFsimpleWriteIrf flexirf ${EXTRA_LIBS} ${ROOT_LIBS} )
 
+set( srcsIRFsimpleWriteIrfSerialization ${PROJECT_SOURCE_DIR}/src/IRFsimpleWriteIrfSerialization.cc )
+add_executable( IRFsimpleWriteIrfSerialization ${srcsIRFsimpleWriteIrfSerialization} )
+target_link_libraries( IRFsimpleWriteIrfSerialization flexirf ${EXTRA_LIBS} ${ROOT_LIBS} )
+
+
 set( srcsIRFsimpleWriteParamIrf ${PROJECT_SOURCE_DIR}/src/IRFsimpleWriteParamIrf.cc )
 add_executable( IRFsimpleWriteParamIrf ${srcsIRFsimpleWriteParamIrf} )
 target_link_libraries( IRFsimpleWriteParamIrf flexirf ${EXTRA_LIBS} ${ROOT_LIBS} )

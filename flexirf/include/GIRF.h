@@ -22,6 +22,7 @@ namespace flexIRF{
 	#endif
 	std::vector<GIRFPdf*> fPdfList;
 	std::string fFilename;
+	std::string fSerialization;
 	fitsfile* fFitsPtr;
 	int fStatus;
 	bool fFITSopened;
@@ -42,8 +43,9 @@ namespace flexIRF{
 	GIRFPdf* 				ReadPdf(int pdfID, GIRFConfig config);
 	//	GIRFPdf* 				ReadPdf(int pdfID);
 
+	inline void 			SetSerialization(std::string serialization){fSerialization=serialization;};
 	int 					Write();
-	inline int 				Write(std::string filename){fFilename=filename; return Write();};
+	inline int 				Write(std::string filename, std::string serialization="IMAGE"){fFilename=filename; fSerialization=serialization; return Write();};
 	int 					OpenFITS();
 	int 					CreateFITS();
 
@@ -54,8 +56,8 @@ namespace flexIRF{
 	#endif
 
 	int 					CheckAxisHDUpos(int axisID);
-	AxisType 		CheckAxisType(int axisID);
-	VarType 		CheckAxisVarType(int axisID);
+	AxisType 				CheckAxisType(int axisID);
+	VarType 				CheckAxisVarType(int axisID);
 	bool 					CheckPdfPointsToAxisIDs(vector< vector<int> > axisIDs, vector<int> pdfAxisIDs);
 	vector<int> 			FindAxisRange(AxisRange axisRange);
 	vector< vector<int> > 	FindAxisRanges(std::vector<AxisRange> axisRanges);
@@ -68,6 +70,9 @@ namespace flexIRF{
 	PdfVar 					ReadPdfVar(int pdfID);
 	PdfFunc 				ReadPdfFunc(int pdfID);
 	float*  				ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axisRanges);
+	int 					Write_PHDU();
+	int 					Write_PDF();
+
 	};
 }
 
