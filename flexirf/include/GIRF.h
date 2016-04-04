@@ -70,6 +70,7 @@ namespace flexIRF{
 	PdfVar 					ReadPdfVar(int pdfID);
 	PdfFunc 				ReadPdfFunc(int pdfID);
 	float*  				ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRange> axisRanges);
+	std::string				ReadSerialization();
 	int 					Write_PHDU();
 	int 					Write_PDF();
 

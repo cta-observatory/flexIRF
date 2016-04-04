@@ -47,6 +47,19 @@ flexIRF::GIRF::GIRF(string filename) : fStatus(0) {
 	else {
 		cout << "ERROR: FITS file " << fFilename.data() << " not found.";
 	}
+
+//	If everything worked, then read FITS file serialization:
+	int status=0, hdutype, hdunum;
+	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
+	fits_movabs_hdu(fFitsPtr, BYTE_IMG, &hdutype, &status);
+	if (hdutype == BINARY_TBL) {
+		if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+			if (strcmp(card, "BINTABLE")) fSerialization="BINTABLE";
+			if (strcmp(card, "IMAGE")) fSerialization="IMAGE";
+		}
+	}
+//	Load all axis/data values now?!
+
 }
 
 ////////////////////////////////////////////////////////////////
@@ -105,7 +118,7 @@ flexIRF::AxisType flexIRF::GIRF::CheckAxisType(int axisID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &fStatus);
 		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &fStatus)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &fStatus)) {
 				if (!strcmp(card, "AXIS")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &fStatus)) { 	// Now we know this is the axis we want.
 						if (!strcmp(card, axisIDkeyword)) {
@@ -148,7 +161,7 @@ flexIRF::VarType flexIRF::GIRF::CheckAxisVarType(int axisID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &fStatus);
 		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &fStatus)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &fStatus)) {
 				if (!strcmp(card, "AXIS")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &fStatus)) {
 						if (!strcmp(card, axisIDkeyword)) {
@@ -308,7 +321,7 @@ int flexIRF::GIRF::CheckAxisHDUpos(int axisID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &fStatus);
 		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &fStatus)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &fStatus)) {
 				if (!strcmp(card, "AXIS")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &fStatus)) { 	// Now we know this is the axis we want.
 						if (!strcmp(card, axisIDkeyword)) {
@@ -553,7 +566,7 @@ flexIRF::PdfVar flexIRF::GIRF::ReadPdfVar(int pdfID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
 		if (hdutype == IMAGE_HDU) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
 				if (!strcmp(card, "DATA")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
 						if (atoi(card) == pdfID){
@@ -597,7 +610,7 @@ flexIRF::PdfFunc flexIRF::GIRF::ReadPdfFunc(int pdfID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
 		if (hdutype == IMAGE_HDU) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
 				if (!strcmp(card, "DATA")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
 						if (atoi(card) == pdfID){
@@ -667,7 +680,7 @@ float*  flexIRF::GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRa
 			lBins.push_back(1);
 			hBins.push_back(axisSize);
 		} else {
-			lBins.push_back(lBin+1);	//TODO: CHECK!!!!!!!!! Donde va el +1!!?!??!?
+			lBins.push_back(lBin+1);
 			hBins.push_back(hBin-1);
 		}
 //		cout << "Axis #" << *axisID << " with axis size = " << axis->GetSize() << endl;
@@ -704,11 +717,6 @@ float*  flexIRF::GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRa
 }
 
 
-
-
-
-
-
 ////////////////////////////////////////////////////////////////
 //
 // 		Return all axis IDs matching AxisRange.
@@ -716,7 +724,7 @@ float*  flexIRF::GIRF::ReadPdfData(int pdfID, vector<int> pdfAxes, vector<AxisRa
 vector<int> flexIRF::GIRF::FindAxisRange(AxisRange axisRange){
 	vector<int> foundAxisID;
 
-	int currenthdu = fFitsPtr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...
+	int currenthdu = fFitsPtr->HDUposition;
 
 	int status = 0;   		// must be initialized (0 means ok)
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
@@ -724,46 +732,94 @@ vector<int> flexIRF::GIRF::FindAxisRange(AxisRange axisRange){
 	fits_get_num_hdus(fFitsPtr, &hdunum, &status);
 
 	AxisType axisType;
-	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
-	{
-		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
-		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
-				if (!strcmp(card, "AXIS")) {
-					if (!fits_read_key_str(fFitsPtr, "VARTYPE", card, NULL, &status)) {
-						if (atoi(card) == axisRange.varType) {
-							if (!fits_read_key_str(fFitsPtr, "AXISTYPE", card, NULL, &status)) {
-								axisType=static_cast<AxisType>(atoi(card));
-								if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
-									switch(axisType){
-										case kBins:{
-											GIRFAxisBins *axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(atoi(card)));
-											if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
-											break;
-										}
-										case kParam:{
-											GIRFAxisParam *axis = dynamic_cast<GIRFAxisParam*>(ReadAxis(atoi(card)));
-											if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
-											break;
-										}
-										default:{
-											cout << "ERROR: Invalid axis type\n";
-											CheckStatus();
-											fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
-											break;
-										}
-									}
 
+	if (fSerialization=="IMAGE"){
+		for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+		{
+			fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
+			if (hdutype == BINARY_TBL) {
+				if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+					if (!strcmp(card, "AXIS")) {
+						if (!fits_read_key_str(fFitsPtr, "VARTYPE", card, NULL, &status)) {
+							if (atoi(card) == axisRange.varType) {
+								if (!fits_read_key_str(fFitsPtr, "AXISTYPE", card, NULL, &status)) {
+									axisType=static_cast<AxisType>(atoi(card));
+									if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
+										switch(axisType){
+											case kBins:{
+												GIRFAxisBins *axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(atoi(card)));
+												if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
+												break;
+											}
+											case kParam:{
+												GIRFAxisParam *axis = dynamic_cast<GIRFAxisParam*>(ReadAxis(atoi(card)));
+												if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
+												break;
+											}
+											default:{
+												cout << "ERROR: Invalid axis type\n";
+												CheckStatus();
+												fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
+												break;
+											}
+										}
+
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-		}
-		if (status == KEY_NO_EXIST) status = 0;
-		if (status) break;
+			if (status == KEY_NO_EXIST) status = 0;
+			if (status) break;
 
+		}
+	} else if (fSerialization=="BINTABLE"){ //TODO!!!!
+		cout << "ERROR: Reading IRFs with BINTABLE serialization is not yet implemented!!" << endl;
+		return foundAxisID;
+
+		for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
+		{
+			fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
+			if (hdutype == BINARY_TBL) {
+				if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+					if (!strcmp(card, "AXIS")) {
+						if (!fits_read_key_str(fFitsPtr, "VARTYPE", card, NULL, &status)) {
+							if (atoi(card) == axisRange.varType) {
+								if (!fits_read_key_str(fFitsPtr, "AXISTYPE", card, NULL, &status)) {
+									axisType=static_cast<AxisType>(atoi(card));
+									if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
+										switch(axisType){
+											case kBins:{
+												GIRFAxisBins *axis = dynamic_cast<GIRFAxisBins*>(ReadAxis(atoi(card)));
+												if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
+												break;
+											}
+											case kParam:{
+												GIRFAxisParam *axis = dynamic_cast<GIRFAxisParam*>(ReadAxis(atoi(card)));
+												if (axis && axis->ContainsRange(axisRange)) foundAxisID.push_back(atoi(card));
+												break;
+											}
+											default:{
+												cout << "ERROR: Invalid axis type\n";
+												CheckStatus();
+												fits_movabs_hdu(fFitsPtr, currenthdu + 1, NULL, &fStatus);
+												break;
+											}
+										}
+
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			if (status == KEY_NO_EXIST) status = 0;
+			if (status) break;
+
+		}
 	}
 
 	if (foundAxisID.empty()) cout << "WARNING: Axis of type " <<  GIRFAxis::GetVarName(axisRange.varType).data() << " between " << axisRange.lowRange << " and " << axisRange.highRange << " is not present in the FITS file." << endl;
@@ -854,7 +910,7 @@ vector<int> flexIRF::GIRF::FindPdfsOfType(PdfVar pdfVar){
 
 	vector<int> foundPdfIDs;
 
-	int currenthdu = fFitsPtr->HDUposition;				//TODO: do we need to know the current position? I leave it just to make sure...
+	int currenthdu = fFitsPtr->HDUposition;
 
 	int status = 0;   		// must be initialized (0 means ok)
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
@@ -865,19 +921,36 @@ vector<int> flexIRF::GIRF::FindPdfsOfType(PdfVar pdfVar){
 	for (int hdupos = 1; hdupos <= hdunum; hdupos++) /* Main loop through each extension */
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
-		if (hdutype == IMAGE_HDU) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
-				if (!strcmp(card, "DATA")) {
-					if (!fits_read_key_str(fFitsPtr, "PDFVAR", card, NULL, &status)) {
-						if (atoi(card) == (int)pdfVar) {
-							if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
-								foundPdfIDs.push_back(atoi(card));
+		if (fSerialization == "BINTABLE"){
+			if (hdutype == BINARY_TBL) {
+				if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
+					if (!strcmp(card, "DATA")) {
+						if (!fits_read_key_str(fFitsPtr, "PDFVAR", card, NULL, &status)) {
+							if (atoi(card) == (int)pdfVar) {
+								if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
+									foundPdfIDs.push_back(atoi(card));
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if (fSerialization == "IMAGE"){
+			if (hdutype == IMAGE_HDU) {
+				if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
+					if (!strcmp(card, "DATA")) {
+						if (!fits_read_key_str(fFitsPtr, "PDFVAR", card, NULL, &status)) {
+							if (atoi(card) == (int)pdfVar) {
+								if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
+									foundPdfIDs.push_back(atoi(card));
+								}
 							}
 						}
 					}
 				}
 			}
 		}
+
 		if (status == KEY_NO_EXIST) status = 0;
 		if (status) break;
 
@@ -907,7 +980,7 @@ vector<int> flexIRF::GIRF::GetPdfAxisIDs(int pdfID){
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
 		if (hdutype == IMAGE_HDU) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
 				if (!strcmp(card, "DATA")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
 						if (atoi(card) == pdfID){
