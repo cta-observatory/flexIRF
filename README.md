@@ -53,6 +53,14 @@ Similarly as "IRFsimpleWriteIrf", this script writes a parameterized effective a
 bin/IRFsimpleWriteParamIrf
 ```
 
+**IRFsimpleWriteIrfSerialization.cc**: 
+
+Again an example macro nearly idenatical to "IRFsimpleWriteIrf". In this case, 2 different serializations are used to write the same IRF into two different FITS files: "examples/testEffAreaIMAGE.fits" and "examples/testEffAreaBINTABLE.fits". To run this script execute:
+
+```shell
+bin/IRFsimpleWriteIrfSerialization
+```
+
 **IRFsimpleReadIrf.cc**:
 
 This script reads a previously generated GIRF FITS file (such as "examples/testEffArea.fits" or "examples/testParamEffArea.fits"), loading it into a GIRF object, extracting an effective area as a "GIRFPdf" and printing it (& drawing it, if you have ROOT properly installed, generating the "plot.png" file). To run it, execute:
