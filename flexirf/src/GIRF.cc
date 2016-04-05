@@ -51,11 +51,13 @@ flexIRF::GIRF::GIRF(string filename) : fStatus(0) {
 //	If everything worked, then read FITS file serialization:
 	int status=0, hdutype, hdunum;
 	char card[FLEN_CARD]; /* Standard string lengths defined in fitsio.h */
-	fits_movabs_hdu(fFitsPtr, BYTE_IMG, &hdutype, &status);
-	if (hdutype == BINARY_TBL) {
+	fits_movabs_hdu(fFitsPtr, 1, &hdutype, &status);
+	if (hdutype == IMAGE_HDU) {
 		if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
-			if (strcmp(card, "BINTABLE")) fSerialization="BINTABLE";
-			if (strcmp(card, "IMAGE")) fSerialization="IMAGE";
+			if (!strcmp(card, "BINTABLE")) fSerialization="BINTABLE";
+			else if (!strcmp(card, "IMAGE")) fSerialization="IMAGE";
+		}else {
+			if (status) fits_report_error(stderr, status);
 		}
 	}
 //	Load all axis/data values now?!
@@ -118,7 +120,7 @@ flexIRF::AxisType flexIRF::GIRF::CheckAxisType(int axisID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &fStatus);
 		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &fStatus)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &fStatus)) {
 				if (!strcmp(card, "AXIS")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &fStatus)) { 	// Now we know this is the axis we want.
 						if (!strcmp(card, axisIDkeyword)) {
@@ -161,7 +163,7 @@ flexIRF::VarType flexIRF::GIRF::CheckAxisVarType(int axisID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &fStatus);
 		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &fStatus)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &fStatus)) {
 				if (!strcmp(card, "AXIS")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &fStatus)) {
 						if (!strcmp(card, axisIDkeyword)) {
@@ -321,7 +323,7 @@ int flexIRF::GIRF::CheckAxisHDUpos(int axisID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &fStatus);
 		if (hdutype == BINARY_TBL) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &fStatus)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &fStatus)) {
 				if (!strcmp(card, "AXIS")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &fStatus)) { 	// Now we know this is the axis we want.
 						if (!strcmp(card, axisIDkeyword)) {
@@ -566,7 +568,7 @@ flexIRF::PdfVar flexIRF::GIRF::ReadPdfVar(int pdfID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
 		if (hdutype == IMAGE_HDU) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
 				if (!strcmp(card, "DATA")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
 						if (atoi(card) == pdfID){
@@ -610,7 +612,7 @@ flexIRF::PdfFunc flexIRF::GIRF::ReadPdfFunc(int pdfID) {
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
 		if (hdutype == IMAGE_HDU) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
 				if (!strcmp(card, "DATA")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
 						if (atoi(card) == pdfID){
@@ -923,7 +925,7 @@ vector<int> flexIRF::GIRF::FindPdfsOfType(PdfVar pdfVar){
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
 		if (fSerialization == "BINTABLE"){
 			if (hdutype == BINARY_TBL) {
-				if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
+				if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
 					if (!strcmp(card, "DATA")) {
 						if (!fits_read_key_str(fFitsPtr, "PDFVAR", card, NULL, &status)) {
 							if (atoi(card) == (int)pdfVar) {
@@ -937,7 +939,7 @@ vector<int> flexIRF::GIRF::FindPdfsOfType(PdfVar pdfVar){
 			}
 		} else if (fSerialization == "IMAGE"){
 			if (hdutype == IMAGE_HDU) {
-				if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
+				if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
 					if (!strcmp(card, "DATA")) {
 						if (!fits_read_key_str(fFitsPtr, "PDFVAR", card, NULL, &status)) {
 							if (atoi(card) == (int)pdfVar) {
@@ -980,7 +982,7 @@ vector<int> flexIRF::GIRF::GetPdfAxisIDs(int pdfID){
 	{
 		fits_movabs_hdu(fFitsPtr, hdupos, &hdutype, &status);
 		if (hdutype == IMAGE_HDU) {
-			if (!fits_read_key_str(fFitsPtr, "HDUCLAS3", card, NULL, &status)) {
+			if (!fits_read_key_str(fFitsPtr, "HDUCLAS2", card, NULL, &status)) {
 				if (!strcmp(card, "DATA")) {
 					if (!fits_read_key_str(fFitsPtr, "HDUCLAS4", card, NULL, &status)) {
 						if (atoi(card) == pdfID){

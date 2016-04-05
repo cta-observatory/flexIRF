@@ -23,7 +23,6 @@ int main(int argc, char **argv)
 	//	Set filename storing the IRF information. If not specified as an input, a previously
     //	generated file (using bin/IRFsimpleWriteIrf executable) will be used.
 	string filename;
-	cout << "argc = " << argc << endl;
 	if(argc == 2) // do more checking on the number of arguments below
 	{
 		filename = argv[1];
