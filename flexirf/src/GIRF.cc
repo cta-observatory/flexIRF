@@ -75,6 +75,7 @@ flexIRF::GIRF::GIRF(string filename) : fStatus(0) {
 int flexIRF::GIRF::OpenFITS(){
 	if (!fits_open_file(&fFitsPtr, fFilename.data(), READWRITE, &fStatus)){
 		CheckStatus();
+		fWritePHDU=0;
 		fFITSopened=1;
 		return 1;
 	}
@@ -88,7 +89,10 @@ int flexIRF::GIRF::OpenFITS(){
 //  	TODO: Handle errors, check status, show warnings...
 //
 int flexIRF::GIRF::CreateFITS(){
-	if (!fits_create_file(&fFitsPtr, fFilename.data(), &fStatus)) return 1;
+	if (!fits_create_file(&fFitsPtr, fFilename.data(), &fStatus)){
+		fWritePHDU=1;
+		return 1;
+	}
 	else return 0;
 }
 
@@ -212,7 +216,17 @@ int flexIRF::GIRF::Write() {
 	}
 
 
-	if (!fFITSopened) if (!CreateFITS()) cout << "ERROR: Could not create FITS file." << endl;
+	if (!fFITSopened){
+		if (ifstream(fFilename.data())){
+			if (!OpenFITS()) {
+				cout << "ERROR: Could not open FITS file." << endl;
+			}
+		} else {
+			if (!CreateFITS()) {
+				cout << "ERROR: Could not create FITS file: does the output directory exist?" << endl;
+			}
+		}
+	}
 
 	// write primary HDU
 	if (fWritePHDU){
@@ -235,6 +249,10 @@ int flexIRF::GIRF::Write() {
 				<< ")" << endl;
 	return fStatus;
 }
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////
