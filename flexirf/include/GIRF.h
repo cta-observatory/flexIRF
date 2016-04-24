@@ -26,6 +26,7 @@ namespace flexIRF{
 	fitsfile* fFitsPtr;
 	int fStatus;
 	bool fFITSopened;
+	bool fWritePHDU;
 
 	public:
 	GIRF();

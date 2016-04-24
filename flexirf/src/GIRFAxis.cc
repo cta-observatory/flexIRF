@@ -92,7 +92,7 @@ std::string flexIRF::GIRFAxis::GetVarName(VarType varType) {
 
 	switch (varType) {
 	case kEnergy:
-		axisVarType = "ENERGY";
+		axisVarType = "ENERG";
 		break;
 	case kEnergy_true:
 		axisVarType = "TENERGY";

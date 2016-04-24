@@ -28,7 +28,7 @@ using namespace std;
 // 
 // Create GIRF object: either for read/write FITS files
 //
-flexIRF::GIRF::GIRF() : fStatus(0), fFitsPtr(NULL), fFITSopened(0) {
+flexIRF::GIRF::GIRF() : fStatus(0), fFitsPtr(NULL), fFITSopened(0), fWritePHDU(1) {
 
 }
 
@@ -42,6 +42,7 @@ flexIRF::GIRF::GIRF(string filename) : fStatus(0) {
 	//First try to open existing fits file.
 	if (OpenFITS()){
 		fFITSopened=1;
+		fWritePHDU=0;
 		CheckStatus();
 	}
 	else {
@@ -209,9 +210,11 @@ int flexIRF::GIRF::Write() {
 	if (!fFITSopened) if (!CreateFITS()) cout << "ERROR: Could not create FITS file." << endl;
 
 	// write primary HDU
-	if (Write_PHDU()) {
-		cout << "ERROR: Impossible to write primary HDU." << endl;
-		return 1;
+	if (fWritePHDU){
+		if (Write_PHDU()) {
+			cout << "ERROR: Impossible to write primary HDU." << endl;
+			return 1;
+		}
 	}
 
 	// write pdf blocks and associated axes
