@@ -19,6 +19,7 @@
 #include "GIRF.h"
 #include "fitsio.h"
 
+#include <fstream>
 
 #include <string.h>
 
@@ -39,14 +40,14 @@ flexIRF::GIRF::GIRF() : fStatus(0), fFitsPtr(NULL), fFITSopened(0), fWritePHDU(1
 flexIRF::GIRF::GIRF(string filename) : fStatus(0) {
 	fFilename=filename;
 
-	//First try to open existing fits file.
-	if (OpenFITS()){
-		fFITSopened=1;
-		fWritePHDU=0;
-		CheckStatus();
-	}
-	else {
-		cout << "ERROR: FITS file " << fFilename.data() << " not found.";
+	if (ifstream(fFilename.data())){
+		if (!OpenFITS()) {
+			cout << "ERROR: Could not open FITS file." << endl;
+		}
+	} else {
+		if (!CreateFITS()) {
+			cout << "ERROR: Could not create FITS file: does the output directory exist?" << endl;
+		}
 	}
 
 //	If everything worked, then read FITS file serialization:
@@ -72,7 +73,11 @@ flexIRF::GIRF::GIRF(string filename) : fStatus(0) {
 //  	TODO: Handle errors, check status, show warnings...
 //
 int flexIRF::GIRF::OpenFITS(){
-	if (!fits_open_file(&fFitsPtr, fFilename.data(), READWRITE, &fStatus)) return 1;
+	if (!fits_open_file(&fFitsPtr, fFilename.data(), READWRITE, &fStatus)){
+		CheckStatus();
+		fFITSopened=1;
+		return 1;
+	}
 	else return 0;
 }
 
