@@ -4,8 +4,9 @@ Project description
 
 FlexIRF, developed as a test bench for the future Cherenkov Telescope Array Data Models, is a tool to read/write an Instrument Response Function into a single FITS file. Due to the large number of external parameters affecting Imaging Atmospheric Cherenkov Telescopes performance, the IRF is required to be defined in a wide phase space to reduce systematic uncertaintie. This code attemps to provide more flexibility to current IRF generators. 
 
-The code is written in C++, making use of the CFITSIO library. Few dependencies, to be removed in the future, make use of ROOT libraries (current standard in gamma-ray astronomy).
+The code is written in C++, making use of the CFITSIO library. Few dependencies, to be removed in the future, make use of ROOT libraries (current standard in gamma-ray astronomy). 
 
+License: [Apache v2](LICENSE)
 
 Dependencies
 --------------
