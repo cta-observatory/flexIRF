@@ -23,6 +23,7 @@ namespace flexIRF{
 		kEnergy_rec,
 		kTheta,
 		kPhi,
+		kRad,
 		kID,
 		kVarMax
 	}; // allowed variables

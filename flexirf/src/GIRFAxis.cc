@@ -106,6 +106,9 @@ std::string flexIRF::GIRFAxis::GetVarName(VarType varType) {
 	case kPhi:
 		axisVarType = "PHI";
 		break;
+	case kRad:
+		axisVarType = "RAD";
+		break;
 	case kID:
 		axisVarType = "ID";
 		break;
@@ -152,6 +155,8 @@ void flexIRF::GIRFAxis::SetVarType(string axisVarName) {
 		fVarType = kTheta;
 	} else if (axisVarName == "PHI") {
 		fVarType = kPhi;
+	} else if (axisVarName == "RAD") {
+		fVarType = kRad;
 	} else if (axisVarName == "ID") {
 		fVarType = kID;
 	} else {
@@ -234,6 +239,9 @@ std::string flexIRF::GIRFAxis::GetVarUnit() const {
 		axisVarType = "deg";
 		break;
 	case kPhi:
+		axisVarType = "deg";
+		break;
+	case kRad:
 		axisVarType = "deg";
 		break;
 	case kID:
