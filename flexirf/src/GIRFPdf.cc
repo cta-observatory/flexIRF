@@ -459,11 +459,11 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 //		TODO: Only if stored column is a float!!!
 
 		char temp1[30];
-		sprintf(temp1, "%s_LOW", (char*)fAxis[jaxis]->GetVarName().data());
+		sprintf(temp1, "%s_LO", (char*)fAxis[jaxis]->GetVarName().data());
 		tType.push_back(temp1);
 
 		char temp2[30];
-		sprintf(temp2, "%s_HIGH", (char*)fAxis[jaxis]->GetVarName().data());
+		sprintf(temp2, "%s_HI", (char*)fAxis[jaxis]->GetVarName().data());
 		tType.push_back(temp2);
 		char temp3[30];
 		sprintf(temp3, "%dE", naxes[2*jaxis]);  //TODO: add type to axis, so float require _LOW _HIGH while "integers" or "chars" not.
