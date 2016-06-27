@@ -24,6 +24,7 @@ namespace flexIRF{
 		kTheta,
 		kPhi,
 		kRad,
+		kMigra,
 		kID,
 		kVarMax
 	}; // allowed variables
