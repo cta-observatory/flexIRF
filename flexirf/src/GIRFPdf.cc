@@ -184,7 +184,7 @@ std::string flexIRF::GIRFPdf::GetVarName() const {
 			pdfVarType = "EFFIC";
 			break;
 		case kEDispersion:
-			pdfVarType = "EDISP";
+			pdfVarType = "MATRIX";
 			break;
 		case kPsf:
 			pdfVarType = "PSF";
@@ -227,7 +227,7 @@ std::string flexIRF::GIRFPdf::GetVarUnit() const {
 		pdfVarType = "";
 		break;
 	case kEDispersion:
-		pdfVarType = "log10(TeV)";
+		pdfVarType = "";
 		break;
 	case kPsf:
 		pdfVarType = "deg";
