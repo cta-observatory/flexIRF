@@ -542,6 +542,20 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 
 	fits_write_col(fptr, TFLOAT, (2*naxis)+1, 1, 1, pdfEntries, fData, status);
 
+	// write tdym of pdf data field
+	sprintf(keyword, "TDIM%d", nColumns);
+	strcpy(chval, "(");
+	for (int jaxis = 0; jaxis < naxis; jaxis++) {
+		if (jaxis == 0) sprintf(chval, "%s%d",chval, naxes[2*jaxis]);
+		else sprintf(chval, "%s,%d",chval, naxes[2*jaxis]);
+	}
+	sprintf(chval, "%s)",chval);
+	sprintf(comment, "Dimensions of the field");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
+
 	// write pdf var
 	sprintf(keyword, "PDFVAR");
 	usval = ushort(fPdfVar);
