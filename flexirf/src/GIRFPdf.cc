@@ -195,6 +195,9 @@ std::string flexIRF::GIRFPdf::GetVarName() const {
 		case kBkgRateSqDeg:
 			pdfVarType = "BGRATESQDEG";
 			break;
+		case kBkgRateSr:
+			pdfVarType = "BACKGROUND";
+			break;
 		case kDiffSens:
 			pdfVarType = "DIFFSENS";
 			break;
@@ -237,6 +240,9 @@ std::string flexIRF::GIRFPdf::GetVarUnit() const {
 		break;
 	case kBkgRateSqDeg:
 		pdfVarType = "events*s^-1*deg^-2";
+		break;
+	case kBkgRateSr:
+		pdfVarType = "1/s/MeV/sr";
 		break;
 	case kDiffSens:
 		pdfVarType = "erg*cm^-2*s^-1";

@@ -12,6 +12,7 @@ namespace flexIRF{
 		 kEDispersion,
 		 kPsf,
 		 kBkgRate,
+		 kBkgRateSr,
 		 kBkgRateSqDeg,
 		 kDiffSens,
 		 kAeff,
