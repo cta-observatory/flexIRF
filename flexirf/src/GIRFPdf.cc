@@ -142,12 +142,56 @@ void flexIRF::GIRFPdf::Draw(string filename, string drawOption) const {
 }
 
 
+////////////////////////////////////////////////////////////////
+//
+// Return the axis name for EXTNAME
+//
+// These names were changed in order to comply with ctools
+// version 1.1.
+std::string flexIRF::GIRFPdf::GetExtName() const {
 
+	string extName;
+
+	switch (fPdfVar) {
+		case kEfficiency:
+			extName = "EFFIC";
+			break;
+		case kEDispersion:
+			extName = "ENERGY DISPERSION";
+			break;
+		case kPsf:
+			extName = "POINT SPREAD FUNCTION";
+			break;
+		case kBkgRate:
+			extName = "BGRATE";
+			break;
+		case kBkgRateSqDeg:
+			extName = "BGRATESQDEG";
+			break;
+		case kBkgRateSr:
+			extName = "BACKGROUND";
+			break;
+		case kDiffSens:
+			extName = "DIFFSENS";
+			break;
+		case kAeff:
+			extName = "EFFECTIVE AREA";
+			break;
+		case kAeffNoTheta2Cut:
+			extName = "EFFANOT2CUT";
+			break;
+		default:
+			cout << "Incorrect variable type.\n";
+			return extName;
+	}
+
+	return extName;
+}
 
 
 ////////////////////////////////////////////////////////////////
 //
-// Return the axis name for EXTNAME
+// Return the pdf function name for EXTNAME
 //
 std::string flexIRF::GIRFPdf::GetFuncName() const {
 

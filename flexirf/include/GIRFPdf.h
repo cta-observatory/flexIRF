@@ -48,7 +48,7 @@ namespace flexIRF{
 	  inline float* GetData()                const {return fData;}
 	  inline float* GetDataEntry(int ientry) const {return fData+ientry*GetNEntriesPerBin(fPdfFunc);}
 	  inline long   GetSize()                const {long tot=1;for(uint i=0;i<fAxis.size();i++) tot*=int(fAxis[i]->GetSize()); return tot;}
-	  virtual inline std::string GetExtName() const {return GetVarName() + "_" + GetFuncName();}
+	  virtual std::string GetExtName() const;
 	  virtual std::string GetFuncName() const;
 	  virtual std::string GetVarName() const;
 	  virtual std::string GetVarUnit() const;
