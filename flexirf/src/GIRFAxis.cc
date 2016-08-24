@@ -95,10 +95,10 @@ std::string flexIRF::GIRFAxis::GetVarName(VarType varType) {
 		axisVarType = "ENERG";
 		break;
 	case kEnergy_true:
-		axisVarType = "TENERGY";
+		axisVarType = "ETRUE";
 		break;
 	case kEnergy_rec:
-		axisVarType = "RENERGY";
+		axisVarType = "ERECO";
 		break;
 	case kTheta:
 		axisVarType = "THETA";
