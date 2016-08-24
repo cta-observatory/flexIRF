@@ -231,7 +231,7 @@ std::string flexIRF::GIRFPdf::GetVarName() const {
 			pdfVarType = "MATRIX";
 			break;
 		case kPsf:
-			pdfVarType = "PSF";
+			pdfVarType = "RPSF";
 			break;
 		case kBkgRate:
 			pdfVarType = "BGRATE";
