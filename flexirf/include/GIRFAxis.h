@@ -26,6 +26,8 @@ namespace flexIRF{
 		kRad,
 		kMigra,
 		kID,
+		kDetX,
+		kDetY,
 		kVarMax
 	}; // allowed variables
 

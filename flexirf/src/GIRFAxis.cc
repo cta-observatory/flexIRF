@@ -115,6 +115,12 @@ std::string flexIRF::GIRFAxis::GetVarName(VarType varType) {
 	case kID:
 		axisVarType = "ID";
 		break;
+	case kDetX:
+		axisVarType = "DETX";
+		break;
+	case kDetY:
+		axisVarType = "DETY";
+		break;
 	default:
 		cout << "Incorrect variable type.\n";
 		return axisVarType;
