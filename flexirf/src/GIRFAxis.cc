@@ -170,6 +170,10 @@ void flexIRF::GIRFAxis::SetVarType(string axisVarName) {
 		fVarType = kMigra;
 	} else if (axisVarName == "ID") {
 		fVarType = kID;
+	} else if (axisVarName == "DETX") {
+		fVarType = kID;
+	} else if (axisVarName == "DETY") {
+		fVarType = kID;
 	} else {
 		cout << "Incorrect axis variable type.\n";
 		fVarType = kNoVarType;
@@ -260,6 +264,12 @@ std::string flexIRF::GIRFAxis::GetVarUnit() const {
 		break;
 	case kID:
 		axisVarType = "";
+		break;
+	case kDetX:
+		axisVarType = "deg";
+		break;
+	case kDetY:
+		axisVarType = "deg";
 		break;
 	default:
 		cout << "Incorrect variable type.\n";
