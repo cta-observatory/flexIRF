@@ -240,7 +240,7 @@ std::string flexIRF::GIRFPdf::GetVarName() const {
 			pdfVarType = "BGRATESQDEG";
 			break;
 		case kBkgRateSr:
-			pdfVarType = "BACKGROUND";
+			pdfVarType = "BGD";
 			break;
 		case kDiffSens:
 			pdfVarType = "DIFFSENS";
