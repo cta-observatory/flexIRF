@@ -34,6 +34,8 @@ namespace flexIRF{
 	  std::vector<GIRFAxis*> fAxis;
 	  std::string fSerialization;
 	  bool fIsEmpty;
+//	  In case IRFs are point-like
+	  bool fIsPointLike;
 	  float*  fData;
 
 	  virtual int Write_IMAGE(fitsfile* fptr, int* status);
@@ -51,8 +53,11 @@ namespace flexIRF{
 	  virtual std::string GetExtName() const;
 	  virtual std::string GetFuncName() const;
 	  virtual std::string GetVarName() const;
+	  virtual std::string GetPdfClassName() const;
+	  virtual std::string GetPdfClassType() const;
 	  virtual std::string GetVarUnit() const;
 	  virtual inline bool IsEmpty () const {return fIsEmpty;}
+	  virtual inline bool IsPointLike () const {return fIsPointLike;}
 	  void   		SetData(float* data);
 
 	  inline int GetNEntriesPerBin(PdfFunc func) const

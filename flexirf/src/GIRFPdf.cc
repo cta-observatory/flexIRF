@@ -261,6 +261,122 @@ std::string flexIRF::GIRFPdf::GetVarName() const {
 
 ////////////////////////////////////////////////////////////////
 //
+// Return the axis name for HDUCLAS2
+//
+std::string flexIRF::GIRFPdf::GetPdfClassName() const {
+
+	string pdfPdfClassName;
+
+	switch (fPdfVar) {
+		case kEfficiency:
+			pdfPdfClassName = "EFFIC";
+			break;
+		case kEDispersion:
+			pdfPdfClassName = "EDISP";
+			break;
+		case kPsf:
+			pdfPdfClassName = "RPSF";
+			break;
+		case kBkgRate:
+			pdfPdfClassName = "BKG";
+			break;
+		case kBkgRateSqDeg:
+			pdfPdfClassName = "BKG";
+			break;
+		case kBkgRateSr:
+			pdfPdfClassName = "BKG";
+			break;
+		case kDiffSens:
+			pdfPdfClassName = "DIFFSENS";
+			break;
+		case kAeff:
+			pdfPdfClassName = "EFF_AREA";
+			break;
+		case kAeffNoTheta2Cut:
+			pdfPdfClassName = "EFF_AREA";
+			break;
+		default:
+			cout << "Incorrect variable type.\n";
+			return pdfPdfClassName;
+	}
+
+	return pdfPdfClassName;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// Return the axis name for HDUCLAS4
+//
+std::string flexIRF::GIRFPdf::GetPdfClassType() const {
+
+	string pdfPdfClassType;
+
+	switch (fPdfVar) {
+		case kEfficiency:
+			pdfPdfClassType = "";
+			break;
+		case kEDispersion:
+			pdfPdfClassType = "EDISP_2D";
+			break;
+		case kPsf:
+//			TODO: Add all PSF types. This can be done looping through the axes.
+			pdfPdfClassType = "PSF_TABLE";
+			break;
+		case kBkgRate:
+			for (int iAxis=0; fAxis.size(); iAxis++){
+				if (fAxis[iAxis]->GetVarName() == "THETA"){
+					pdfPdfClassType = "BKG_2D";
+					break;
+				}
+				else if (fAxis[iAxis]->GetVarName() == "DETX"){
+					pdfPdfClassType = "BKG_3D";
+					break;
+				}
+			}
+			break;
+		case kBkgRateSqDeg:
+			for (int iAxis=0; fAxis.size(); iAxis++){
+				if (fAxis[iAxis]->GetVarName() == "THETA"){
+					pdfPdfClassType = "BKG_2D";
+					break;
+				}
+				else if (fAxis[iAxis]->GetVarName() == "DETX"){
+					pdfPdfClassType = "BKG_3D";
+					break;
+				}
+			}
+			break;
+		case kBkgRateSr:
+			for (int iAxis=0; fAxis.size(); iAxis++){
+				if (fAxis[iAxis]->GetVarName() == "THETA"){
+					pdfPdfClassType = "BKG_2D";
+					break;
+				}
+				else if (fAxis[iAxis]->GetVarName() == "DETX"){
+					pdfPdfClassType = "BKG_3D";
+					break;
+				}
+			}
+			break;
+		case kDiffSens:
+			pdfPdfClassType = "DIFFSENS";
+			break;
+		case kAeff:
+			pdfPdfClassType = "AEFF_2D";
+			break;
+		case kAeffNoTheta2Cut:
+			pdfPdfClassType = "AEFF_2D";
+			break;
+		default:
+			cout << "Incorrect variable type.\n";
+			return pdfPdfClassType;
+	}
+
+	return pdfPdfClassType;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // Return the axis name for EXTNAME
 //
 std::string flexIRF::GIRFPdf::GetVarUnit() const {
@@ -507,11 +623,9 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 		naxes[2*jaxis] = int(fAxis[jaxis]->GetSize());
 		naxes[(2*jaxis)+1] = int(fAxis[jaxis]->GetSize());
 //		TODO: Only if stored column is a float!!!
-
 		char temp1[30];
 		sprintf(temp1, "%s_LO", (char*)fAxis[jaxis]->GetVarName().data());
 		tType.push_back(temp1);
-
 		char temp2[30];
 		sprintf(temp2, "%s_HI", (char*)fAxis[jaxis]->GetVarName().data());
 		tType.push_back(temp2);
@@ -562,7 +676,6 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
                 tfields++;
         }
     }
-
 
 	// write the pdf BINTABLE HDU.
 	if (fits_create_tbl(fptr, BINARY_TBL, 0, nColumns,ttype, tform, tunit,GetExtName().data(), status))
@@ -624,33 +737,45 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 				<< *status << ")" << endl;
 
 	// Add class keywords to the HDU.
+	sprintf(keyword, "HDUDOC");
+	sprintf(chval, "See comment");
+	sprintf(comment, "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	sprintf(keyword, "HDUVERS");
+	sprintf(chval, "0.2");
+	sprintf(comment, "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLASS");
-	sprintf(chval, "CTA");
-	sprintf(comment, "FITS file following the CTA data format.");
+	sprintf(chval, "GADF");
+	sprintf(comment, "FITS file following the GADF data format.");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS1");
-	sprintf(chval, "IRM");
-	sprintf(comment, "Instrument Response Model HDU.");
+	sprintf(chval, "RESPONSE");
+	sprintf(comment, "HDU class");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS2");
-	sprintf(chval, "DATA");
-	sprintf(comment, "Data HDU.");
+	sprintf(chval, "%s", GetPdfClassName().data());
+	sprintf(comment, "HDU class");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS3");
-	sprintf(chval, "%s", GetVarName().data());
-	sprintf(comment, "Variable whose pdf is parameterized (see GIRFPdf.h for details)");
+	if (IsPointLike()) 	sprintf(chval, "POINT-LIKE");
+	else 				sprintf(chval, "FULL-ENCLOSURE");
+	sprintf(comment, "HDU class");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	//Get the last Pdf ID of the same class
 	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
-
 	sprintf(keyword, "HDUCLAS4");
 	usval = ushort(pdfID);
 	sprintf(comment, "Pdf ID");
