@@ -549,34 +549,53 @@ int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
 				<< *status << ")" << endl;
 
 	// Add class keywords to the HDU.
+	sprintf(keyword, "HDUDOC");
+	sprintf(chval, "See comment");
+	sprintf(comment, "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+	sprintf(keyword, "HDUVERS");
+	sprintf(chval, "0.2");
+	sprintf(comment, "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLASS");
-	sprintf(chval, "CTA");
-	sprintf(comment, "FITS file following the CTA data format.");
+	sprintf(chval, "GADF");
+	sprintf(comment, "FITS file following the GADF data format.");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS1");
-	sprintf(chval, "IRM");
-	sprintf(comment, "Instrument Response Model HDU.");
+	sprintf(chval, "RESPONSE");
+	sprintf(comment, "HDU class");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS2");
-	sprintf(chval, "DATA");
-	sprintf(comment, "Data HDU.");
+	sprintf(chval, "%s", GetPdfClassName().data());
+	sprintf(comment, "HDU class");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
 	sprintf(keyword, "HDUCLAS3");
-	sprintf(chval, "%s", GetVarName().data());
-	sprintf(comment, "Variable whose pdf is parameterized (see GIRFPdf.h for details)");
+	if (IsPointLike()) 	sprintf(chval, "POINT-LIKE");
+	else 				sprintf(chval, "FULL-ENCLOSURE");
+	sprintf(comment, "HDU class");
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
+	sprintf(keyword, "HDUCLAS4");
+	sprintf(chval, "%s", GetPdfClassType().data());
+	sprintf(comment, "HDU class");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
 	//Get the last Pdf ID of the same class
 	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
-
-	sprintf(keyword, "HDUCLAS4");
+	sprintf(keyword, "PDFID");
 	usval = ushort(pdfID);
 	sprintf(comment, "Pdf ID");
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
@@ -774,9 +793,16 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
 		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
 				<< *status << ")" << endl;
+	sprintf(keyword, "HDUCLAS4");
+	sprintf(chval, "%s", GetPdfClassType().data());
+	sprintf(comment, "HDU class");
+	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+				<< *status << ")" << endl;
+
 	//Get the last Pdf ID of the same class
 	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
-	sprintf(keyword, "HDUCLAS4");
+	sprintf(keyword, "PDFID");
 	usval = ushort(pdfID);
 	sprintf(comment, "Pdf ID");
 	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
