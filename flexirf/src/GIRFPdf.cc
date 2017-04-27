@@ -34,7 +34,7 @@ using namespace std;
 // 
 // Construct pdf table with type
 //
-flexIRF::GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc, unsigned long naxes) : fPdfFunc(pdffunc), fData(0), fIsEmpty(1) {
+flexIRF::GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc, unsigned long naxes) : fPdfFunc(pdffunc), fData(0), fIsEmpty(1),fIsPointLike(0) {
 	fPdfVar = pdftype;
 	fAxis.reserve(naxes);
 }

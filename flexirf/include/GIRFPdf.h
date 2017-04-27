@@ -59,6 +59,7 @@ namespace flexIRF{
 	  virtual inline bool IsEmpty () const {return fIsEmpty;}
 	  virtual inline bool IsPointLike () const {return fIsPointLike;}
 	  void   		SetData(float* data);
+	  inline void   SetPointLike(bool isPointLike){fIsPointLike=isPointLike;}
 
 	  inline int GetNEntriesPerBin(PdfFunc func) const
 	  {
