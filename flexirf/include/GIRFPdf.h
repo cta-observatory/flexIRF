@@ -5,6 +5,7 @@
 #include <vector>
 #include "fitsio.h"
 #include "GIRFAxis.h"
+#include "GMetaData.h"
 
 namespace flexIRF{
 	enum PdfVar {kNoPdfVar=0,
@@ -29,6 +30,7 @@ namespace flexIRF{
 	{
 
 	 private:
+	  GMetaData fMetaData;
 	  PdfVar  fPdfVar;
 	  PdfFunc fPdfFunc;
 	  std::vector<GIRFAxis*> fAxis;
@@ -46,6 +48,7 @@ namespace flexIRF{
 	  virtual ~GIRFPdf(){};
 
 	  inline int    AddAxis(GIRFAxis* axis)  {if (!axis->CheckAxisConsistency()) fAxis.push_back(axis); return int(fAxis.size());} // insert axis in the list
+	  inline void   AddMetaKeyword(string keyword, string value, string comment)  {fMetaData.AddMetaKeyword(keyword, value, comment);}
 	  virtual void 	Draw(string filename="", string drawOption="") const;
 	  inline float* GetData()                const {return fData;}
 	  inline float* GetDataEntry(int ientry) const {return fData+ientry*GetNEntriesPerBin(fPdfFunc);}
