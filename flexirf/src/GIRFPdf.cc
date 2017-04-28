@@ -549,7 +549,6 @@ int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
 				<< *status << ")" << endl;
 
 	// Add class keywords to the HDU.
-
 	fMetaData.AddMetaKeyword("HDUDOC", "See comment", "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
 	fMetaData.AddMetaKeyword("HDUVERS", "0.2", "Reference version");
 	fMetaData.AddMetaKeyword("HDUCLASS", "GADF", "FITS file following the GADF data format.");
@@ -732,49 +731,25 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 				<< *status << ")" << endl;
 
 	// Add class keywords to the HDU.
-	sprintf(keyword, "HDUDOC");
-	sprintf(chval, "See comment");
-	sprintf(comment, "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
-	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
-		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
-	sprintf(keyword, "HDUVERS");
-	sprintf(chval, "0.2");
-	sprintf(comment, "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
-	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
-		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
-	sprintf(keyword, "HDUCLASS");
-	sprintf(chval, "GADF");
-	sprintf(comment, "FITS file following the GADF data format.");
-	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
-		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
-	sprintf(keyword, "HDUCLAS1");
-	sprintf(chval, "RESPONSE");
-	sprintf(comment, "HDU class");
-	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
-		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
-	sprintf(keyword, "HDUCLAS2");
-	sprintf(chval, "%s", GetPdfClassName().data());
-	sprintf(comment, "HDU class");
-	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
-		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
-	sprintf(keyword, "HDUCLAS3");
-	if (IsPointLike()) 	sprintf(chval, "POINT-LIKE");
-	else 				sprintf(chval, "FULL-ENCLOSURE");
-	sprintf(comment, "HDU class");
-	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
-		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
-	sprintf(keyword, "HDUCLAS4");
-	sprintf(chval, "%s", GetPdfClassType().data());
-	sprintf(comment, "HDU class");
-	if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
-		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
+	fMetaData.AddMetaKeyword("HDUDOC", "See comment", "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
+	fMetaData.AddMetaKeyword("HDUVERS", "0.2", "Reference version");
+	fMetaData.AddMetaKeyword("HDUCLASS", "GADF", "FITS file following the GADF data format.");
+	fMetaData.AddMetaKeyword("HDUCLAS1", "RESPONSE", "HDU class");
+	fMetaData.AddMetaKeyword("HDUCLAS2", GetPdfClassName(), "HDU class");
+	if (IsPointLike()) 	fMetaData.AddMetaKeyword("HDUCLAS3", "POINT-LIKE", "HDU class");
+	else 				fMetaData.AddMetaKeyword("HDUCLAS3", "FULL-ENCLOSURE", "HDU class");
+	fMetaData.AddMetaKeyword("HDUCLAS4", GetPdfClassType(), "HDU class");
+
+	// Write all string keywords
+	for (int iKey=0;iKey < fMetaData.GetSize();iKey++){
+		sprintf(keyword, "%s", fMetaData.GetKeyword(iKey).data());
+		sprintf(chval, "%s", fMetaData.GetValue(iKey).data());
+		sprintf(comment, "%s", fMetaData.GetComment(iKey).data());
+		if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+			cout << "GIRFPdf::Write_IMAGE Error: cannot write keyword (error code: "
+					<< *status << ")" << endl;
+	}
+
 
 	//Get the last Pdf ID of the same class
 	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
