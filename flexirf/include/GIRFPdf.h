@@ -39,6 +39,7 @@ namespace flexIRF{
 //	  In case IRFs are point-like
 	  bool fIsPointLike;
 	  float*  fData;
+	  float*  fRadMax;
 
 	  virtual int Write_IMAGE(fitsfile* fptr, int* status);
 	  virtual int Write_BINTABLE(fitsfile* fptr, int* status);
@@ -51,8 +52,10 @@ namespace flexIRF{
 	  inline void   AddMetaKeyword(string keyword, string value, string comment)  {fMetaData.AddMetaKeyword(keyword, value, comment);}
 	  virtual void 	Draw(string filename="", string drawOption="") const;
 	  inline float* GetData()                const {return fData;}
+	  inline float* GetRadMax()              const {return fRadMax;}
 	  inline float* GetDataEntry(int ientry) const {return fData+ientry*GetNEntriesPerBin(fPdfFunc);}
 	  inline long   GetSize()                const {long tot=1;for(uint i=0;i<fAxis.size();i++) tot*=int(fAxis[i]->GetSize()); return tot;}
+	  long   		GetRadMaxSize()          const;
 	  virtual std::string GetExtName() const;
 	  virtual std::string GetFuncName() const;
 	  virtual std::string GetVarName() const;
@@ -62,6 +65,7 @@ namespace flexIRF{
 	  virtual inline bool IsEmpty () const {return fIsEmpty;}
 	  virtual inline bool IsPointLike () const {return fIsPointLike;}
 	  void   		SetData(float* data);
+	  inline void   SetRadMax(float* radMax){if (radMax==0) return; fRadMax = radMax;}
 	  inline void   SetPointLike(bool isPointLike){fIsPointLike=isPointLike;}
 
 	  inline int GetNEntriesPerBin(PdfFunc func) const

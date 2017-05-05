@@ -766,6 +766,16 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 }
 
 
+long flexIRF::GIRFPdf::GetRadMaxSize() const{
+	long tot=1;
+	for(uint i=0;i<fAxis.size();i++)
+		if (fAxis[i]->IsFoV()){
+			tot*=int(fAxis[i]->GetSize());
+		}
+	return tot;
+}
+
+
 ////////////////////////////////////////////////////////////////
 //
 // Write the pdf and the associated axes to the specified

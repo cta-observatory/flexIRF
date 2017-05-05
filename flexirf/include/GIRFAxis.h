@@ -99,6 +99,7 @@ namespace flexIRF{
 		virtual std::string 		GetVarUnit() const;
 
 		virtual bool operator==(const GIRFAxis& otherAxis) {return 1;}//TH: We will constantly check if Axis are equal... (when adding new Pdfs)
+		virtual bool IsFoV() const;
 
 		virtual int const 	Write(fitsfile* fptr, int& axisID, int* status) {*status = WRITE_ERROR;	return *status;}
 		virtual int const	WriteAxis(fitsfile* fptr, long size, float* data, int& lastID, int* status);

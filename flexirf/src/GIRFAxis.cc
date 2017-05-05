@@ -279,6 +279,16 @@ std::string flexIRF::GIRFAxis::GetVarUnit() const {
 	return axisVarType;
 }
 
+bool flexIRF::GIRFAxis::IsFoV() const{
+
+	if (fVarType == kTheta) return 1;
+	else if (fVarType == kDetX) return 1;
+	else if (fVarType == kDetY) return 1;
+	return 0;
+}
+
+
+
 ////////////////////////////////////////////////////////////////
 // 
 // Write the header of the axis HDU
