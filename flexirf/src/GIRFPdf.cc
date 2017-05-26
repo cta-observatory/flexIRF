@@ -570,8 +570,9 @@ int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
 	// Write all float keywords
 	for (int iKey=0;iKey < fMetaData.GetFlSize();iKey++){
 		sprintf(keyword, "%s", fMetaData.GetFlKeyword(iKey).data());
+		float value = fMetaData.GetFlValue(iKey);
 		sprintf(comment, "%s", fMetaData.GetFlComment(iKey).data());
-		if (fits_write_key(fptr, TFLOAT, keyword, &fMetaData.GetFlValue(iKey), comment, status))
+		if (fits_write_key(fptr, TFLOAT, keyword, &value, comment, status))
 			cout << "GIRFPdf::Write_IMAGE Error: cannot write keyword (error code: "
 					<< *status << ")" << endl;
 	}
@@ -760,8 +761,9 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 	// Write all float keywords
 	for (int iKey=0;iKey < fMetaData.GetFlSize();iKey++){
 		sprintf(keyword, "%s", fMetaData.GetFlKeyword(iKey).data());
+		float value = fMetaData.GetFlValue(iKey);
 		sprintf(comment, "%s", fMetaData.GetFlComment(iKey).data());
-		if (fits_write_key(fptr, TFLOAT, keyword, &fMetaData.GetFlValue(iKey), comment, status))
+		if (fits_write_key(fptr, TFLOAT, keyword, &value, comment, status))
 			cout << "GIRFPdf::Write_IMAGE Error: cannot write keyword (error code: "
 					<< *status << ")" << endl;
 	}
