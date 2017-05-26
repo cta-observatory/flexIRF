@@ -14,18 +14,26 @@ namespace flexIRF{
 	{
 	 private:
 
-		vector<string> fKeywords;
-		vector<string> fValues;
-		vector<string> fComments;
+		vector<string> fStKeywords;
+		vector<string> fStValues;
+		vector<string> fStComments;
+		vector<string> fFlKeywords;
+		vector<float> fFlValues;
+		vector<string> fFlComments;
 
 	 public:
 		GMetaData();
 		virtual ~GMetaData(){};
 		void AddMetaKeyword(string keyword, string value, string comment);
-		inline int GetSize(){return (int) fKeywords.size();}
-		inline string GetKeyword(int iKey){return fKeywords[iKey];}
-		inline string GetValue(int iKey){return fValues[iKey];}
-		inline string GetComment(int iKey){return fComments[iKey];}
+		void AddMetaKeyword(string keyword, float value, string comment);
+		inline int GetStSize(){return (int) fStKeywords.size();}
+		inline int GetFlSize(){return (int) fStKeywords.size();}
+		inline string GetStKeyword(int iKey){return fStKeywords[iKey];}
+		inline string GetStValue(int iKey){return fStValues[iKey];}
+		inline string GetStComment(int iKey){return fStComments[iKey];}
+		inline string GetFlKeyword(int iKey){return fFlKeywords[iKey];}
+		inline float GetFlValue(int iKey){return fFlValues[iKey];}
+		inline string GetFlComment(int iKey){return fFlComments[iKey];}
 	};
 }
 #endif

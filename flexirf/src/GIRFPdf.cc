@@ -559,11 +559,19 @@ int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
 	fMetaData.AddMetaKeyword("HDUCLAS4", GetPdfClassType(), "HDU class");
 
 	// Write all string keywords
-	for (int iKey=0;iKey < fMetaData.GetSize();iKey++){
-		sprintf(keyword, "%s", fMetaData.GetKeyword(iKey).data());
-		sprintf(chval, "%s", fMetaData.GetValue(iKey).data());
-		sprintf(comment, "%s", fMetaData.GetComment(iKey).data());
+	for (int iKey=0;iKey < fMetaData.GetStSize();iKey++){
+		sprintf(keyword, "%s", fMetaData.GetStKeyword(iKey).data());
+		sprintf(chval, "%s", fMetaData.GetStValue(iKey).data());
+		sprintf(comment, "%s", fMetaData.GetStComment(iKey).data());
 		if (fits_write_key(fptr, TSTRING, keyword, &chval, comment, status))
+			cout << "GIRFPdf::Write_IMAGE Error: cannot write keyword (error code: "
+					<< *status << ")" << endl;
+	}
+	// Write all float keywords
+	for (int iKey=0;iKey < fMetaData.GetFlSize();iKey++){
+		sprintf(keyword, "%s", fMetaData.GetFlKeyword(iKey).data());
+		sprintf(comment, "%s", fMetaData.GetFlComment(iKey).data());
+		if (fits_write_key(fptr, TFLOAT, keyword, &fMetaData.GetFlValue(iKey), comment, status))
 			cout << "GIRFPdf::Write_IMAGE Error: cannot write keyword (error code: "
 					<< *status << ")" << endl;
 	}
