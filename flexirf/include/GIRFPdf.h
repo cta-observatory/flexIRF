@@ -50,6 +50,7 @@ namespace flexIRF{
 
 	  inline int    AddAxis(GIRFAxis* axis)  {if (!axis->CheckAxisConsistency()) fAxis.push_back(axis); return int(fAxis.size());} // insert axis in the list
 	  inline void   AddMetaKeyword(string keyword, string value, string comment)  {fMetaData.AddMetaKeyword(keyword, value, comment);}
+	  inline void   AddMetaKeyword(string keyword, float value, string comment)  {fMetaData.AddMetaKeyword(keyword, value, comment);}
 	  virtual void 	Draw(string filename="", string drawOption="") const;
 	  inline float* GetData()                const {return fData;}
 	  inline float* GetRadMax()              const {return fRadMax;}
