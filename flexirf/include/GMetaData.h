@@ -32,7 +32,7 @@ namespace flexIRF{
 		inline string GetStValue(int iKey){return fStValues[iKey];}
 		inline string GetStComment(int iKey){return fStComments[iKey];}
 		inline string GetFlKeyword(int iKey){return fFlKeywords[iKey];}
-		inline float GetFlValue(int iKey){return fFlValues[iKey];}
+		inline float  GetFlValue(int iKey){return fFlValues[iKey];}
 		inline string GetFlComment(int iKey){return fFlComments[iKey];}
 	};
 }

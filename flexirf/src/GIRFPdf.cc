@@ -568,14 +568,17 @@ int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
 					<< *status << ")" << endl;
 	}
 	// Write all float keywords
-	for (int iKey=0;iKey < fMetaData.GetFlSize();iKey++){
-		sprintf(keyword, "%s", fMetaData.GetFlKeyword(iKey).data());
-		float value = fMetaData.GetFlValue(iKey);
-		sprintf(comment, "%s", fMetaData.GetFlComment(iKey).data());
-		if (fits_write_key(fptr, TFLOAT, keyword, &value, comment, status))
-			cout << "GIRFPdf::Write_IMAGE Error: cannot write keyword (error code: "
-					<< *status << ")" << endl;
+	if (fMetaData.GetFlSize()){
+		for (int iKey=0;iKey < fMetaData.GetFlSize();iKey++){
+			sprintf(keyword, "%s", fMetaData.GetFlKeyword(iKey).data());
+			float value = fMetaData.GetFlValue(iKey);
+			sprintf(comment, "%s", fMetaData.GetFlComment(iKey).data());
+			if (fits_write_key(fptr, TFLOAT, keyword, &value, comment, status))
+				cout << "GIRFPdf::Write_IMAGE Error: cannot write keyword (error code: "
+						<< *status << ")" << endl;
+		}
 	}
+
 
 	//Get the last Pdf ID of the same class
 	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
