@@ -27,7 +27,7 @@ namespace flexIRF{
 		void AddMetaKeyword(string keyword, string value, string comment);
 		void AddMetaKeyword(string keyword, float value, string comment);
 		inline int GetStSize(){return (int) fStKeywords.size();}
-		inline int GetFlSize(){return (int) fStKeywords.size();}
+		inline int GetFlSize(){return (int) fFlKeywords.size();}
 		inline string GetStKeyword(int iKey){return fStKeywords[iKey];}
 		inline string GetStValue(int iKey){return fStValues[iKey];}
 		inline string GetStComment(int iKey){return fStComments[iKey];}
