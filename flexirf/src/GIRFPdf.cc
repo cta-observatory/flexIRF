@@ -234,13 +234,13 @@ std::string flexIRF::GIRFPdf::GetVarName() const {
 			pdfVarType = "RPSF";
 			break;
 		case kBkgRate:
-			pdfVarType = "BGD";
+			pdfVarType = "BKG";
 			break;
 		case kBkgRateSqDeg:
 			pdfVarType = "BGRATESQDEG";
 			break;
 		case kBkgRateSr:
-			pdfVarType = "BGD";
+			pdfVarType = "BKG";
 			break;
 		case kDiffSens:
 			pdfVarType = "DIFFSENS";
@@ -532,21 +532,21 @@ int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
 
 
 	// write pdf var
-	sprintf(keyword, "PDFVAR");
-	usval = ushort(fPdfVar);
-	sprintf(comment,
-			"Variable whose pdf is parameterized (see GIRFPdf.h for details)");
-	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
-		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
+//	sprintf(keyword, "PDFVAR");
+//	usval = ushort(fPdfVar);
+//	sprintf(comment,
+//			"Variable whose pdf is parameterized (see GIRFPdf.h for details)");
+//	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+//		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+//				<< *status << ")" << endl;
 
 	// write pdf function
-	sprintf(keyword, "PDFFunc");
-	usval = ushort(fPdfFunc);
-	sprintf(comment, "Function describing pdf (see GIRFPdf.h for details)");
-	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
-		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
+//	sprintf(keyword, "PDFFunc");
+//	usval = ushort(fPdfFunc);
+//	sprintf(comment, "Function describing pdf (see GIRFPdf.h for details)");
+//	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+//		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+//				<< *status << ")" << endl;
 
 	// Add class keywords to the HDU.
 	fMetaData.AddMetaKeyword("HDUDOC", "See comment", "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
@@ -581,13 +581,13 @@ int flexIRF::GIRFPdf::Write_IMAGE(fitsfile* fptr, int* status) {
 
 
 	//Get the last Pdf ID of the same class
-	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
-	sprintf(keyword, "PDFID");
-	usval = ushort(pdfID);
-	sprintf(comment, "Pdf ID");
-	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
-		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
+//	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
+//	sprintf(keyword, "PDFID");
+//	usval = ushort(pdfID);
+//	sprintf(comment, "Pdf ID");
+//	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+//		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+//				<< *status << ")" << endl;
 
 	// write the pdf data
 	long nentries = GetSize();
@@ -726,21 +726,21 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 
 
 	// write pdf var
-	sprintf(keyword, "PDFVAR");
-	usval = ushort(fPdfVar);
-	sprintf(comment,
-			"Variable whose pdf is parameterized (see GIRFPdf.h for details)");
-	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
-		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
+//	sprintf(keyword, "PDFVAR");
+//	usval = ushort(fPdfVar);
+//	sprintf(comment,
+//			"Variable whose pdf is parameterized (see GIRFPdf.h for details)");
+//	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+//		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+//				<< *status << ")" << endl;
 
 	// write pdf function
-	sprintf(keyword, "PDFFunc");
-	usval = ushort(fPdfFunc);
-	sprintf(comment, "Function describing pdf (see GIRFPdf.h for details)");
-	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
-		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
+//	sprintf(keyword, "PDFFunc");
+//	usval = ushort(fPdfFunc);
+//	sprintf(comment, "Function describing pdf (see GIRFPdf.h for details)");
+//	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+//		cout << "GIRFPdf::Write Error: cannot write keyword (error code: "
+//				<< *status << ")" << endl;
 
 	// Add class keywords to the HDU.
 	fMetaData.AddMetaKeyword("HDUDOC", "See comment", "https://github.com/open-gamma-ray-astro/gamma-astro-data-formats");
@@ -773,13 +773,22 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 
 
 	//Get the last Pdf ID of the same class
-	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
-	sprintf(keyword, "PDFID");
-	usval = ushort(pdfID);
-	sprintf(comment, "Pdf ID");
-	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
-		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
-				<< *status << ")" << endl;
+//	int pdfID = GIRFUtils::GetLastPdfID(fptr)+1;
+//	sprintf(keyword, "PDFID");
+//	usval = ushort(pdfID);
+//	sprintf(comment, "Pdf ID");
+//	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+//		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+//				<< *status << ")" << endl;
+
+	// CREF keyword, as described in e.g. https://github.com/open-gamma-ray-astro/gamma-astro-data-formats/issues/102
+//	char cref[70];
+//	sprintf(keyword, "PDFID");
+//	usval = ushort(pdfID);
+//	sprintf(comment, "Pdf ID");
+//	if (fits_write_key(fptr, TUSHORT, keyword, &usval, comment, status))
+//		cout << "GIRFAxis::WriteAxis Error: cannot write keyword (error code: "
+//				<< *status << ")" << endl;
 
 	return *status;
 
