@@ -689,9 +689,9 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 				<< *status << ")" << endl;
 
 	// write keywords to the header
-	char keyword[9];
-	char chval[20];
-	char comment[70];
+	char keyword[8];
+	char chval[71];
+	char comment[73];
 	ushort usval;
 
 	//	Loop over axes, writing both low and high edge columns. TODO: Must be improved for other kind of axes.

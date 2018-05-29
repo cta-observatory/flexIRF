@@ -37,11 +37,11 @@ void flexIRF::GMetaData::AddMetaKeyword(string keyword, string value, string com
 		return;
 	}
 	if (value.length() > 71){
-		cout << "ERROR: Value too long (max length = 20)" << endl;
+		cout << "ERROR: Value too long (max length = 71)" << endl;
 		return;
 	}
-	if (comment.length() > 70){
-		cout << "ERROR: Comment too long (max length = 70)" << endl;
+	if (comment.length() > 73){
+		cout << "ERROR: Comment too long (max length = 73)" << endl;
 		return;
 	}
 	fStKeywords.push_back(keyword);
@@ -57,8 +57,8 @@ void flexIRF::GMetaData::AddMetaKeyword(string keyword, float value, string comm
 		return;
 	}
 
-	if (comment.length() > 70){
-		cout << "ERROR: Comment too long (max length = 70)" << endl;
+	if (comment.length() > 73){
+		cout << "ERROR: Comment too long (max length = 73)" << endl;
 		return;
 	}
 	fFlKeywords.push_back(keyword);
