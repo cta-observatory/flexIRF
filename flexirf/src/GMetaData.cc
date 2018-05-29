@@ -36,7 +36,7 @@ void flexIRF::GMetaData::AddMetaKeyword(string keyword, string value, string com
 		cout << "ERROR: Keyword too long (max length = 8)" << endl;
 		return;
 	}
-	if (value.length() > 20){
+	if (value.length() > 71){
 		cout << "ERROR: Value too long (max length = 20)" << endl;
 		return;
 	}
