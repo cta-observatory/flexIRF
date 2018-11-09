@@ -31,7 +31,7 @@
 using namespace std;
 
 ////////////////////////////////////////////////////////////////
-// 
+//
 // Construct pdf table with type
 //
 flexIRF::GIRFPdf::GIRFPdf(PdfVar pdftype, PdfFunc pdffunc, unsigned long naxes) : fPdfFunc(pdffunc), fData(0), fIsEmpty(1),fIsPointLike(0) {
@@ -626,8 +626,17 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 	vector<string> tType, tForm, tUnit;
 //	Loop over axes, filling both low and high edges. TODO: Must be improved for other kind of axes.
 	for (int jaxis = 0; jaxis < naxis; jaxis++) {
+		if (fAxis[jaxis]->GetAxisEdgesType()=="Edges"){
 		naxes[2*jaxis] = int(fAxis[jaxis]->GetSize());
 		naxes[(2*jaxis)+1] = int(fAxis[jaxis]->GetSize());
+	}
+	else if (fAxis[jaxis]->GetAxisEdgesType()=="Nodes"){
+		naxes[2*jaxis] = int(fAxis[jaxis]->GetSize()+1);
+		naxes[(2*jaxis)+1] = int(fAxis[jaxis]->GetSize()+1);
+	}
+	else{
+		cout << "You didn't give any king of type for the bin axis" << endl;
+	}
 //		TODO: Only if stored column is a float!!!
 		char temp1[30];
 		sprintf(temp1, "%s_LO", (char*)fAxis[jaxis]->GetVarName().data());
@@ -701,12 +710,13 @@ int flexIRF::GIRFPdf::Write_BINTABLE(fitsfile* fptr, int* status) {
 		if (axisPtr){
 			vector<float> axisBinsLow= axisPtr->GetAxisBins();
 			vector<float> axisBinsHigh= axisPtr->GetAxisBins();
+			if (fAxis[jaxis]->GetAxisEdgesType()=="Edges"){
 			axisBinsLow.pop_back();
 			axisBinsHigh.erase(axisBinsHigh.begin());
+			}
 			fits_write_col(fptr, TFLOAT, (2*jaxis)+1, 1, 1, naxes[2*jaxis], axisBinsLow.data(), status);
 			fits_write_col(fptr, TFLOAT, (2*jaxis)+2, 1, 1, naxes[(2*jaxis)+1], axisBinsHigh.data(), status);
 		}
-
 	}
 
 	fits_write_col(fptr, TFLOAT, (2*naxis)+1, 1, 1, pdfEntries, fData, status);
@@ -854,11 +864,3 @@ void   flexIRF::GIRFPdf::SetData(float* data){
 	fData = data;
 	fIsEmpty=0;
 }
-
-
-
-
-
-
-
-
