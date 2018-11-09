@@ -63,11 +63,12 @@ namespace flexIRF{
 		VarType fVarType;   		// Variable contained in axis (energy, theta, phi...)
 		ScaleType fScaleType;		// Scale in which the variable is stored (linear, log...)
 //		bool fIsLog;        		// if true, the interpolation/parameterization will be done on the log of the variable TODO: deprecated!
-
+		string fAxisEdgesType; // To say of we give the edges or the nodes of the edges for the DL3 file
 	public:
 		GIRFAxis();                	// create new empty axis
 		GIRFAxis(VarType vartype); 	// create new axis for given variable
-
+		void SetAxisEdgesType(string edges_name){fAxisEdgesType =  edges_name;}
+		string GetAxisEdgesType(){return fAxisEdgesType;}
 		virtual ~GIRFAxis(){};
 
 		virtual inline void SetVarType(VarType varType) {fVarType = varType;}
@@ -120,4 +121,3 @@ namespace flexIRF{
 	};
 }
 #endif
-

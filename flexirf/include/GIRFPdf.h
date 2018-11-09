@@ -55,7 +55,7 @@ namespace flexIRF{
 	  inline float* GetData()                const {return fData;}
 	  inline float* GetRadMax()              const {return fRadMax;}
 	  inline float* GetDataEntry(int ientry) const {return fData+ientry*GetNEntriesPerBin(fPdfFunc);}
-	  inline long   GetSize()                const {long tot=1;for(uint i=0;i<fAxis.size();i++) tot*=int(fAxis[i]->GetSize()); return tot;}
+	  inline long   GetSize()                const {long tot=1;for(uint i=0;i<fAxis.size();i++) {if(fAxis[i]->GetAxisEdgesType()=="Nodes") tot*=int(fAxis[i]->GetSize()+1); else tot*=int(fAxis[i]->GetSize());} return tot;}
 	  long   		GetRadMaxSize()          const;
 	  virtual std::string GetExtName() const;
 	  virtual std::string GetFuncName() const;
@@ -91,4 +91,3 @@ namespace flexIRF{
 	};
 }
 #endif
-

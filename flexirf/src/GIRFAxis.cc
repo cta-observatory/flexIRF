@@ -28,15 +28,15 @@
 using namespace std;
 
 ////////////////////////////////////////////////////////////////
-// 
+//
 // Construct empty axis object
 //
 flexIRF::GIRFAxis::GIRFAxis() :
-		fAxisType(kNoAxisType), fVarType(kNoVarType), fScaleType(kLinear) {
+		fAxisType(kNoAxisType), fVarType(kNoVarType), fScaleType(kLinear), fAxisEdgesType("") {
 }
 
 ////////////////////////////////////////////////////////////////
-// 
+//
 // Construct empty axis object
 //
 flexIRF::GIRFAxis::GIRFAxis(VarType vartype) :
@@ -45,7 +45,7 @@ flexIRF::GIRFAxis::GIRFAxis(VarType vartype) :
 
 
 ////////////////////////////////////////////////////////////////
-// 
+//
 // Check that the vector describe consistently the axis
 //
 int flexIRF::GIRFAxis::CheckAxisConsistency() {
@@ -292,7 +292,7 @@ bool flexIRF::GIRFAxis::IsFoV() const{
 
 
 ////////////////////////////////////////////////////////////////
-// 
+//
 // Write the header of the axis HDU
 //
 int const flexIRF::GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, int& lastID,
@@ -445,5 +445,3 @@ int const flexIRF::GIRFAxis::WriteAxis(fitsfile* fptr, long size, float* data, i
 
 	return *status;
 }
-
-
